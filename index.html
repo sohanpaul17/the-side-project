@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Side Project</title>
+<meta name="description" content="The Side Project — customised, hand-illustrated Lovebooks about you and your favourite people.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="home">
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow reveal">Hand-illustrated · Printed · PDF copy</span>
+        <h1 class="h-display h1" style="margin-top:20px">
+          <span class="split-line"><span>Made for</span></span>
+          <span class="split-line"><span style="--d:.1s">your everyday</span></span>
+          <span class="split-line"><span style="--d:.2s;color:var(--accent)">side quests.</span></span>
+        </h1>
+        <p class="lead reveal" style="--d:.35s">Customised Lovebooks that tell your story in little illustrated pages — drawn by hand, printed, and delivered with a PDF copy.</p>
+        <div class="hero-actions reveal" style="--d:.45s">
+          <a href="shop.html" class="btn btn-lg">Explore the shop <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a href="about.html" class="btn btn-ghost btn-lg">Meet the maker</a>
+        </div>
+        <div class="hero-meta reveal" style="--d:.55s">
+          <div><strong>24</strong>Pages max</div>
+          <div><strong>Print + PDF</strong>With every book</div>
+          <div><strong>1:1</strong>Personal service</div>
+        </div>
+      </div>
+      <div class="hero-logo reveal reveal-scale" style="--d:.15s">
+        <img src="assets/logo.png" alt="The Side Project — a little bit of everything">
+        <span class="hero-star s1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z"/></svg></span>
+        <span class="hero-star s2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z"/></svg></span>
+        <span class="hero-star s3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z"/></svg></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow reveal">Featured</span>
+          <h2 class="h-display h2" style="margin-top:14px"><span class="split-line"><span>Our Lovebooks</span></span></h2>
+        </div>
+        <a href="shop.html" class="btn btn-ghost reveal">View all products <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="carousel reveal" id="featured-carousel">
+        <div class="carousel-viewport"><div class="carousel-track" id="carousel-track"></div></div>
+        <div class="carousel-controls">
+          <button class="circle-btn prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
+          <span class="carousel-count">01 / 01</span>
+          <div class="carousel-progress"><i></i></div>
+          <button class="circle-btn next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="features">
+        <div class="feature reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg></div><h3>Printed &amp; delivered</h3><p>Your book is printed on quality paper and sent to your door — shipping within India included.</p></div>
+        <div class="feature reveal" style="--d:.1s"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6M12 18v-6M9 15l3 3 3-3"/></svg></div><h3>PDF copy included</h3><p>Every book comes with a PDF copy to keep forever and share with your person.</p></div>
+        <div class="feature reveal" style="--d:.2s"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/></svg></div><h3>Order by message</h3><p>Tap Buy now and chat with me directly on WhatsApp or Instagram.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="cta-band reveal reveal-scale">
+        <span class="orbit"></span>
+        <div style="position:relative">
+          <span class="eyebrow" style="color:rgba(244,236,223,.6)">Something custom?</span>
+          <h2 class="h-display h2" style="margin:16px 0 14px">Have an idea?<br>Let's make it.</h2>
+          <p>Want a different story, theme or page count? Send me a message and we'll make it together.</p>
+        </div>
+        <div class="cta-actions">
+          <a class="btn btn-lg btn-wa js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.8 11.8 0 002 17.7L.3 24l6.4-1.7A11.8 11.8 0 0024 12c0-3.2-1.2-6.2-3.5-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1112 21.8z"/></svg> Chat on WhatsApp</a>
+          <a class="btn btn-lg btn-ig js-ig" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg> Follow on Instagram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
