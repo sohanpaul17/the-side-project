@@ -204,6 +204,37 @@ const PRODUCTS = [
       "assets/products/journey-map-6.webp",
     ],
   },
+  {
+    id: "customised-calendar-magnet",
+    title: "Customised Calendar Fridge Magnet",
+    category: "Custom",
+    price: 599,
+    featured: true,
+    badge: "New",
+    formats: ["print"],
+    palette: ["#fde2ea", "#1b1b1b", "#e0456e"],
+    motif: "grid",
+    short: "A whole year on your fridge — with your names and cute characters that look like you.",
+    description:
+      "A 2027 calendar magnet that's all yours. Your names and a little line of your choice sit beside cute characters drawn to look like you, with all twelve months laid out in big, easy-to-read numbers, Sundays in pink and a cute doodle for every month. Your special dates — birthdays, anniversaries, date nights — are marked with little hearts. Make one for your partner, your family, your siblings or your grandparents, and see it every day.",
+    details: [
+      "Your names and cute characters that look like you",
+      "All 12 months of 2027, with your special dates marked in hearts",
+      "Horizontal (13.9 × 10.7 cm) or vertical (10.7 × 13.9 cm)",
+      "About postcard-sized, 0.3 cm thick",
+      "Gift-ready, delivered to your door",
+      "Design preview shared with you before it's printed",
+    ],
+    images: [
+      "assets/products/calendar-magnet-1.webp",
+      "assets/products/calendar-magnet-2.webp",
+      "assets/products/calendar-magnet-3.webp",
+      "assets/products/calendar-magnet-4.webp",
+      "assets/products/calendar-magnet-5.webp",
+      "assets/products/calendar-magnet-6.webp",
+      "assets/products/calendar-magnet-7.webp",
+    ],
+  },
 ];
 
 /* ---------------------------------------------------------
