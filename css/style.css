@@ -676,3 +676,17 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 #grid.product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 760px) { #grid.product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; } }
 @media (max-width: 460px) { #grid.product-grid { grid-template-columns: 1fr; } }
+
+/* Contact page icons */
+.contact-ico { width: 96px; height: 96px; border-radius: 28px; display: grid; place-items: center; color: #fff; flex: none; transform: rotate(-6deg); transition: transform .5s var(--ease); box-shadow: 0 18px 36px -18px rgba(0,0,0,.5); }
+.contact-ico svg { width: 48px; height: 48px; }
+.contact-card:hover .contact-ico { transform: rotate(4deg) scale(1.06); }
+.ci-wa { background: #25d366; }
+.ci-ig { background: linear-gradient(45deg, #f09433, #dc2743 55%, #bc1888); }
+.ci-mail { background: var(--accent); width: 60px; height: 60px; border-radius: 18px; }
+.ci-mail svg { width: 28px; height: 28px; }
+.contact-mail { grid-template-columns: auto 1fr auto !important; padding: 24px 30px !important; }
+.contact-mail b { display: block; font-size: 19px; }
+.contact-mail > svg { width: 22px; transition: transform .35s var(--ease); }
+.contact-mail:hover > svg { transform: translateX(5px); }
+@media (max-width: 480px) { .contact-card .contact-ico:not(.ci-mail) { width: 72px; height: 72px; border-radius: 22px; } .contact-card .contact-ico:not(.ci-mail) svg { width: 36px; height: 36px; } }

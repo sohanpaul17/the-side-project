@@ -183,10 +183,6 @@
       </div>`;
     document.body.append(footer);
 
-    const fab = document.createElement("a");
-    fab.className = "fab"; fab.href = waLink("Hi! I found you through your website."); fab.target = "_blank"; fab.rel = "noopener";
-    fab.setAttribute("aria-label", "Chat on WhatsApp"); fab.innerHTML = I.wa;
-    document.body.append(fab);
 
     $(".menu-btn").addEventListener("click", () => document.body.classList.toggle("menu-open"));
     const onScroll = () => header.classList.toggle("scrolled", scrollY > 10);
