@@ -176,6 +176,8 @@ const PRODUCTS = [
     title: "Customised Journey Map",
     category: "Custom",
     price: 399,
+    priceNote: "Including shipping within India",
+    shippingNote: "International shipping costs extra",
     featured: true,
     badge: "New",
     formats: ["print", "pdf"],
@@ -191,6 +193,7 @@ const PRODUCTS = [
       "Printed copy delivered, plus a PDF copy",
       "For couples, families and best friends",
       "Preview shared with you before it's printed",
+      "Price includes shipping within India — international shipping costs extra",
     ],
     images: [
       "assets/products/map-story-1.webp",
