@@ -209,6 +209,8 @@ const PRODUCTS = [
     title: "Customised Calendar Fridge Magnet",
     category: "Custom",
     price: 599,
+    priceNote: "Including shipping within India",
+    shippingNote: "International shipping costs extra",
     featured: true,
     badge: "New",
     formats: ["print"],
@@ -224,6 +226,7 @@ const PRODUCTS = [
       "About postcard-sized, 0.3 cm thick",
       "Gift-ready, delivered to your door",
       "Design preview shared with you before it's printed",
+      "Price includes shipping within India — international shipping costs extra",
     ],
     images: [
       "assets/products/calendar-magnet-1.webp",
