@@ -99,8 +99,8 @@ const PRODUCTS = [
       "Price includes shipping within India — international shipping costs extra",
     ],
     images: [
-      "assets/products/mini-lovebook-1.jpg",
       "assets/products/mini-lovebook-2.jpg",
+      "assets/products/mini-lovebook-1.jpg",
       "assets/products/mini-lovebook-3.jpg",
       "assets/products/mini-lovebook-4.jpg",
       "assets/products/mini-lovebook-5.webp",
