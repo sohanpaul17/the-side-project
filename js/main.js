@@ -384,8 +384,8 @@
   }
 
   /* ---------- Logo star orbit ----------
-     The hero logo's star rests in its usual spot, then glides once around
-     the orbit line (passing behind the wordmark), leaving a sparkle trail. */
+     The hero logo's star circles the orbit line continuously at a steady pace
+     (passing behind the wordmark), leaving a sparkle trail. */
   function initLogoOrbit() {
     const svg = $(".logo-orbit");
     if (!svg) return;
@@ -424,36 +424,24 @@
       c.setAttribute("fill", i % 3 === 0 ? "#d9653b" : "#161513");
       c.setAttribute("r", "0"); trail.appendChild(c); dots.push(c);
     }
-    const ease = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
-    const REST = 2800, TRAVEL = 5400;
-    let start = performance.now(), visible = true, history = [];
+    // one full lap every LAP ms, round and round without stopping
+    const LAP = 14000, SPIN = 9000, TRAIL_GAP = 0.04; // trail dots sit this far (radians) behind each other
+    let start = performance.now(), visible = true;
 
     const io2 = new IntersectionObserver(([en]) => (visible = en.isIntersecting));
     io2.observe(svg);
-    // hovering the logo launches the star straight away
-    svg.closest(".hero-logo").addEventListener("mouseenter", () => {
-      const e = (performance.now() - start) % (REST + TRAVEL);
-      if (e < REST) start -= REST - e;
-    });
 
     function frame(now) {
       requestAnimationFrame(frame);
       if (!visible) return;
-      const e = (now - start) % (REST + TRAVEL);
-      if (e < REST) {
-        // resting: a soft twinkle
-        const k = e / REST, tw = Math.sin(k * Math.PI * 4);
-        place(HOME.x, HOME.y, 1 + 0.06 * tw, 6 * Math.sin(k * Math.PI * 2));
-        history = [];
-      } else {
-        const k = ease((e - REST) / TRAVEL), t = t0 + dir * k * Math.PI * 2, p = pos(t);
-        place(p.x, p.y, size(t), k * 360);
-        history.unshift(p); if (history.length > DOTS * 2) history.length = DOTS * 2;
-      }
+      const e = now - start;
+      const t = t0 + dir * ((e % LAP) / LAP) * Math.PI * 2, p = pos(t);
+      const twinkle = 1 + 0.05 * Math.sin(e / 450);
+      place(p.x, p.y, size(t) * twinkle, ((e % SPIN) / SPIN) * 360);
       dots.forEach((c, i) => {
-        const p = history[i * 2 + 2];
-        if (!p) { c.setAttribute("r", "0"); return; }
+        const q = pos(t - dir * TRAIL_GAP * (i + 1));
         const f = 1 - i / DOTS;
+        const p = q;
         c.setAttribute("cx", p.x.toFixed(1)); c.setAttribute("cy", p.y.toFixed(1));
         c.setAttribute("r", (7 * f).toFixed(2)); c.setAttribute("opacity", (0.75 * f).toFixed(2));
       });
