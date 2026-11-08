@@ -138,6 +138,36 @@ const PRODUCTS = [
       "assets/products/love-letter-6.webp",
     ],
   },
+  {
+    id: "customised-notebook",
+    title: "Customised Notebook",
+    category: "Custom",
+    price: 799,
+    featured: true,
+    badge: "New",
+    formats: ["print"],
+    palette: ["#f7c6d9", "#1b1b1b", "#e0456e"],
+    motif: "lines",
+    short: "A spiral notebook with your names and cute characters that look like you on the cover.",
+    description:
+      "A notebook that's unmistakably yours. The cover is drawn just for you — your names, a little line of your choice, and cute characters that look like you (or the person you're gifting it to). Pick the inside pages that suit you: ruled for journaling, blank for sketching, dotted for bullet journals or planner pages to stay organised. Make one for your partner, your sibling, your grandparents — or just for you.",
+    details: [
+      "Custom cover with your names and characters that look like you",
+      "Choose A4 (21 × 29.7 cm) or A5 (14.8 × 21 cm)",
+      "Inside pages: ruled, blank, dotted or planner",
+      "Spiral bound",
+      "Gift-ready, delivered to your door",
+      "Cover preview shared with you before it's printed",
+    ],
+    images: [
+      "assets/products/notebook-1.webp",
+      "assets/products/notebook-2.webp",
+      "assets/products/notebook-3.webp",
+      "assets/products/notebook-4.webp",
+      "assets/products/notebook-5.webp",
+      "assets/products/notebook-6.webp",
+    ],
+  },
 ];
 
 /* ---------------------------------------------------------
