@@ -191,7 +191,7 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 
 /* ============ Product card ============ */
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: clamp(16px, 2.4vw, 30px); }
-.product-grid.few { grid-template-columns: repeat(2, minmax(0, 460px)); }
+.product-grid.few { grid-template-columns: repeat(auto-fit, minmax(260px, 420px)); }
 .product-grid.few .card-media { aspect-ratio: 1 / 1; }
 @media (max-width: 600px) { .product-grid.few { grid-template-columns: 1fr; } }
 .card { position: relative; display: block; border-radius: var(--radius); }

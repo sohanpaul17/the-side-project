@@ -106,6 +106,35 @@ const PRODUCTS = [
       "assets/products/mini-lovebook-5.webp",
     ],
   },
+  {
+    id: "customised-love-letter",
+    title: "Customised Love Letter",
+    category: "Custom",
+    price: 399,
+    featured: true,
+    badge: "New",
+    formats: ["print", "pdf"],
+    palette: ["#fde8d8", "#1b1b1b", "#e0456e"],
+    motif: "lines",
+    short: "Say it with a drawing — your words plus one big illustration of you two, ready to frame.",
+    description:
+      "Some feelings deserve more than a text. The Customised Love Letter pairs your own words with one big, hand-drawn illustration of your favourite moment together — the first trip, the proposal, an ordinary Tuesday — with characters drawn to look just like you. Write what you feel and I'll lay it out in a beautiful handwritten style, printed and ready to frame. Perfect for proposals, anniversaries and long-distance surprises, for your girlfriend, boyfriend, husband, wife, mom, dad or best friend.",
+    details: [
+      "One custom illustration of your favourite moment, with characters that look like you",
+      "Your letter, laid out in a handwritten style",
+      "Choose A4 (21 × 29.7 cm) or A3 (29.7 × 42 cm) — both fit a standard frame",
+      "Printed copy delivered, plus a PDF copy",
+      "Preview shared with you before it's finalised",
+    ],
+    images: [
+      "assets/products/love-letter-1.webp",
+      "assets/products/love-letter-2.webp",
+      "assets/products/love-letter-3.webp",
+      "assets/products/love-letter-4.webp",
+      "assets/products/love-letter-5.webp",
+      "assets/products/love-letter-6.webp",
+    ],
+  },
 ];
 
 /* ---------------------------------------------------------

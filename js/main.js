@@ -347,6 +347,7 @@
       bar.style.width = (pv / total) * 100 + "%";
       bar.style.left = (index / total) * 100 + "%";
       count.textContent = `${String(index + 1).padStart(2, "0")} / ${String(m + 1).padStart(2, "0")}`;
+      $(".carousel-controls", root).style.display = m === 0 ? "none" : ""; // everything already fits
     }
     const play = () => { clearInterval(timer); timer = setInterval(() => go(index + 1), 4200); };
     const stop = () => clearInterval(timer);
@@ -479,7 +480,6 @@
     track.innerHTML = featured.map(card).join("");
     track.classList.toggle("few", featured.length <= 2);
     initCarousel($("#featured-carousel"));
-    if (featured.length <= 2) $(".carousel-controls").style.display = "none";
     if ($("#latest-grid")) $("#latest-grid").innerHTML = PRODUCTS.slice(0, 4).map(card).join("");
     $$(".js-wa").forEach((a) => (a.href = waLink("Hi! I'd love to know more about your products.")));
     $$(".js-ig").forEach((a) => (a.href = igProfile()));
@@ -498,7 +498,7 @@
       if (state.sort === "high") list = [...list].sort((a, b) => b.price - a.price);
       if (state.sort === "az") list = [...list].sort((a, b) => a.title.localeCompare(b.title));
       $("#count").textContent = `Showing ${list.length} of ${PRODUCTS.length} products`;
-      $("#grid").classList.toggle("few", list.length > 0 && list.length <= 2);
+      $("#grid").classList.toggle("few", list.length > 0 && list.length <= 3);
       $("#grid").innerHTML = list.length ? list.map(card).join("") : `<div class="empty" style="grid-column:1/-1">Nothing matches that yet — try another search.</div>`;
     };
     $("#chips").addEventListener("click", (e) => {
@@ -610,7 +610,7 @@
     // related
     const related = PRODUCTS.filter((x) => x.id !== p.id).sort((a, b) => (b.category === p.category) - (a.category === p.category)).slice(0, 4);
     $("#related").innerHTML = related.map(card).join("");
-    $("#related").classList.toggle("few", related.length <= 2);
+    $("#related").classList.toggle("few", related.length <= 3);
   }
 
   function aboutPage() {
