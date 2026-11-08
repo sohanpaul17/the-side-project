@@ -17,6 +17,13 @@ const STORE = {
   instagramHandle: "shoptheside/",    // without the @
   email: "sanjoysohan17@gmail.com",
 
+  // Customer reviews are stored in Supabase (see supabase/reviews.sql).
+  // The publishable key is meant to be public; never put a "secret" or "service_role" key here.
+  reviewsDb: {
+    url: "https://gwzappsbbagutxkpuooq.supabase.co",
+    key: "sb_publishable_dIhrl8wAo5oGZxNO5Ndfng_IOLidyi0",
+  },
+
   founder: {
     name: "Sohan",
     role: "Founder & Maker",
@@ -102,9 +109,10 @@ const PRODUCTS = [
 ];
 
 /* ---------------------------------------------------------
-   REVIEWS
-   Customers send reviews from the Reviews page; they arrive on
-   your WhatsApp. To publish one, add it below (newest first):
+   EXTRA REVIEWS (optional)
+   Reviews customers post on the Reviews page are saved in Supabase
+   and appear automatically. You can also add reviews you received
+   elsewhere (e.g. on WhatsApp) here, newest first:
 
    {
      name: "Priya",                       // first name is fine

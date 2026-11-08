@@ -38,10 +38,10 @@
         <div class="rv-write-side">
           <span class="eyebrow" style="color:rgba(244,236,223,.6)">Share your story</span>
           <h2 class="h-display h2" style="margin:16px 0 14px;color:var(--cream)">Loved your<br>Lovebook?</h2>
-          <p>Tell us how it went — the reaction, the tears, the "you made this?!" moment. Your review is sent to me on WhatsApp, and I'll add it to this page.</p>
+          <p>Tell us how it went — the reaction, the tears, the "you made this?!" moment. Post it here and it shows up on this page right away.</p>
           <ul class="rv-perks">
             <li>Takes less than a minute</li>
-            <li>Add a photo of your book in the chat if you like</li>
+            <li>Posted instantly — no sign-up needed</li>
             <li>Only your first name is shown</li>
           </ul>
         </div>
@@ -60,9 +60,10 @@
           <label class="rv-field"><span>Your review *</span><textarea name="text" rows="5" maxlength="800" required placeholder="What did you love about it? How did they react?"></textarea><small class="rv-count" id="rv-count">0 / 800</small></label>
           <label class="rv-consent"><input type="checkbox" name="consent" required><span>I'm happy for my review and first name to appear on this website.</span></label>
           <p class="rv-error" id="rv-error" role="alert"></p>
-          <button class="btn btn-lg btn-block btn-wa" type="submit" id="rv-send"></button>
-          <button class="btn btn-ghost btn-block" type="button" id="rv-ig"></button>
-          <p class="rv-note">WhatsApp opens with your review typed in — just press send. For Instagram, your review is copied so you can paste it into the DM.</p>
+          <!-- hidden from people; bots that fill it in are ignored -->
+          <label class="rv-hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
+          <button class="btn btn-lg btn-block" type="submit" id="rv-send"></button>
+          <p class="rv-note">Your review appears on this page straight away. Prefer to message me instead? <a id="rv-wa" target="_blank" rel="noopener">Chat on WhatsApp</a></p>
         </form>
       </div>
     </div>

@@ -19,9 +19,13 @@ The Buy Now WhatsApp and Instagram links update automatically from your number a
 
 ## Reviews
 
-Customers write reviews on the **Reviews** page (`reviews.html`). Pressing send opens WhatsApp with the review already typed in, addressed to your number. They can also copy it into an Instagram DM. Nothing is published automatically.
+Customers post reviews on the **Reviews** page (`reviews.html`). Each review is saved to a free **Supabase** database and appears on the Reviews page and on that product's page straight away.
 
-To publish a review, add it to the `REVIEWS` list at the bottom of `js/data.js` (newest first). There's a template there. It then shows on the Reviews page and on that product's page, with a star rating next to the product title. Customer photos go in `assets/reviews/`.
+- **One-time setup:** in Supabase, open **SQL Editor → New query**, paste the contents of `supabase/reviews.sql`, and click **Run**.
+- **Delete or edit a review:** go to Supabase → **Table Editor → reviews**.
+- **Approve reviews before they appear:** run `alter table public.reviews alter column approved set default false;` in the SQL Editor. New reviews then stay hidden until you tick **approved**.
+- **Supabase key:** the connection settings are `reviewsDb` in `js/data.js`. Only the *publishable* key belongs there; never the secret key.
+- **Reviews from elsewhere:** you can add reviews you received another way (WhatsApp, for example) to the `REVIEWS` list at the bottom of `js/data.js`.
 
 ## Previewing
 

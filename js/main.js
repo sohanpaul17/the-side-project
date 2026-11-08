@@ -625,15 +625,44 @@
     $$(".acc-head").forEach((h) => h.addEventListener("click", () => h.parentElement.classList.toggle("open")));
   }
 
-  /* ---------- Reviews ---------- */
-  const ALL_REVIEWS = (typeof REVIEWS !== "undefined" ? REVIEWS : []).filter((r) => r && r.text && r.rating);
+  /* ---------- Reviews ----------
+     Reviews posted on the site live in Supabase (table "reviews", see supabase/reviews.sql).
+     Anything in REVIEWS (js/data.js) is shown too. */
+  const DB = STORE.reviewsDb || {};
+  const STATIC_REVIEWS = (typeof REVIEWS !== "undefined" ? REVIEWS : []).filter((r) => r && r.text && r.rating);
   const STAR_PATH = "M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z";
   const starsHtml = (n, cls = "") =>
-    `<span class="rv-stars ${cls}" aria-label="${n} out of 5 stars">${[1, 2, 3, 4, 5]
+    `<span class="rv-stars ${cls}" aria-label="${Number(n).toFixed(1)} out of 5 stars">${[1, 2, 3, 4, 5]
       .map((i) => `<svg viewBox="0 0 24 24" class="${i <= n + 0.25 ? "on" : ""}"><path d="${STAR_PATH}"/></svg>`).join("")}</span>`;
-  const productName = (id) => (PRODUCTS.find((p) => p.id === id) || {}).title || "";
   const fmtDate = (d) => { const t = new Date(d); return isNaN(t) ? "" : t.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); };
   const avgRating = (list) => (list.length ? list.reduce((s, r) => s + Number(r.rating), 0) / list.length : 0);
+  const dbHeaders = () => ({ apikey: DB.key, "Content-Type": "application/json" });
+
+  let reviewsCache = null;
+  async function loadReviews() {
+    if (reviewsCache) return reviewsCache;
+    let remote = [];
+    if (DB.url && DB.key) {
+      try {
+        const res = await fetch(`${DB.url}/rest/v1/reviews?select=id,created_at,name,city,product,rating,body&order=created_at.desc&limit=500`, { headers: dbHeaders() });
+        if (!res.ok) throw new Error(res.status + " " + (await res.text()));
+        remote = (await res.json()).map((r) => ({ id: r.id, name: r.name, city: r.city, product: r.product, rating: r.rating, date: r.created_at, text: r.body }));
+      } catch (err) {
+        console.warn("Could not load reviews from Supabase:", err);
+      }
+    }
+    reviewsCache = [...remote, ...STATIC_REVIEWS].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    return reviewsCache;
+  }
+  async function postReview(review) {
+    const res = await fetch(`${DB.url}/rest/v1/reviews`, {
+      method: "POST",
+      headers: { ...dbHeaders(), Prefer: "return=minimal" },
+      body: JSON.stringify(review),
+    });
+    if (!res.ok) throw new Error(res.status + " " + (await res.text()));
+  }
+
   function reviewCard(r, i = 0) {
     const prod = PRODUCTS.find((p) => p.id === r.product);
     return `
@@ -644,118 +673,135 @@
         <footer>
           <span class="rv-avatar">${esc((r.name || "?").trim().charAt(0).toUpperCase())}</span>
           <span><b>${esc(r.name)}</b>${r.city ? `<small>${esc(r.city)}</small>` : ""}</span>
-          <span class="rv-meta">${prod ? `<a href="${productUrl(prod)}">${esc(prod.title)}</a>` : ""}${r.date ? `<small>${fmtDate(r.date)}</small>` : ""}</span>
+          <span class="rv-meta">${prod ? `<a href="${productUrl(prod)}">${esc(prod.title)}</a>` : "<span></span>"}${r.date ? `<small>${fmtDate(r.date)}</small>` : ""}</span>
         </footer>
       </article>`;
   }
+  const skeletons = (n) => Array.from({ length: n }, () => `<div class="rv-card rv-skel"><i></i><i></i><i></i></div>`).join("");
 
   function reviewsPage() {
     const params = new URLSearchParams(location.search);
-    const withReviews = PRODUCTS.filter((p) => ALL_REVIEWS.some((r) => r.product === p.id));
-    let filter = "all";
+    let all = [], filter = "all";
+    $("#rv-summary").hidden = true;
+    $("#rv-chips").hidden = true;
+    $("#rv-grid").innerHTML = skeletons(3);
 
-    // summary
-    const avg = avgRating(ALL_REVIEWS);
-    $("#rv-summary").innerHTML = ALL_REVIEWS.length
-      ? `<div class="rv-score"><strong>${avg.toFixed(1)}</strong>${starsHtml(avg, "lg")}<span>${ALL_REVIEWS.length} review${ALL_REVIEWS.length > 1 ? "s" : ""}</span></div>
-         <div class="rv-bars">${[5, 4, 3, 2, 1].map((n) => {
-           const c = ALL_REVIEWS.filter((r) => Math.round(r.rating) === n).length, pct = (c / ALL_REVIEWS.length) * 100;
-           return `<div class="rv-bar"><span>${n}★</span><i><b style="width:${pct}%"></b></i><span>${c}</span></div>`;
-         }).join("")}</div>`
-      : "";
-    $("#rv-summary").hidden = !ALL_REVIEWS.length;
-
-    // filter chips (only when there's something to filter)
-    const chips = $("#rv-chips");
-    if (withReviews.length > 1) {
-      chips.innerHTML = [`<button class="chip active" data-f="all">All</button>`, ...withReviews.map((p) => `<button class="chip" data-f="${esc(p.id)}">${esc(p.title)}</button>`)].join("");
-      chips.addEventListener("click", (e) => {
-        const b = e.target.closest(".chip"); if (!b) return;
-        filter = b.dataset.f; $$(".chip", chips).forEach((c) => c.classList.toggle("active", c === b)); renderList();
-      });
-    } else chips.hidden = true;
-
+    function renderSummary() {
+      const avg = avgRating(all);
+      $("#rv-summary").hidden = !all.length;
+      if (!all.length) return;
+      $("#rv-summary").innerHTML = `<div class="rv-score"><strong>${avg.toFixed(1)}</strong>${starsHtml(avg, "lg")}<span>${all.length} review${all.length > 1 ? "s" : ""}</span></div>
+        <div class="rv-bars">${[5, 4, 3, 2, 1].map((n) => {
+          const c = all.filter((r) => Math.round(r.rating) === n).length, pct = (c / all.length) * 100;
+          return `<div class="rv-bar"><span>${n}★</span><i><b style="width:${pct}%"></b></i><span>${c}</span></div>`;
+        }).join("")}</div>`;
+    }
+    function renderChips() {
+      const withReviews = PRODUCTS.filter((p) => all.some((r) => r.product === p.id));
+      const chips = $("#rv-chips");
+      chips.hidden = withReviews.length < 2;
+      if (filter !== "all" && !withReviews.some((p) => p.id === filter)) filter = "all";
+      chips.innerHTML = [`<button class="chip ${filter === "all" ? "active" : ""}" data-f="all">All</button>`,
+        ...withReviews.map((p) => `<button class="chip ${filter === p.id ? "active" : ""}" data-f="${esc(p.id)}">${esc(p.title)}</button>`)].join("");
+    }
     function renderList() {
-      const list = ALL_REVIEWS.filter((r) => filter === "all" || r.product === filter);
+      const list = all.filter((r) => filter === "all" || r.product === filter);
       $("#rv-grid").innerHTML = list.length
         ? list.map(reviewCard).join("")
         : `<div class="rv-empty">${STAR()}<h3>No reviews yet</h3><p>Got your Lovebook? You could be the very first story here.</p><a href="#write" class="btn">Write the first review</a></div>`;
     }
-    renderList();
+    const renderAll = () => { renderSummary(); renderChips(); renderList(); };
+    $("#rv-chips").addEventListener("click", (e) => {
+      const b = e.target.closest(".chip"); if (!b) return;
+      filter = b.dataset.f; renderChips(); renderList();
+    });
+    loadReviews().then((list) => { all = list.slice(); renderAll(); });
 
-    // form
+    // ----- form -----
     const form = $("#rv-form"), sel = $("#rv-product");
     sel.innerHTML = `<option value="">Choose a book</option>` + PRODUCTS.map((p) => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join("");
     if (PRODUCTS.some((p) => p.id === params.get("product"))) sel.value = params.get("product");
     let rating = 0;
     const starsEl = $("#rv-stars");
-    const labels = ["", "Not for me", "It was okay", "Good", "Loved it", "Absolutely perfect"];
+    const labels = ["Tap to rate", "Not for me", "It was okay", "Good", "Loved it", "Absolutely perfect"];
     starsEl.innerHTML = [1, 2, 3, 4, 5].map((i) => `<button type="button" role="radio" aria-checked="false" aria-label="${i} star${i > 1 ? "s" : ""}" data-v="${i}"><svg viewBox="0 0 24 24"><path d="${STAR_PATH}"/></svg></button>`).join("") + `<em id="rv-star-label">Tap to rate</em>`;
     const paint = (v) => $$("button", starsEl).forEach((b) => b.classList.toggle("on", +b.dataset.v <= v));
+    const setRating = (v) => {
+      rating = v; paint(v);
+      $$("button", starsEl).forEach((x) => x.setAttribute("aria-checked", String(+x.dataset.v === v)));
+      $("#rv-star-label").textContent = labels[v];
+    };
     starsEl.addEventListener("mouseover", (e) => { const b = e.target.closest("button"); if (b) paint(+b.dataset.v); });
     starsEl.addEventListener("mouseleave", () => paint(rating));
     starsEl.addEventListener("click", (e) => {
       const b = e.target.closest("button"); if (!b) return;
-      rating = +b.dataset.v; paint(rating);
-      $$("button", starsEl).forEach((x) => x.setAttribute("aria-checked", String(+x.dataset.v === rating)));
-      $("#rv-star-label").textContent = labels[rating];
+      setRating(+b.dataset.v);
       b.animate([{ transform: "scale(1)" }, { transform: "scale(1.35)" }, { transform: "scale(1)" }], { duration: 350, easing: "ease-out" });
     });
     const ta = form.text;
     ta.addEventListener("input", () => ($("#rv-count").textContent = `${ta.value.length} / 800`));
-    $("#rv-send").innerHTML = `${I.wa} Send review on WhatsApp`;
-    $("#rv-ig").innerHTML = `${I.ig} Send on Instagram instead`;
+    const sendBtn = $("#rv-send"), sendLabel = `${I.heart} Post my review`;
+    sendBtn.innerHTML = sendLabel;
+    $("#rv-wa").href = waLink("Hi! I'd like to share some feedback about my Lovebook.");
 
-    function compose() {
-      const err = $("#rv-error");
-      const name = form.name.value.trim(), text = ta.value.trim();
-      const problem = !name ? "Please add your name." : !sel.value ? "Please choose which book you got." : !rating ? "Please choose a star rating." : text.length < 10 ? "Please write a few words about your book." : !form.consent.checked ? "Please tick the box so I can show your review." : "";
-      err.textContent = problem;
-      if (problem) { err.classList.remove("shake"); void err.offsetWidth; err.classList.add("shake"); return null; }
-      const city = form.city.value.trim();
-      return [
-        `⭐ New review for ${STORE.name}`,
-        ``,
-        `Name: ${name}`,
-        city ? `City: ${city}` : null,
-        `Product: ${productName(sel.value)}`,
-        `Rating: ${"★".repeat(rating)}${"☆".repeat(5 - rating)} (${rating}/5)`,
-        ``,
-        `"${text}"`,
-        ``,
-        `✅ Happy for this to appear on the website.`,
-      ].filter((l) => l !== null).join("\n");
-    }
-    form.addEventListener("submit", (e) => {
+    const err = $("#rv-error");
+    const fail = (msg) => { err.textContent = msg; err.classList.remove("shake"); void err.offsetWidth; err.classList.add("shake"); };
+    const RECENT_KEY = "sp-review-posted";
+    const recentlyPosted = () => { try { return Date.now() - Number(localStorage.getItem(RECENT_KEY) || 0) < 864e5; } catch { return false; } };
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const msg = compose(); if (!msg) return;
-      window.open(waLink(msg), "_blank", "noopener");
-      toast("Opening WhatsApp — just press send 💌");
+      const name = form.name.value.trim(), city = form.city.value.trim(), text = ta.value.trim();
+      const problem = !name ? "Please add your name." : !sel.value ? "Please choose which book you got." : !rating ? "Please choose a star rating."
+        : text.length < 10 ? "Please write a few words about your book (at least 10 characters)." : !form.consent.checked ? "Please tick the box so your review can be shown."
+        : recentlyPosted() ? "Thanks — you've already posted a review today. You can post another tomorrow." : "";
+      if (problem) return fail(problem);
+      err.textContent = "";
+      const review = { name, city: city || null, product: sel.value, rating, body: text };
+      if (form.website.value) { done(); return; } // hidden field: only bots fill it in
+
+      sendBtn.disabled = true; sendBtn.innerHTML = `<span class="rv-spinner"></span> Posting…`;
+      try {
+        await postReview(review);
+        try { localStorage.setItem(RECENT_KEY, String(Date.now())); } catch {}
+        all.unshift({ ...review, text, date: new Date().toISOString() });
+        if (reviewsCache) reviewsCache = all.slice();
+        filter = "all"; renderAll();
+        done();
+        const first = $("#rv-grid .rv-card");
+        if (first) { first.classList.add("rv-new"); setTimeout(() => first.scrollIntoView({ behavior: "smooth", block: "center" }), 250); }
+      } catch (ex) {
+        console.warn(ex);
+        fail("Sorry, your review couldn't be posted right now. Please try again in a moment, or send it to me on WhatsApp.");
+      } finally {
+        sendBtn.disabled = false; sendBtn.innerHTML = sendLabel;
+      }
     });
-    $("#rv-ig").addEventListener("click", async () => {
-      const msg = compose(); if (!msg) return;
-      try { await navigator.clipboard.writeText(msg); toast("Review copied — paste it in the DM"); } catch { toast("Opening Instagram…"); }
-      window.open(igLink(), "_blank", "noopener");
-    });
+    function done() {
+      form.reset(); setRating(0); $("#rv-count").textContent = "0 / 800";
+      toast("Thank you! Your review is live 💌");
+    }
   }
 
   // reviews block on each product page
-  function productReviews(p) {
+  async function productReviews(p) {
     const box = $("#pdp-reviews"); if (!box) return;
-    const list = ALL_REVIEWS.filter((r) => r.product === p.id);
     const writeUrl = `reviews.html?product=${encodeURIComponent(p.id)}#write`;
-    if (list.length) {
-      const avg = avgRating(list);
-      const title = $(".pdp-title");
-      if (title) title.insertAdjacentHTML("afterend", `<a class="pdp-rating" href="#pdp-reviews">${starsHtml(avg)} <span>${avg.toFixed(1)} · ${list.length} review${list.length > 1 ? "s" : ""}</span></a>`);
-    }
-    box.innerHTML = `
+    const head = (title) => `
       <div class="section-head">
-        <div><span class="eyebrow reveal">Reviews</span><h2 class="h-display h2" style="margin-top:14px"><span class="split-line"><span>${list.length ? "What people say" : "No reviews yet"}</span></span></h2></div>
-        <a href="${writeUrl}" class="btn btn-ghost reveal">Write a review ${I.arrow}</a>
-      </div>
-      ${list.length ? `<div class="rv-grid">${list.slice(0, 6).map(reviewCard).join("")}</div>${list.length > 6 ? `<p style="margin-top:24px"><a class="btn" href="reviews.html">See all ${list.length} reviews ${I.arrow}</a></p>` : ""}`
-        : `<p class="muted reveal">Got this book? Your review would be the very first — <a href="${writeUrl}" style="text-decoration:underline">share it here</a>.</p>`}`;
+        <div><span class="eyebrow">Reviews</span><h2 class="h-display h2" style="margin-top:14px">${title}</h2></div>
+        <a href="${writeUrl}" class="btn btn-ghost">Write a review ${I.arrow}</a>
+      </div>`;
+    box.innerHTML = head("What people say") + `<div class="rv-grid">${skeletons(2)}</div>`;
+    const list = (await loadReviews()).filter((r) => r.product === p.id);
+    if (list.length) {
+      const avg = avgRating(list), title = $(".pdp-title");
+      if (title && !$(".pdp-rating")) title.insertAdjacentHTML("afterend", `<a class="pdp-rating" href="#pdp-reviews">${starsHtml(avg)} <span>${avg.toFixed(1)} · ${list.length} review${list.length > 1 ? "s" : ""}</span></a>`);
+      box.innerHTML = head("What people say") + `<div class="rv-grid">${list.slice(0, 6).map(reviewCard).join("")}</div>` +
+        (list.length > 6 ? `<p style="margin-top:24px"><a class="btn" href="reviews.html">See all ${list.length} reviews ${I.arrow}</a></p>` : "");
+    } else {
+      box.innerHTML = head("No reviews yet") + `<p class="muted">Got this book? Your review would be the very first — <a href="${writeUrl}" style="text-decoration:underline">share it here</a>.</p>`;
+    }
   }
 
   /* ---------- Boot ---------- */

@@ -628,3 +628,13 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
 .rv-note { margin: 0; font-size: 12.5px; color: var(--muted); text-align: center; }
 @media (max-width: 860px) { .rv-write { grid-template-columns: 1fr; } }
+.rv-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.rv-note a { color: var(--ink); font-weight: 700; text-decoration: underline; }
+.rv-skel { min-height: 170px; display: grid; gap: 12px; align-content: start; }
+.rv-skel i { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--cream-2), var(--cream-3), var(--cream-2)); background-size: 200% 100%; animation: skel 1.3s linear infinite; }
+.rv-skel i:nth-child(1) { width: 40%; } .rv-skel i:nth-child(2) { width: 95%; } .rv-skel i:nth-child(3) { width: 70%; }
+@keyframes skel { to { background-position: -200% 0; } }
+.rv-spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
+#rv-send:disabled { opacity: .75; cursor: progress; transform: none; }
+.rv-card.rv-new { animation: rvNew 1.6s var(--ease) both; box-shadow: 0 0 0 2px var(--accent), 0 18px 40px -30px rgba(0,0,0,.35); }
+@keyframes rvNew { 0% { opacity: 0; transform: translateY(-20px) scale(.96); } 40% { opacity: 1; transform: none; } }
