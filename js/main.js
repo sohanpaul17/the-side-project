@@ -383,8 +383,87 @@
     $$("[data-count]").forEach((el) => obs.observe(el));
   }
 
+  /* ---------- Logo star orbit ----------
+     The hero logo's star rests in its usual spot, then glides once around
+     the orbit line (passing behind the wordmark), leaving a sparkle trail. */
+  function initLogoOrbit() {
+    const svg = $(".logo-orbit");
+    if (!svg) return;
+    const star = $(".orbit-star", svg), trail = $(".orbit-trail", svg);
+    const NS = "http://www.w3.org/2000/svg";
+    // Ellipse fitted to the orbit line in the logo (viewBox units)
+    const CX = 566.44, CY = 309.78, A = 558.85, B = 141.87, TH = (-19.774 * Math.PI) / 180;
+    const HOME = { x: 761, y: 120 };
+    const cos = Math.cos(TH), sin = Math.sin(TH);
+    const at = (t) => ({
+      x: CX + A * Math.cos(t) * cos - B * Math.sin(t) * sin,
+      y: CY + A * Math.cos(t) * sin + B * Math.sin(t) * cos,
+    });
+    // where on the ellipse the star normally sits
+    let t0 = 0, best = Infinity;
+    for (let i = 0; i < 3600; i++) {
+      const t = (i / 3600) * Math.PI * 2, p = at(t), d = (p.x - HOME.x) ** 2 + (p.y - HOME.y) ** 2;
+      if (d < best) { best = d; t0 = t; }
+    }
+    const off = { x: HOME.x - at(t0).x, y: HOME.y - at(t0).y };
+    const dir = at(t0 + 0.01).x > at(t0).x ? 1 : -1; // set off to the right, like the swoosh
+    // the drawn line isn't a perfect ellipse: nudge the path onto it near the star's home,
+    // fading the correction out on the far side where the fit already matches
+    const near = (t) => ((1 + Math.cos(t - t0)) / 2) ** 2;
+    const pos = (t) => { const p = at(t), w = near(t); return { x: p.x + off.x * w, y: p.y + off.y * w }; };
+    // full size at home, smaller in flight; a little bigger on the front (lower) side of the orbit
+    const size = (t) => { const w = near(t); return 0.68 + 0.32 * w + 0.1 * (Math.sin(t) - Math.sin(t0)) * (1 - w); };
+    const place = (x, y, s, r) => star.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${r.toFixed(1)}) scale(${s.toFixed(3)})`);
+
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    // sparkle trail
+    const DOTS = 16, dots = [];
+    for (let i = 0; i < DOTS; i++) {
+      const c = document.createElementNS(NS, "circle");
+      c.setAttribute("fill", i % 3 === 0 ? "#d9653b" : "#161513");
+      c.setAttribute("r", "0"); trail.appendChild(c); dots.push(c);
+    }
+    const ease = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+    const REST = 2800, TRAVEL = 5400;
+    let start = performance.now(), visible = true, history = [];
+
+    const io2 = new IntersectionObserver(([en]) => (visible = en.isIntersecting));
+    io2.observe(svg);
+    // hovering the logo launches the star straight away
+    svg.closest(".hero-logo").addEventListener("mouseenter", () => {
+      const e = (performance.now() - start) % (REST + TRAVEL);
+      if (e < REST) start -= REST - e;
+    });
+
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!visible) return;
+      const e = (now - start) % (REST + TRAVEL);
+      if (e < REST) {
+        // resting: a soft twinkle
+        const k = e / REST, tw = Math.sin(k * Math.PI * 4);
+        place(HOME.x, HOME.y, 1 + 0.06 * tw, 6 * Math.sin(k * Math.PI * 2));
+        history = [];
+      } else {
+        const k = ease((e - REST) / TRAVEL), t = t0 + dir * k * Math.PI * 2, p = pos(t);
+        place(p.x, p.y, size(t), k * 360);
+        history.unshift(p); if (history.length > DOTS * 2) history.length = DOTS * 2;
+      }
+      dots.forEach((c, i) => {
+        const p = history[i * 2 + 2];
+        if (!p) { c.setAttribute("r", "0"); return; }
+        const f = 1 - i / DOTS;
+        c.setAttribute("cx", p.x.toFixed(1)); c.setAttribute("cy", p.y.toFixed(1));
+        c.setAttribute("r", (7 * f).toFixed(2)); c.setAttribute("opacity", (0.75 * f).toFixed(2));
+      });
+    }
+    requestAnimationFrame(frame);
+  }
+
   /* ================= PAGES ================= */
   function homePage() {
+    initLogoOrbit();
     const words = ["Customised Lovebooks", "Hand-illustrated", "Your story", "Printed + PDF copy", "Mini Lovebooks", "Made with love"];
     const mq = words.map((w) => `<span>${w} ${STAR()}</span>`).join("");
     $("#marquee").innerHTML = mq + mq;

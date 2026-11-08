@@ -164,7 +164,9 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 .hero { position: relative; z-index: 2; padding: clamp(28px, 5vw, 60px) 0 clamp(60px, 8vw, 100px); overflow: hidden; }
 .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(24px, 4vw, 60px); align-items: center; }
 .hero-logo { position: relative; }
-.hero-logo img { width: 100%; animation: float 7s ease-in-out infinite; }
+.logo-stage { position: relative; animation: float 7s ease-in-out infinite; }
+.logo-stage img { width: 100%; }
+.logo-orbit { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .hero-copy .lead { margin: 22px 0 34px; }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 .hero-meta { display: flex; gap: 32px; margin-top: 44px; flex-wrap: wrap; }
