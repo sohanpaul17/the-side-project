@@ -171,6 +171,34 @@ const PRODUCTS = [
       "assets/products/notebook-6.webp",
     ],
   },
+  {
+    id: "customised-journey-map",
+    title: "Customised Journey Map",
+    category: "Custom",
+    price: 399,
+    featured: true,
+    badge: "New",
+    formats: ["print", "pdf"],
+    palette: ["#bfe4f4", "#1b1b1b", "#e0456e"],
+    motif: "orbit",
+    short: "An illustrated map of your story — every place that made you, you.",
+    description:
+      "Where you met, the first coffee, the first date, the proposal, home — every place that matters, drawn as one illustrated map. Each place gets its own pin and a little note in your words, with cute characters that look like you and your names on top. Make one for your partner, your family or your best friends. You name the places, I draw the journey.",
+    details: [
+      "An illustrated map of your places, with a pin and note for each",
+      "Your names and cute characters that look like you",
+      "Choose A3 (29.7 × 42 cm), A4 (21 × 29.7 cm) or A5 (14.8 × 21 cm)",
+      "Printed copy delivered, plus a PDF copy",
+      "For couples, families and best friends",
+      "Preview shared with you before it's printed",
+    ],
+    images: [
+      "assets/products/map-story-1.webp",
+      "assets/products/map-story-2.webp",
+      "assets/products/map-story-3.webp",
+      "assets/products/map-story-6.webp",
+    ],
+  },
 ];
 
 /* ---------------------------------------------------------
