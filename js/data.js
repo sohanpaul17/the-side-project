@@ -143,6 +143,8 @@ const PRODUCTS = [
     title: "Customised Notebook",
     category: "Custom",
     price: 799,
+    priceNote: "Including shipping within India",
+    shippingNote: "International shipping costs extra",
     featured: true,
     badge: "New",
     formats: ["print"],
@@ -158,6 +160,7 @@ const PRODUCTS = [
       "Spiral bound",
       "Gift-ready, delivered to your door",
       "Cover preview shared with you before it's printed",
+      "Price includes shipping within India — international shipping costs extra",
     ],
     images: [
       "assets/products/notebook-1.webp",
