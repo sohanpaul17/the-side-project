@@ -638,3 +638,24 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 #rv-send:disabled { opacity: .75; cursor: progress; transform: none; }
 .rv-card.rv-new { animation: rvNew 1.6s var(--ease) both; box-shadow: 0 0 0 2px var(--accent), 0 18px 40px -30px rgba(0,0,0,.35); }
 @keyframes rvNew { 0% { opacity: 0; transform: translateY(-20px) scale(.96); } 40% { opacity: 1; transform: none; } }
+
+/* ============ Home: moving reviews ============ */
+#home-rv-score { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+#home-rv-score b { color: var(--ink); }
+.rv-marquee { display: grid; gap: 22px; overflow: hidden; padding: 6px 0 10px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.rv-row-track { display: flex; width: max-content; animation: rvScroll var(--dur, 40s) linear infinite; }
+.rv-row-track.rev { animation-direction: reverse; }
+.rv-marquee:hover .rv-row-track { animation-play-state: paused; }
+.rv-row-set { display: flex; gap: 22px; padding-right: 22px; }
+.rv-marquee .rv-card { width: 340px; flex: none; margin: 0; animation: none; display: flex; flex-direction: column; }
+.rv-marquee .rv-text { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+.rv-marquee .rv-card:hover { transform: translateY(-4px) rotate(-.6deg); }
+@keyframes rvScroll { to { transform: translateX(-50%); } }
+@media (max-width: 600px) { .rv-marquee .rv-card { width: 280px; } }
+@media (prefers-reduced-motion: reduce) {
+  .rv-marquee { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  .rv-row-track { animation: none; }
+  .rv-row-set[aria-hidden] { display: none; }
+}

@@ -461,9 +461,28 @@
     requestAnimationFrame(frame);
   }
 
+  /* ---------- Home page: moving reviews ---------- */
+  async function homeReviews() {
+    const sec = $("#home-reviews"); if (!sec) return;
+    const list = await loadReviews();
+    if (!list.length) return; // stays hidden until the first review arrives
+    sec.hidden = false;
+    const avg = avgRating(list);
+    $("#home-rv-score").innerHTML = `${starsHtml(avg)} <b>${avg.toFixed(1)}</b> from ${list.length} review${list.length > 1 ? "s" : ""}`;
+    // two rows moving in opposite directions once there are enough reviews
+    const rows = list.length >= 6 ? [list.filter((_, i) => i % 2 === 0), list.filter((_, i) => i % 2 === 1)] : [list];
+    $("#home-rv-rows").innerHTML = rows.map((items, r) => {
+      let set = items.slice();
+      while (set.length < 6) set = set.concat(items); // enough cards to fill wide screens
+      const cards = set.map((x) => reviewCard(x)).join("");
+      return `<div class="rv-row-track ${r % 2 ? "rev" : ""}" style="--dur:${set.length * 7}s"><div class="rv-row-set">${cards}</div><div class="rv-row-set" aria-hidden="true">${cards}</div></div>`;
+    }).join("");
+  }
+
   /* ================= PAGES ================= */
   function homePage() {
     initLogoOrbit();
+    homeReviews();
     const words = ["Customised Lovebooks", "Hand-illustrated", "Your story", "Printed + PDF copy", "Mini Lovebooks", "Made with love"];
     const mq = words.map((w) => `<span>${w} ${STAR()}</span>`).join("");
     $("#marquee").innerHTML = mq + mq;
