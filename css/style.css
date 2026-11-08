@@ -690,3 +690,11 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 .contact-mail > svg { width: 22px; transition: transform .35s var(--ease); }
 .contact-mail:hover > svg { transform: translateX(5px); }
 @media (max-width: 480px) { .contact-card .contact-ico:not(.ci-mail) { width: 72px; height: 72px; border-radius: 22px; } .contact-card .contact-ico:not(.ci-mail) svg { width: 36px; height: 36px; } }
+
+/* Write-a-review form under each product's reviews */
+.pdp-write { margin-top: 40px; border-radius: calc(var(--radius) * 1.4); background: var(--cream-2); overflow: hidden; display: grid; grid-template-columns: .8fr 1.2fr; scroll-margin-top: 90px; }
+.pdp-write-head { background: var(--ink); color: var(--cream); padding: clamp(26px, 4vw, 44px); position: relative; overflow: hidden; }
+.pdp-write-head::after { content: ""; position: absolute; width: 420px; height: 140px; border: 1.5px solid rgba(244,236,223,.18); border-radius: 50%; left: -90px; bottom: -40px; transform: rotate(-16deg); }
+.pdp-write-head .eyebrow { color: rgba(244,236,223,.6); }
+.pdp-write-head h3 { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: clamp(26px, 3vw, 36px); line-height: 1; margin: 14px 0 0; }
+@media (max-width: 860px) { .pdp-write { grid-template-columns: 1fr; } }

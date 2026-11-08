@@ -721,18 +721,55 @@
     loadReviews().then((list) => { all = list.slice(); renderAll(); });
 
     // ----- form -----
-    const form = $("#rv-form"), sel = $("#rv-product");
-    sel.innerHTML = `<option value="">Choose a book</option>` + PRODUCTS.map((p) => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join("");
-    if (PRODUCTS.some((p) => p.id === params.get("product"))) sel.value = params.get("product");
+    const preselect = PRODUCTS.some((p) => p.id === params.get("product")) ? params.get("product") : "";
+    setupReviewForm($("#rv-form"), {
+      preselect,
+      onPosted(r) {
+        all.unshift(r);
+        filter = "all"; renderAll();
+        const first = $("#rv-grid .rv-card");
+        if (first) { first.classList.add("rv-new"); setTimeout(() => first.scrollIntoView({ behavior: "smooth", block: "center" }), 250); }
+      },
+    });
+  }
+
+  /* Review form markup (used on product pages; reviews.html has the same fields in its HTML) */
+  function reviewFormHtml(p) {
+    return `
+      <form class="rv-form" novalidate>
+        <div class="rv-row">
+          <label class="rv-field"><span>Your name *</span><input name="name" autocomplete="given-name" maxlength="40" required></label>
+          <label class="rv-field"><span>City</span><input name="city" autocomplete="address-level2" maxlength="40"></label>
+        </div>
+        <div class="rv-field"><span>Your rating *</span><div class="rv-stars-input" role="radiogroup" aria-label="Rating"></div></div>
+        <label class="rv-field"><span>Your review *</span><textarea name="text" rows="4" maxlength="800" required placeholder="What did you love about your ${esc(p.title)}?"></textarea><small class="rv-count">0 / 800</small></label>
+        <label class="rv-consent"><input type="checkbox" name="consent" required><span>I'm happy for my review and first name to appear on this website.</span></label>
+        <p class="rv-error" role="alert"></p>
+        <label class="rv-hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
+        <button class="btn btn-lg btn-block rv-send-btn" type="submit"></button>
+        <p class="rv-note">Your review appears here straight away.</p>
+      </form>`;
+  }
+
+  /* Wires up a review form. opts.product = fixed product id (no dropdown); opts.preselect = dropdown default;
+     opts.onPosted(review) runs after a review is saved. */
+  function setupReviewForm(form, opts = {}) {
+    if (!form) return;
+    const q = (s) => form.querySelector(s);
+    const sel = form.querySelector('select[name="product"]'); // only when the product isn't fixed
+    if (sel) {
+      sel.innerHTML = `<option value="">Choose a product</option>` + PRODUCTS.map((p) => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join("");
+      if (opts.preselect) sel.value = opts.preselect;
+    }
     let rating = 0;
-    const starsEl = $("#rv-stars");
+    const starsEl = q(".rv-stars-input");
     const labels = ["Tap to rate", "Not for me", "It was okay", "Good", "Loved it", "Absolutely perfect"];
-    starsEl.innerHTML = [1, 2, 3, 4, 5].map((i) => `<button type="button" role="radio" aria-checked="false" aria-label="${i} star${i > 1 ? "s" : ""}" data-v="${i}"><svg viewBox="0 0 24 24"><path d="${STAR_PATH}"/></svg></button>`).join("") + `<em id="rv-star-label">Tap to rate</em>`;
+    starsEl.innerHTML = [1, 2, 3, 4, 5].map((i) => `<button type="button" role="radio" aria-checked="false" aria-label="${i} star${i > 1 ? "s" : ""}" data-v="${i}"><svg viewBox="0 0 24 24"><path d="${STAR_PATH}"/></svg></button>`).join("") + `<em class="rv-star-label">Tap to rate</em>`;
     const paint = (v) => $$("button", starsEl).forEach((b) => b.classList.toggle("on", +b.dataset.v <= v));
     const setRating = (v) => {
       rating = v; paint(v);
       $$("button", starsEl).forEach((x) => x.setAttribute("aria-checked", String(+x.dataset.v === v)));
-      $("#rv-star-label").textContent = labels[v];
+      q(".rv-star-label").textContent = labels[v];
     };
     starsEl.addEventListener("mouseover", (e) => { const b = e.target.closest("button"); if (b) paint(+b.dataset.v); });
     starsEl.addEventListener("mouseleave", () => paint(rating));
@@ -741,70 +778,83 @@
       setRating(+b.dataset.v);
       b.animate([{ transform: "scale(1)" }, { transform: "scale(1.35)" }, { transform: "scale(1)" }], { duration: 350, easing: "ease-out" });
     });
-    const ta = form.text;
-    ta.addEventListener("input", () => ($("#rv-count").textContent = `${ta.value.length} / 800`));
-    const sendBtn = $("#rv-send"), sendLabel = `${I.heart} Post my review`;
+    const ta = form.querySelector('textarea[name="text"]'), count = q(".rv-count");
+    ta.addEventListener("input", () => (count.textContent = `${ta.value.length} / 800`));
+    const sendBtn = q(".rv-send-btn"), sendLabel = `${I.heart} Post my review`;
     sendBtn.innerHTML = sendLabel;
-    $("#rv-wa").href = waLink("Hi! I'd like to share some feedback about my Lovebook.");
+    const wa = q(".rv-wa"); if (wa) wa.href = waLink("Hi! I'd like to share some feedback about my order.");
 
-    const err = $("#rv-error");
+    const err = q(".rv-error");
     const fail = (msg) => { err.textContent = msg; err.classList.remove("shake"); void err.offsetWidth; err.classList.add("shake"); };
     const RECENT_KEY = "sp-review-posted";
     const recentlyPosted = () => { try { return Date.now() - Number(localStorage.getItem(RECENT_KEY) || 0) < 864e5; } catch { return false; } };
+    const field = (n) => form.querySelector(`[name="${n}"]`);
+    const done = () => {
+      form.reset(); setRating(0); count.textContent = "0 / 800";
+      if (sel && opts.preselect) sel.value = opts.preselect;
+      toast("Thank you! Your review is live 💌");
+    };
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const name = form.name.value.trim(), city = form.city.value.trim(), text = ta.value.trim();
-      const problem = !name ? "Please add your name." : !sel.value ? "Please choose which book you got." : !rating ? "Please choose a star rating."
-        : text.length < 10 ? "Please write a few words about your book (at least 10 characters)." : !form.consent.checked ? "Please tick the box so your review can be shown."
+      const product = opts.product || (sel ? sel.value : "");
+      const name = field("name").value.trim(), city = field("city").value.trim(), text = ta.value.trim();
+      const problem = !name ? "Please add your name." : !product ? "Please choose which product you got." : !rating ? "Please choose a star rating."
+        : text.length < 10 ? "Please write a few words (at least 10 characters)." : !field("consent").checked ? "Please tick the box so your review can be shown."
         : recentlyPosted() ? "Thanks — you've already posted a review today. You can post another tomorrow." : "";
       if (problem) return fail(problem);
       err.textContent = "";
-      const review = { name, city: city || null, product: sel.value, rating, body: text };
-      if (form.website.value) { done(); return; } // hidden field: only bots fill it in
+      const review = { name, city: city || null, product, rating, body: text };
+      if (field("website").value) { done(); return; } // hidden field: only bots fill it in
 
       sendBtn.disabled = true; sendBtn.innerHTML = `<span class="rv-spinner"></span> Posting…`;
       try {
         await postReview(review);
         try { localStorage.setItem(RECENT_KEY, String(Date.now())); } catch {}
-        all.unshift({ ...review, text, date: new Date().toISOString() });
-        if (reviewsCache) reviewsCache = all.slice();
-        filter = "all"; renderAll();
+        const posted = { ...review, text, date: new Date().toISOString() };
+        if (reviewsCache) reviewsCache.unshift(posted);
         done();
-        const first = $("#rv-grid .rv-card");
-        if (first) { first.classList.add("rv-new"); setTimeout(() => first.scrollIntoView({ behavior: "smooth", block: "center" }), 250); }
+        if (opts.onPosted) opts.onPosted(posted);
       } catch (ex) {
         console.warn(ex);
-        fail("Sorry, your review couldn't be posted right now. Please try again in a moment, or send it to me on WhatsApp.");
+        fail("Sorry, your review couldn't be posted right now. Please try again in a moment, or message me on WhatsApp.");
       } finally {
         sendBtn.disabled = false; sendBtn.innerHTML = sendLabel;
       }
     });
-    function done() {
-      form.reset(); setRating(0); $("#rv-count").textContent = "0 / 800";
-      toast("Thank you! Your review is live 💌");
-    }
   }
 
-  // reviews block on each product page
+  // reviews block on each product page: the product's reviews, then a form to write one
   async function productReviews(p) {
     const box = $("#pdp-reviews"); if (!box) return;
-    const writeUrl = `reviews.html?product=${encodeURIComponent(p.id)}#write`;
-    const head = (title) => `
+    box.innerHTML = `
       <div class="section-head">
-        <div><span class="eyebrow">Reviews</span><h2 class="h-display h2" style="margin-top:14px">${title}</h2></div>
-        <a href="${writeUrl}" class="btn btn-ghost">Write a review ${I.arrow}</a>
+        <div><span class="eyebrow">Reviews</span><h2 class="h-display h2" style="margin-top:14px" id="pdp-rv-title">What people say</h2></div>
+        <a href="#pdp-write" class="btn btn-ghost">Write a review ${I.arrow}</a>
+      </div>
+      <div id="pdp-rv-list"><div class="rv-grid">${skeletons(2)}</div></div>
+      <div class="pdp-write" id="pdp-write">
+        <div class="pdp-write-head"><span class="eyebrow">Share your experience</span><h3>Write a review for ${esc(p.title)}</h3></div>
+        ${reviewFormHtml(p)}
       </div>`;
-    box.innerHTML = head("What people say") + `<div class="rv-grid">${skeletons(2)}</div>`;
     const list = (await loadReviews()).filter((r) => r.product === p.id);
-    if (list.length) {
-      const avg = avgRating(list), title = $(".pdp-title");
-      if (title && !$(".pdp-rating")) title.insertAdjacentHTML("afterend", `<a class="pdp-rating" href="#pdp-reviews">${starsHtml(avg)} <span>${avg.toFixed(1)} · ${list.length} review${list.length > 1 ? "s" : ""}</span></a>`);
-      box.innerHTML = head("What people say") + `<div class="rv-grid">${list.slice(0, 6).map(reviewCard).join("")}</div>` +
-        (list.length > 6 ? `<p style="margin-top:24px"><a class="btn" href="reviews.html">See all ${list.length} reviews ${I.arrow}</a></p>` : "");
-    } else {
-      box.innerHTML = head("No reviews yet") + `<p class="muted">Got this book? Your review would be the very first — <a href="${writeUrl}" style="text-decoration:underline">share it here</a>.</p>`;
-    }
+    const render = (highlight) => {
+      $("#pdp-rv-title").textContent = list.length ? "What people say" : "No reviews yet";
+      $("#pdp-rv-list").innerHTML = list.length
+        ? `<div class="rv-grid">${list.slice(0, 6).map(reviewCard).join("")}</div>` + (list.length > 6 ? `<p style="margin-top:24px"><a class="btn" href="reviews.html">See all ${list.length} reviews ${I.arrow}</a></p>` : "")
+        : `<p class="muted">Got this? Your review would be the very first — write it just below.</p>`;
+      const prev = $(".pdp-rating"); if (prev) prev.parentNode.removeChild(prev);
+      if (list.length) {
+        const avg = avgRating(list), title = $(".pdp-title");
+        if (title) title.insertAdjacentHTML("afterend", `<a class="pdp-rating" href="#pdp-reviews">${starsHtml(avg)} <span>${avg.toFixed(1)} · ${list.length} review${list.length > 1 ? "s" : ""}</span></a>`);
+      }
+      if (highlight) {
+        const first = $("#pdp-rv-list .rv-card");
+        if (first) { first.classList.add("rv-new"); setTimeout(() => first.scrollIntoView({ behavior: "smooth", block: "center" }), 250); }
+      }
+    };
+    render();
+    setupReviewForm($("#pdp-write form"), { product: p.id, onPosted(r) { list.unshift(r); render(true); } });
   }
 
   /* ---------- Boot ---------- */

@@ -53,7 +53,7 @@
             <label class="rv-field"><span>Your name *</span><input name="name" autocomplete="given-name" maxlength="40" required></label>
             <label class="rv-field"><span>City</span><input name="city" autocomplete="address-level2" maxlength="40"></label>
           </div>
-          <label class="rv-field"><span>Which book did you get? *</span>
+          <label class="rv-field"><span>Which product did you get? *</span>
             <span class="field select"><select name="product" id="rv-product" required></select></span>
           </label>
           <div class="rv-field">
@@ -65,8 +65,8 @@
           <p class="rv-error" id="rv-error" role="alert"></p>
           <!-- hidden from people; bots that fill it in are ignored -->
           <label class="rv-hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
-          <button class="btn btn-lg btn-block" type="submit" id="rv-send"></button>
-          <p class="rv-note">Your review appears on this page straight away. Prefer to message me instead? <a id="rv-wa" target="_blank" rel="noopener">Chat on WhatsApp</a></p>
+          <button class="btn btn-lg btn-block rv-send-btn" type="submit" id="rv-send"></button>
+          <p class="rv-note">Your review appears on this page straight away. Prefer to message me instead? <a id="rv-wa" class="rv-wa" target="_blank" rel="noopener">Chat on WhatsApp</a></p>
         </form>
       </div>
     </div>
