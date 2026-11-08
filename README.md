@@ -17,6 +17,12 @@ A multi-page static site: **Home**, **Shop**, **Product** (one page per product)
 
 The Buy Now WhatsApp and Instagram links update automatically from your number and handle. On WhatsApp, the message arrives with the product, price and chosen format already filled in.
 
+## Reviews
+
+Customers write reviews on the **Reviews** page (`reviews.html`). Pressing send opens WhatsApp with the review already typed in, addressed to your number. They can also copy it into an Instagram DM. Nothing is published automatically.
+
+To publish a review, add it to the `REVIEWS` list at the bottom of `js/data.js` (newest first). There's a template there. It then shows on the Reviews page and on that product's page, with a star rating next to the product title. Customer photos go in `assets/reviews/`.
+
 ## Previewing
 
 Open `index.html` in a browser, or run a local server from this folder:

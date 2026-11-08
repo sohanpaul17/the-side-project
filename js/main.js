@@ -138,7 +138,7 @@
   };
 
   /* ---------- Shared layout ---------- */
-  const NAV = [["index.html", "Home", "home"], ["shop.html", "Shop", "shop"], ["about.html", "About", "about"], ["contact.html", "Contact", "contact"]];
+  const NAV = [["index.html", "Home", "home"], ["shop.html", "Shop", "shop"], ["reviews.html", "Reviews", "reviews"], ["about.html", "About", "about"], ["contact.html", "Contact", "contact"]];
   const brandMark = `<span class="brand-mark"><svg viewBox="0 0 40 40" fill="none"><ellipse cx="20" cy="22" rx="18" ry="8" stroke="currentColor" stroke-width="2.2" transform="rotate(-18 20 22)"/><path d="${starPath(27, 11, 7)}" fill="currentColor"/><circle cx="20" cy="22" r="4" fill="currentColor"/></svg></span>`;
 
   function renderChrome() {
@@ -625,10 +625,143 @@
     $$(".acc-head").forEach((h) => h.addEventListener("click", () => h.parentElement.classList.toggle("open")));
   }
 
+  /* ---------- Reviews ---------- */
+  const ALL_REVIEWS = (typeof REVIEWS !== "undefined" ? REVIEWS : []).filter((r) => r && r.text && r.rating);
+  const STAR_PATH = "M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z";
+  const starsHtml = (n, cls = "") =>
+    `<span class="rv-stars ${cls}" aria-label="${n} out of 5 stars">${[1, 2, 3, 4, 5]
+      .map((i) => `<svg viewBox="0 0 24 24" class="${i <= n + 0.25 ? "on" : ""}"><path d="${STAR_PATH}"/></svg>`).join("")}</span>`;
+  const productName = (id) => (PRODUCTS.find((p) => p.id === id) || {}).title || "";
+  const fmtDate = (d) => { const t = new Date(d); return isNaN(t) ? "" : t.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); };
+  const avgRating = (list) => (list.length ? list.reduce((s, r) => s + Number(r.rating), 0) / list.length : 0);
+  function reviewCard(r, i = 0) {
+    const prod = PRODUCTS.find((p) => p.id === r.product);
+    return `
+      <article class="rv-card" style="--d:${(i % 6) * 0.06}s">
+        ${starsHtml(r.rating)}
+        <p class="rv-text">“${esc(r.text)}”</p>
+        ${r.photo ? `<img class="rv-photo" src="${esc(r.photo)}" alt="Photo from ${esc(r.name)}" loading="lazy">` : ""}
+        <footer>
+          <span class="rv-avatar">${esc((r.name || "?").trim().charAt(0).toUpperCase())}</span>
+          <span><b>${esc(r.name)}</b>${r.city ? `<small>${esc(r.city)}</small>` : ""}</span>
+          <span class="rv-meta">${prod ? `<a href="${productUrl(prod)}">${esc(prod.title)}</a>` : ""}${r.date ? `<small>${fmtDate(r.date)}</small>` : ""}</span>
+        </footer>
+      </article>`;
+  }
+
+  function reviewsPage() {
+    const params = new URLSearchParams(location.search);
+    const withReviews = PRODUCTS.filter((p) => ALL_REVIEWS.some((r) => r.product === p.id));
+    let filter = "all";
+
+    // summary
+    const avg = avgRating(ALL_REVIEWS);
+    $("#rv-summary").innerHTML = ALL_REVIEWS.length
+      ? `<div class="rv-score"><strong>${avg.toFixed(1)}</strong>${starsHtml(avg, "lg")}<span>${ALL_REVIEWS.length} review${ALL_REVIEWS.length > 1 ? "s" : ""}</span></div>
+         <div class="rv-bars">${[5, 4, 3, 2, 1].map((n) => {
+           const c = ALL_REVIEWS.filter((r) => Math.round(r.rating) === n).length, pct = (c / ALL_REVIEWS.length) * 100;
+           return `<div class="rv-bar"><span>${n}★</span><i><b style="width:${pct}%"></b></i><span>${c}</span></div>`;
+         }).join("")}</div>`
+      : "";
+    $("#rv-summary").hidden = !ALL_REVIEWS.length;
+
+    // filter chips (only when there's something to filter)
+    const chips = $("#rv-chips");
+    if (withReviews.length > 1) {
+      chips.innerHTML = [`<button class="chip active" data-f="all">All</button>`, ...withReviews.map((p) => `<button class="chip" data-f="${esc(p.id)}">${esc(p.title)}</button>`)].join("");
+      chips.addEventListener("click", (e) => {
+        const b = e.target.closest(".chip"); if (!b) return;
+        filter = b.dataset.f; $$(".chip", chips).forEach((c) => c.classList.toggle("active", c === b)); renderList();
+      });
+    } else chips.hidden = true;
+
+    function renderList() {
+      const list = ALL_REVIEWS.filter((r) => filter === "all" || r.product === filter);
+      $("#rv-grid").innerHTML = list.length
+        ? list.map(reviewCard).join("")
+        : `<div class="rv-empty">${STAR()}<h3>No reviews yet</h3><p>Got your Lovebook? You could be the very first story here.</p><a href="#write" class="btn">Write the first review</a></div>`;
+    }
+    renderList();
+
+    // form
+    const form = $("#rv-form"), sel = $("#rv-product");
+    sel.innerHTML = `<option value="">Choose a book</option>` + PRODUCTS.map((p) => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join("");
+    if (PRODUCTS.some((p) => p.id === params.get("product"))) sel.value = params.get("product");
+    let rating = 0;
+    const starsEl = $("#rv-stars");
+    const labels = ["", "Not for me", "It was okay", "Good", "Loved it", "Absolutely perfect"];
+    starsEl.innerHTML = [1, 2, 3, 4, 5].map((i) => `<button type="button" role="radio" aria-checked="false" aria-label="${i} star${i > 1 ? "s" : ""}" data-v="${i}"><svg viewBox="0 0 24 24"><path d="${STAR_PATH}"/></svg></button>`).join("") + `<em id="rv-star-label">Tap to rate</em>`;
+    const paint = (v) => $$("button", starsEl).forEach((b) => b.classList.toggle("on", +b.dataset.v <= v));
+    starsEl.addEventListener("mouseover", (e) => { const b = e.target.closest("button"); if (b) paint(+b.dataset.v); });
+    starsEl.addEventListener("mouseleave", () => paint(rating));
+    starsEl.addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      rating = +b.dataset.v; paint(rating);
+      $$("button", starsEl).forEach((x) => x.setAttribute("aria-checked", String(+x.dataset.v === rating)));
+      $("#rv-star-label").textContent = labels[rating];
+      b.animate([{ transform: "scale(1)" }, { transform: "scale(1.35)" }, { transform: "scale(1)" }], { duration: 350, easing: "ease-out" });
+    });
+    const ta = form.text;
+    ta.addEventListener("input", () => ($("#rv-count").textContent = `${ta.value.length} / 800`));
+    $("#rv-send").innerHTML = `${I.wa} Send review on WhatsApp`;
+    $("#rv-ig").innerHTML = `${I.ig} Send on Instagram instead`;
+
+    function compose() {
+      const err = $("#rv-error");
+      const name = form.name.value.trim(), text = ta.value.trim();
+      const problem = !name ? "Please add your name." : !sel.value ? "Please choose which book you got." : !rating ? "Please choose a star rating." : text.length < 10 ? "Please write a few words about your book." : !form.consent.checked ? "Please tick the box so I can show your review." : "";
+      err.textContent = problem;
+      if (problem) { err.classList.remove("shake"); void err.offsetWidth; err.classList.add("shake"); return null; }
+      const city = form.city.value.trim();
+      return [
+        `⭐ New review for ${STORE.name}`,
+        ``,
+        `Name: ${name}`,
+        city ? `City: ${city}` : null,
+        `Product: ${productName(sel.value)}`,
+        `Rating: ${"★".repeat(rating)}${"☆".repeat(5 - rating)} (${rating}/5)`,
+        ``,
+        `"${text}"`,
+        ``,
+        `✅ Happy for this to appear on the website.`,
+      ].filter((l) => l !== null).join("\n");
+    }
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const msg = compose(); if (!msg) return;
+      window.open(waLink(msg), "_blank", "noopener");
+      toast("Opening WhatsApp — just press send 💌");
+    });
+    $("#rv-ig").addEventListener("click", async () => {
+      const msg = compose(); if (!msg) return;
+      try { await navigator.clipboard.writeText(msg); toast("Review copied — paste it in the DM"); } catch { toast("Opening Instagram…"); }
+      window.open(igLink(), "_blank", "noopener");
+    });
+  }
+
+  // reviews block on each product page
+  function productReviews(p) {
+    const box = $("#pdp-reviews"); if (!box) return;
+    const list = ALL_REVIEWS.filter((r) => r.product === p.id);
+    const writeUrl = `reviews.html?product=${encodeURIComponent(p.id)}#write`;
+    if (list.length) {
+      const avg = avgRating(list);
+      const title = $(".pdp-title");
+      if (title) title.insertAdjacentHTML("afterend", `<a class="pdp-rating" href="#pdp-reviews">${starsHtml(avg)} <span>${avg.toFixed(1)} · ${list.length} review${list.length > 1 ? "s" : ""}</span></a>`);
+    }
+    box.innerHTML = `
+      <div class="section-head">
+        <div><span class="eyebrow reveal">Reviews</span><h2 class="h-display h2" style="margin-top:14px"><span class="split-line"><span>${list.length ? "What people say" : "No reviews yet"}</span></span></h2></div>
+        <a href="${writeUrl}" class="btn btn-ghost reveal">Write a review ${I.arrow}</a>
+      </div>
+      ${list.length ? `<div class="rv-grid">${list.slice(0, 6).map(reviewCard).join("")}</div>${list.length > 6 ? `<p style="margin-top:24px"><a class="btn" href="reviews.html">See all ${list.length} reviews ${I.arrow}</a></p>` : ""}`
+        : `<p class="muted reveal">Got this book? Your review would be the very first — <a href="${writeUrl}" style="text-decoration:underline">share it here</a>.</p>`}`;
+  }
+
   /* ---------- Boot ---------- */
   renderChrome();
   initTransitions();
-  ({ home: homePage, shop: shopPage, product: productPage, about: aboutPage, contact: contactPage }[page] || (() => {}))();
+  ({ home: homePage, shop: shopPage, product: (...a) => { productPage(...a); productReviews(PRODUCTS.find((x) => x.id === new URLSearchParams(location.search).get("id")) || PRODUCTS[0]); }, about: aboutPage, contact: contactPage, reviews: reviewsPage }[page] || (() => {}))();
   observeReveals();
   window.SP = { STAR, I };
 })();

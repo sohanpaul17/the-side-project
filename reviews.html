@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reviews — The Side Project</title>
+<meta name="description" content="What customers say about their Lovebooks from The Side Project — and share your own review.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="reviews">
+<main>
+  <section class="page-hero">
+    <span class="orbit-deco"></span>
+    <div class="wrap">
+      <nav class="breadcrumb reveal"><a href="index.html">Home</a> / <span>Reviews</span></nav>
+      <h1 class="h-display h1"><span class="split-line"><span>Kind words.</span></span></h1>
+      <p class="lead reveal" style="--d:.2s;margin-top:18px">Stories from the people who've gifted a Lovebook — and a place to share yours.</p>
+      <div class="hero-actions reveal" style="--d:.3s;margin-top:28px">
+        <a href="#write" class="btn btn-lg">Write a review <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:10px">
+    <div class="wrap">
+      <div class="rv-summary reveal" id="rv-summary"></div>
+      <div class="chips rv-chips reveal" id="rv-chips"></div>
+      <div class="rv-grid" id="rv-grid"></div>
+    </div>
+  </section>
+
+  <section class="section" id="write" style="padding-top:0">
+    <div class="wrap">
+      <div class="rv-write reveal reveal-scale">
+        <div class="rv-write-side">
+          <span class="eyebrow" style="color:rgba(244,236,223,.6)">Share your story</span>
+          <h2 class="h-display h2" style="margin:16px 0 14px;color:var(--cream)">Loved your<br>Lovebook?</h2>
+          <p>Tell us how it went — the reaction, the tears, the "you made this?!" moment. Your review is sent to me on WhatsApp, and I'll add it to this page.</p>
+          <ul class="rv-perks">
+            <li>Takes less than a minute</li>
+            <li>Add a photo of your book in the chat if you like</li>
+            <li>Only your first name is shown</li>
+          </ul>
+        </div>
+        <form class="rv-form" id="rv-form" novalidate>
+          <div class="rv-row">
+            <label class="rv-field"><span>Your name *</span><input name="name" autocomplete="given-name" maxlength="40" required></label>
+            <label class="rv-field"><span>City</span><input name="city" autocomplete="address-level2" maxlength="40"></label>
+          </div>
+          <label class="rv-field"><span>Which book did you get? *</span>
+            <span class="field select"><select name="product" id="rv-product" required></select></span>
+          </label>
+          <div class="rv-field">
+            <span>Your rating *</span>
+            <div class="rv-stars-input" id="rv-stars" role="radiogroup" aria-label="Rating"></div>
+          </div>
+          <label class="rv-field"><span>Your review *</span><textarea name="text" rows="5" maxlength="800" required placeholder="What did you love about it? How did they react?"></textarea><small class="rv-count" id="rv-count">0 / 800</small></label>
+          <label class="rv-consent"><input type="checkbox" name="consent" required><span>I'm happy for my review and first name to appear on this website.</span></label>
+          <p class="rv-error" id="rv-error" role="alert"></p>
+          <button class="btn btn-lg btn-block btn-wa" type="submit" id="rv-send"></button>
+          <button class="btn btn-ghost btn-block" type="button" id="rv-ig"></button>
+          <p class="rv-note">WhatsApp opens with your review typed in — just press send. For Instagram, your review is copied so you can paste it into the DM.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

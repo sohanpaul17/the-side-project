@@ -100,3 +100,20 @@ const PRODUCTS = [
     ],
   },
 ];
+
+/* ---------------------------------------------------------
+   REVIEWS
+   Customers send reviews from the Reviews page; they arrive on
+   your WhatsApp. To publish one, add it below (newest first):
+
+   {
+     name: "Priya",                       // first name is fine
+     city: "Kolkata",                     // optional
+     product: "customised-lovebook",      // a product id from above
+     rating: 5,                           // 1 to 5
+     date: "2026-11-08",                  // YYYY-MM-DD
+     text: "What the customer wrote…",
+     photo: "",                           // optional, e.g. "assets/reviews/priya.jpg"
+   },
+   --------------------------------------------------------- */
+const REVIEWS = [];
