@@ -711,7 +711,7 @@
       const list = all.filter((r) => filter === "all" || r.product === filter);
       $("#rv-grid").innerHTML = list.length
         ? list.map(reviewCard).join("")
-        : `<div class="rv-empty">${STAR()}<h3>No reviews yet</h3><p>Got your Lovebook? You could be the very first story here.</p><a href="#write" class="btn">Write the first review</a></div>`;
+        : `<div class="rv-empty">${STAR()}<h3>No reviews yet</h3><p>Got something from us? You could be the very first story here.</p><a href="#write" class="btn">Write the first review</a></div>`;
     }
     const renderAll = () => { renderSummary(); renderChips(); renderList(); };
     $("#rv-chips").addEventListener("click", (e) => {
