@@ -659,3 +659,15 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
   .rv-row-track { animation: none; }
   .rv-row-set[aria-hidden] { display: none; }
 }
+
+/* footer contact icons */
+.footer-social { gap: 12px !important; }
+.footer-social a { display: inline-flex; align-items: center; gap: 12px; opacity: .9; }
+.fs-ico { width: 38px; height: 38px; flex: none; border-radius: 50%; display: grid; place-items: center; color: #fff; transition: transform .35s var(--ease), box-shadow .35s; }
+.fs-ico svg { width: 19px; height: 19px; }
+.fs-wa .fs-ico { background: #25d366; }
+.fs-ig .fs-ico { background: linear-gradient(45deg, #f09433, #dc2743 55%, #bc1888); }
+.fs-mail .fs-ico { background: var(--accent); }
+.footer-social a:hover .fs-ico { transform: translateY(-3px) rotate(-8deg) scale(1.08); box-shadow: 0 10px 22px -10px rgba(0,0,0,.6); }
+.site-footer .footer-social a:hover { color: var(--cream); }
+.fs-text { word-break: break-all; }

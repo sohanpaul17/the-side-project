@@ -172,10 +172,10 @@
           </div>
           <div><h4>Explore</h4><ul>${NAV.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}</ul></div>
           <div><h4>Shop</h4><ul>${PRODUCTS.slice(0, 5).map((p) => `<li><a href="${productUrl(p)}">${esc(p.title)}</a></li>`).join("")}</ul></div>
-          <div><h4>Say hi</h4><ul>
-            <li><a href="${waLink("Hi! I found you through your website.")}" target="_blank" rel="noopener">WhatsApp</a></li>
-            <li><a href="${igProfile()}" target="_blank" rel="noopener">Instagram</a></li>
-            <li><a href="mailto:${STORE.email}">${esc(STORE.email)}</a></li>
+          <div><h4>Say hi</h4><ul class="footer-social">
+            <li><a class="fs-wa" href="${waLink("Hi! I found you through your website.")}" target="_blank" rel="noopener"><span class="fs-ico">${I.wa}</span>WhatsApp</a></li>
+            <li><a class="fs-ig" href="${igProfile()}" target="_blank" rel="noopener"><span class="fs-ico">${I.ig}</span>Instagram</a></li>
+            <li><a class="fs-mail" href="mailto:${STORE.email}" title="${esc(STORE.email)}"><span class="fs-ico">${I.mail}</span>Email</a></li>
           </ul></div>
         </div>
         <div class="footer-big" aria-hidden="true">A little bit of everything.</div>
