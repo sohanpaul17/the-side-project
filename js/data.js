@@ -111,6 +111,8 @@ const PRODUCTS = [
     title: "Customised Love Letter",
     category: "Custom",
     price: 399,
+    priceNote: "Including shipping within India",
+    shippingNote: "International shipping costs extra",
     featured: true,
     badge: "New",
     formats: ["print", "pdf"],
@@ -125,6 +127,7 @@ const PRODUCTS = [
       "Choose A4 (21 × 29.7 cm) or A3 (29.7 × 42 cm) — both fit a standard frame",
       "Printed copy delivered, plus a PDF copy",
       "Preview shared with you before it's finalised",
+      "Price includes shipping within India — international shipping costs extra",
     ],
     images: [
       "assets/products/love-letter-1.webp",
