@@ -196,10 +196,12 @@ const PRODUCTS = [
       "Price includes shipping within India — international shipping costs extra",
     ],
     images: [
-      "assets/products/map-story-1.webp",
-      "assets/products/map-story-2.webp",
-      "assets/products/map-story-3.webp",
-      "assets/products/map-story-6.webp",
+      "assets/products/journey-map-1.webp",
+      "assets/products/journey-map-2.webp",
+      "assets/products/journey-map-3.webp",
+      "assets/products/journey-map-4.webp",
+      "assets/products/journey-map-5.webp",
+      "assets/products/journey-map-6.webp",
     ],
   },
 ];
