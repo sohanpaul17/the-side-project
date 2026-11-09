@@ -870,3 +870,14 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 @keyframes lbSway { from { transform: translateX(calc(var(--sway) * -.5)); } to { transform: translateX(calc(var(--sway) * .5)); } }
 .lb-spark { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #ffe3ec; box-shadow: 0 0 8px 2px rgba(255,200,220,.7); opacity: 0; animation: ssTwinkle 3s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .lb-glow, .lb-heart, .lb-heart svg, .lb-spark { animation: none; } .lb-heart { opacity: .4; bottom: auto; top: 50%; } }
+
+/* Shop: category headings when showing All (each heading spans the full row) */
+.chip small { font-size: 11px; opacity: .6; margin-left: 2px; }
+#grid .shop-cat-head { grid-column: 1 / -1; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 18px; padding: 26px 0 4px; border-top: 1px solid var(--line); }
+#grid .shop-cat-head:first-child { border-top: 0; padding-top: 0; }
+.shop-cat-head h2 { margin: 0; font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: clamp(24px, 3vw, 36px); line-height: 1; }
+.shop-cat-head p { margin: 0; color: var(--muted); font-size: 14.5px; flex: 1 1 260px; }
+.shop-cat-link { margin-left: auto; font-size: 13.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 6px 0; }
+.shop-cat-link svg { width: 15px; transition: transform .3s var(--ease); }
+.shop-cat-link:hover svg { transform: translateX(4px); }
+@media (max-width: 460px) { .shop-cat-link { margin-left: 0; } #grid .shop-cat-head { padding-top: 18px; } }
