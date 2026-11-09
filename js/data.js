@@ -43,6 +43,8 @@ const STORE = {
 const PRODUCTS = [
   {
     id: "customised-lovebook",
+    // pages shown in the home page flipbook (cover first, then pages in reading order)
+    flipPages: ["assets/products/lovebook-pages/cover.webp", "assets/products/lovebook-pages/p1.webp", "assets/products/lovebook-pages/p2.webp", "assets/products/lovebook-pages/p3.webp", "assets/products/lovebook-pages/p4.webp"],
     title: "Customised Lovebook",
     category: "Custom",
     price: 899,

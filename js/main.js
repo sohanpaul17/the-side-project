@@ -470,21 +470,22 @@
     addEventListener("resize", () => { if (phone.matches !== wasPhone) { wasPhone = phone.matches; render(); } });
   }
 
-  /* ---------- Home page: bestseller spotlight with a page-turning flipbook ----------
-     Each page shows one product photo on its front; when it turns, its back becomes the
-     left-hand page with a handwritten note. Turns forever, then flips back to the start. */
+  /* ---------- Home page: bestseller spotlight with the real book, turning its pages ----------
+     The book starts closed on its cover, opens, turns through its pages, closes on the
+     back cover, then flips back to the front — forever. Notes scroll beneath it. */
   function bestsellerSpotlight() {
     const sec = $("#bestseller"); if (!sec) return null;
     const p = PRODUCTS.find((x) => /bestseller/i.test(x.badge || "")) || PRODUCTS[0];
     if (!p) return null;
-    const imgs = imagesOf(p);
-    const notes = (p.details || []).slice(0, imgs.length);
-    while (notes.length < imgs.length) notes.push("made just for you ♡");
-    const pages = imgs.map((src, i) => `
-      <div class="fb-page" style="z-index:${imgs.length - i}">
-        <div class="fb-face fb-front"><img src="${src}" alt="${esc(p.title)} — photo ${i + 1}" loading="lazy"></div>
-        <div class="fb-face fb-back"><span class="fb-num">${String(i + 1).padStart(2, "0")}</span><p>${esc(notes[i])}</p><span class="fb-heart">♡</span></div>
-      </div>`).join("");
+    // the book's own pages if we have them, otherwise the product photos
+    const pg = p.flipPages && p.flipPages.length ? p.flipPages : imagesOf(p);
+    // pages pair up as leaves: front of each leaf is a right-hand page, back is the next left-hand page
+    const leaves = [];
+    for (let i = 0; i < pg.length; i += 2) leaves.push({ front: pg[i], back: pg[i + 1] || null });
+    const face = (src, side) => src
+      ? `<div class="bk-face bk-${side}"><img src="${src}" alt="" loading="lazy"></div>`
+      : `<div class="bk-face bk-${side} bk-backcover"><span>${STAR()}</span><b>The Side Project</b><small>a little bit of everything</small></div>`;
+    const N = leaves.length;
 
     sec.querySelector(".bs-copy").innerHTML = `
       <span class="bs-pill">${STAR()} Bestseller</span>
@@ -497,10 +498,13 @@
         <a class="btn btn-lg btn-ghost bs-view" href="${productUrl(p)}">See the book ${I.arrow}</a>
       </div>`;
     sec.querySelector(".flipbook").innerHTML = `
-      <div class="fb-base fb-base-left"><div><span class="hand">our story</span><b>${esc(p.title)}</b><small>flip through ♡</small></div></div>
-      <div class="fb-base fb-base-right"><img src="${imgs[0]}" alt=""></div>
-      <div class="fb-spine"></div>
-      ${pages}`;
+      <div class="bk-stage">
+        <div class="bk-inner bk-inner-left"></div><div class="bk-inner bk-inner-right"></div>
+        ${leaves.map((l, i) => `<div class="bk-leaf" style="z-index:${N - i}">${face(l.front, "front")}${face(l.back, "back")}</div>`).join("")}
+      </div>`;
+    const notes = [...(p.details || []), p.short].filter(Boolean);
+    const strip = notes.map((t) => `<span>${esc(t)}</span><i>${STAR()}</i>`).join("");
+    sec.querySelector(".bs-notes").innerHTML = `<div class="bs-notes-track">${strip}${strip}</div>`;
     sec.hidden = false;
 
     loadReviews().then((all) => {
@@ -508,30 +512,40 @@
       if (list.length) { const avg = avgRating(list); $("#bs-rating").innerHTML = `${starsHtml(avg)} <b>${avg.toFixed(1)}</b> · ${list.length} happy review${list.length > 1 ? "s" : ""}`; }
     });
 
+    const stage = $(".bk-stage", sec), els = $$(".bk-leaf", sec);
+    let turned = 0;
+    // closed on the front cover → shift right half to centre; closed on the back → shift the other way
+    const place = () => {
+      stage.style.transform = turned === 0 ? "translateX(-25%)" : turned === N ? "translateX(25%)" : "translateX(0)";
+      stage.classList.toggle("is-open", turned > 0 && turned < N);
+    };
+    const setZ = () => els.forEach((el, i) => (el.style.zIndex = i < turned ? 10 + i : N - i));
+    place();
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return p.id;
-    const els = $$(".fb-page", sec), N = els.length;
-    let turned = 0, visible = true, timer;
+
+    let visible = true;
     new IntersectionObserver(([en]) => (visible = en.isIntersecting)).observe(sec);
-    const setZ = () => els.forEach((el, i) => (el.style.zIndex = i < turned ? 100 + i : N - i));
+    const HOLD = 2600;
     const step = () => {
-      if (!visible || document.hidden) return (timer = setTimeout(step, 800));
-      if (turned < N - 1) {
-        // turn the next page; bring it on top of the left stack halfway through the turn
-        const el = els[turned];
-        el.classList.add("turned");
-        turned++;
-        setTimeout(setZ, 450);
-        timer = setTimeout(step, 2600);
+      if (!visible || document.hidden) return setTimeout(step, 800);
+      if (turned < N) {
+        els[turned].classList.add("turned");
+        turned++; place();
+        setTimeout(setZ, 600);
+        setTimeout(step, turned === N ? 2000 : HOLD);
       } else {
-        // reached the end: flip everything back, one after another, then start again
-        for (let k = turned - 1; k >= 0; k--) {
-          setTimeout(() => { els[k].classList.remove("turned"); els[k].style.zIndex = 200 + (N - k); }, (turned - 1 - k) * 160);
-        }
-        setTimeout(() => { turned = 0; setZ(); }, turned * 160 + 1100);
-        timer = setTimeout(step, turned * 160 + 2600);
+        // back to the front cover, turning the pages back one by one
+        const back = () => {
+          if (turned === 0) { setZ(); return setTimeout(step, HOLD); }
+          turned--; const el = els[turned];
+          el.style.zIndex = 50 + turned;
+          el.classList.remove("turned"); place();
+          setTimeout(() => { setZ(); back(); }, 520);
+        };
+        back();
       }
     };
-    timer = setTimeout(step, 1600);
+    setTimeout(step, 1800);
     return p.id;
   }
 
@@ -543,7 +557,7 @@
     const mq = words.map((w) => `<span>${w} ${STAR()}</span>`).join("");
     $("#marquee").innerHTML = mq + mq;
     const bestId = bestsellerSpotlight();
-    const featured = PRODUCTS.filter((p) => p.featured && p.id !== bestId);
+    const featured = PRODUCTS.filter((p) => p.featured);
     const track = $("#carousel-track");
     track.innerHTML = featured.map(card).join("");
     track.classList.toggle("few", featured.length <= 2);
