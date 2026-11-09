@@ -272,6 +272,34 @@ const PRODUCTS = [
       "assets/products/reasons-box-5.webp",
     ],
   },
+  {
+    id: "customised-night-sky",
+    title: "Customised Night Sky",
+    category: "Custom",
+    price: 349,
+    featured: true,
+    badge: "New",
+    formats: ["print", "pdf"],
+    palette: ["#1e2549", "#f3eadb", "#e2b75a"],
+    motif: "sparkle",
+    short: "A star map of the night you met, with you two drawn in beneath it.",
+    description:
+      "The sky on your night, exactly as it was. Tell me your date and the city it happened in, and I'll map the stars as they shone that night — then draw the two of you in beneath it, with your names and a line you love. Perfect for anniversaries, proposals and birthdays, for your girlfriend, boyfriend, husband, wife — or new parents celebrating the night their little one arrived.",
+    details: [
+      "A star map of your special date and place",
+      "You two drawn in, with your names and a line you love",
+      "Printed and ready to frame, delivered to you",
+      "Digital copy included",
+      "Preview shared with you before it's printed",
+    ],
+    images: [
+      "assets/products/night-sky-1.webp",
+      "assets/products/night-sky-4.webp",
+      "assets/products/night-sky-2.webp",
+      "assets/products/night-sky-3.webp",
+      "assets/products/night-sky-5.webp",
+    ],
+  },
 ];
 
 /* ---------------------------------------------------------
