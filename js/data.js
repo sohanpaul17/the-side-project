@@ -40,13 +40,22 @@ const STORE = {
                 ["print", "pdf"] = both, ["pdf"] = PDF only, [] = hide the note.
    - featured:  true = shown on the home page.
    --------------------------------------------------------- */
+/* Shop categories, in the order they appear, with a short line under each heading.
+   A product's `category` must match one of these names. */
+const CATEGORY_INFO = {
+  "Books": "Your story, page by page — illustrated books and scrapbooks.",
+  "Wall Art": "Maps and skies of the moments that made you, ready to frame.",
+  "Letters & Cards": "Little love notes to read again and again.",
+  "Keepsakes": "Everyday things, made yours — for the desk and the fridge.",
+};
+
 const PRODUCTS = [
   {
     id: "customised-lovebook",
     // pages shown in the home page flipbook (cover first, then pages in reading order)
     flipPages: ["assets/products/lovebook-pages/cover.webp", "assets/products/lovebook-pages/p1.webp", "assets/products/lovebook-pages/p2.webp", "assets/products/lovebook-pages/p3.webp", "assets/products/lovebook-pages/p4.webp"],
     title: "Customised Lovebook",
-    category: "Custom",
+    category: "Books",
     price: 899,
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
@@ -80,7 +89,7 @@ const PRODUCTS = [
   {
     id: "customised-mini-lovebook",
     title: "Customised Mini Lovebook",
-    category: "Custom",
+    category: "Books",
     price: 649,
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
@@ -111,7 +120,7 @@ const PRODUCTS = [
   {
     id: "customised-love-letter",
     title: "Customised Love Letter",
-    category: "Custom",
+    category: "Letters & Cards",
     price: 399,
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
@@ -143,7 +152,7 @@ const PRODUCTS = [
   {
     id: "customised-notebook",
     title: "Customised Notebook",
-    category: "Custom",
+    category: "Keepsakes",
     price: 799,
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
@@ -176,7 +185,7 @@ const PRODUCTS = [
   {
     id: "customised-journey-map",
     title: "Customised Journey Map",
-    category: "Custom",
+    category: "Wall Art",
     price: 399,
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
@@ -209,7 +218,7 @@ const PRODUCTS = [
   {
     id: "customised-calendar-magnet",
     title: "Customised Calendar Fridge Magnet",
-    category: "Custom",
+    category: "Keepsakes",
     price: 599,
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
@@ -243,7 +252,7 @@ const PRODUCTS = [
   {
     id: "customised-52-reasons-box",
     title: "Customised 52 Reasons Box",
-    category: "Custom",
+    category: "Letters & Cards",
     price: 399,
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
@@ -274,8 +283,9 @@ const PRODUCTS = [
   },
   {
     id: "customised-night-sky",
+    spotlight: true,   // shown in its own spotlight section on the home page
     title: "Customised Night Sky",
-    category: "Custom",
+    category: "Wall Art",
     price: 349,
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
@@ -306,7 +316,7 @@ const PRODUCTS = [
   {
     id: "customised-scrapbook",
     title: "Customised Scrapbook",
-    category: "Custom",
+    category: "Books",
     price: 899,
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
