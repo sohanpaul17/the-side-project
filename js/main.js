@@ -470,6 +470,71 @@
     addEventListener("resize", () => { if (phone.matches !== wasPhone) { wasPhone = phone.matches; render(); } });
   }
 
+  /* ---------- Home page: bestseller spotlight with a page-turning flipbook ----------
+     Each page shows one product photo on its front; when it turns, its back becomes the
+     left-hand page with a handwritten note. Turns forever, then flips back to the start. */
+  function bestsellerSpotlight() {
+    const sec = $("#bestseller"); if (!sec) return null;
+    const p = PRODUCTS.find((x) => /bestseller/i.test(x.badge || "")) || PRODUCTS[0];
+    if (!p) return null;
+    const imgs = imagesOf(p);
+    const notes = (p.details || []).slice(0, imgs.length);
+    while (notes.length < imgs.length) notes.push("made just for you ♡");
+    const pages = imgs.map((src, i) => `
+      <div class="fb-page" style="z-index:${imgs.length - i}">
+        <div class="fb-face fb-front"><img src="${src}" alt="${esc(p.title)} — photo ${i + 1}" loading="lazy"></div>
+        <div class="fb-face fb-back"><span class="fb-num">${String(i + 1).padStart(2, "0")}</span><p>${esc(notes[i])}</p><span class="fb-heart">♡</span></div>
+      </div>`).join("");
+
+    sec.querySelector(".bs-copy").innerHTML = `
+      <span class="bs-pill">${STAR()} Bestseller</span>
+      <h2 class="h-display bs-title">${esc(p.title)}</h2>
+      <p class="bs-rating" id="bs-rating"></p>
+      <p class="bs-short">${esc(p.short)}</p>
+      <div class="bs-price"><span class="price">${money(p.price)}</span>${p.priceNote ? `<small>${esc(p.priceNote)}</small>` : ""}</div>
+      <div class="bs-actions">
+        <a class="btn btn-lg bs-buy" href="${productUrl(p)}" data-buy="${esc(p.id)}">${I.bag} Buy now</a>
+        <a class="btn btn-lg btn-ghost bs-view" href="${productUrl(p)}">See the book ${I.arrow}</a>
+      </div>`;
+    sec.querySelector(".flipbook").innerHTML = `
+      <div class="fb-base fb-base-left"><div><span class="hand">our story</span><b>${esc(p.title)}</b><small>flip through ♡</small></div></div>
+      <div class="fb-base fb-base-right"><img src="${imgs[0]}" alt=""></div>
+      <div class="fb-spine"></div>
+      ${pages}`;
+    sec.hidden = false;
+
+    loadReviews().then((all) => {
+      const list = all.filter((r) => r.product === p.id);
+      if (list.length) { const avg = avgRating(list); $("#bs-rating").innerHTML = `${starsHtml(avg)} <b>${avg.toFixed(1)}</b> · ${list.length} happy review${list.length > 1 ? "s" : ""}`; }
+    });
+
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return p.id;
+    const els = $$(".fb-page", sec), N = els.length;
+    let turned = 0, visible = true, timer;
+    new IntersectionObserver(([en]) => (visible = en.isIntersecting)).observe(sec);
+    const setZ = () => els.forEach((el, i) => (el.style.zIndex = i < turned ? 100 + i : N - i));
+    const step = () => {
+      if (!visible || document.hidden) return (timer = setTimeout(step, 800));
+      if (turned < N - 1) {
+        // turn the next page; bring it on top of the left stack halfway through the turn
+        const el = els[turned];
+        el.classList.add("turned");
+        turned++;
+        setTimeout(setZ, 450);
+        timer = setTimeout(step, 2600);
+      } else {
+        // reached the end: flip everything back, one after another, then start again
+        for (let k = turned - 1; k >= 0; k--) {
+          setTimeout(() => { els[k].classList.remove("turned"); els[k].style.zIndex = 200 + (N - k); }, (turned - 1 - k) * 160);
+        }
+        setTimeout(() => { turned = 0; setZ(); }, turned * 160 + 1100);
+        timer = setTimeout(step, turned * 160 + 2600);
+      }
+    };
+    timer = setTimeout(step, 1600);
+    return p.id;
+  }
+
   /* ================= PAGES ================= */
   function homePage() {
     initLogoOrbit();
@@ -477,7 +542,8 @@
     const words = ["Lovebooks", "Love letters", "Journey maps", "Notebooks", "Calendar magnets", "52 Reasons boxes", "Drawn just for you", "Made with love"];
     const mq = words.map((w) => `<span>${w} ${STAR()}</span>`).join("");
     $("#marquee").innerHTML = mq + mq;
-    const featured = PRODUCTS.filter((p) => p.featured);
+    const bestId = bestsellerSpotlight();
+    const featured = PRODUCTS.filter((p) => p.featured && p.id !== bestId);
     const track = $("#carousel-track");
     track.innerHTML = featured.map(card).join("");
     track.classList.toggle("few", featured.length <= 2);
