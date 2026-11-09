@@ -238,6 +238,35 @@ const PRODUCTS = [
       "assets/products/calendar-magnet-7.webp",
     ],
   },
+  {
+    id: "customised-52-reasons-box",
+    title: "Customised 52 Reasons Box",
+    category: "Custom",
+    price: 399,
+    featured: true,
+    badge: "New",
+    formats: ["print", "pdf"],
+    palette: ["#fde2ea", "#1b1b1b", "#e0456e"],
+    motif: "dots",
+    short: "52 reasons why you love them — one little card each, in a keepsake box.",
+    description:
+      "Tell them all the reasons, one card at a time. The 52 Reasons Box is a deck of playing-card-sized cards, each with one of your own reasons and tiny drawings of you two that look just like you. \"Your smile fixes my worst days.\" \"Our 2 AM conversations.\" \"Simply because you're you.\" Every card is a little love note, tucked into a keepsake box that's delivered to your door — with a PDF copy of every card too.",
+    details: [
+      "Up to 52 reason cards — your own reasons, one per card",
+      "Tiny drawings of you two, drawn to look like you",
+      "Playing-card size: 63 × 88 mm, thick matte card stock with rounded corners",
+      "Keepsake gift box (70 × 95 × 25 mm), delivered to your door",
+      "Digital PDF copy of every card",
+      "Preview shared with you before it's printed",
+    ],
+    images: [
+      "assets/products/reasons-box-1.webp",
+      "assets/products/reasons-box-2.webp",
+      "assets/products/reasons-box-3.webp",
+      "assets/products/reasons-box-4.webp",
+      "assets/products/reasons-box-5.webp",
+    ],
+  },
 ];
 
 /* ---------------------------------------------------------
