@@ -468,7 +468,7 @@
   function homePage() {
     initLogoOrbit();
     homeReviews();
-    const words = ["Customised Lovebooks", "Hand-illustrated", "Your story", "Printed + PDF copy", "Mini Lovebooks", "Made with love"];
+    const words = ["Lovebooks", "Love letters", "Journey maps", "Notebooks", "Calendar magnets", "52 Reasons boxes", "Drawn just for you", "Made with love"];
     const mq = words.map((w) => `<span>${w} ${STAR()}</span>`).join("");
     $("#marquee").innerHTML = mq + mq;
     const featured = PRODUCTS.filter((p) => p.featured);
