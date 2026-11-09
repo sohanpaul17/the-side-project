@@ -243,6 +243,8 @@ const PRODUCTS = [
     title: "Customised 52 Reasons Box",
     category: "Custom",
     price: 399,
+    priceNote: "Including shipping within India",
+    shippingNote: "International shipping costs extra",
     featured: true,
     badge: "New",
     formats: ["print", "pdf"],
@@ -258,6 +260,7 @@ const PRODUCTS = [
       "Keepsake gift box (70 × 95 × 25 mm), delivered to your door",
       "Digital PDF copy of every card",
       "Preview shared with you before it's printed",
+      "Price includes shipping within India — international shipping costs extra",
     ],
     images: [
       "assets/products/reasons-box-1.webp",
