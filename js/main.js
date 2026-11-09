@@ -500,6 +500,17 @@
     sec.hidden = false;
 
     fillRating(sec.querySelector(".spot-book"), p);
+    // the Lovebook card's background: drifting glows, hearts floating up, little sparkles
+    const lb = sec.querySelector(".lb-field");
+    if (lb) {
+      let sd = 3; const r = () => ((sd = (sd * 9301 + 49297) % 233280) / 233280);
+      const HEART = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.7 4.5c2.2 0 3.6 1.2 5.3 3.1 1.7-1.9 3.1-3.1 5.3-3.1 3.7 0 5.9 3.8 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>';
+      const colors = ["#f06b8f", "#ff9eb5", "#e0456e", "#c9b4f2", "#ffc7d6", "#f6a3c4"];
+      lb.innerHTML =
+        '<b class="lb-glow g1"></b><b class="lb-glow g2"></b><b class="lb-glow g3"></b>' +
+        Array.from({ length: 16 }, (_, i) => `<span class="lb-heart" style="left:${(r() * 96).toFixed(1)}%;--s:${(12 + r() * 22).toFixed(0)}px;--d:${(9 + r() * 9).toFixed(1)}s;--sway:${(20 + r() * 40).toFixed(0)}px;--c:${colors[i % colors.length]};animation-delay:-${(r() * 18).toFixed(1)}s">${HEART}</span>`).join("") +
+        Array.from({ length: 18 }, () => `<i class="lb-spark" style="left:${(r() * 100).toFixed(1)}%;top:${(r() * 100).toFixed(1)}%;animation-delay:-${(r() * 3).toFixed(1)}s"></i>`).join("");
+    }
 
     const stage = $(".bk-stage", sec), els = $$(".bk-leaf", sec);
     let turned = 0;

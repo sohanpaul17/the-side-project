@@ -855,3 +855,18 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
   .ss-field .shoot { display: none; }
   .ss-poster .cons, .ss-poster .cons polyline { animation: none; opacity: 1; stroke-dashoffset: 0; }
 }
+
+/* Lovebook spotlight card: rose background with drifting glows, floating hearts and sparkles */
+.spot-card.spot-book { background: radial-gradient(ellipse at 50% 0%, #4a2445 0%, #321a35 50%, #22142a 100%); border-color: rgba(240,107,143,.28); }
+.lb-field { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lb-glow { position: absolute; border-radius: 50%; filter: blur(50px); opacity: .55; animation: lbDrift 14s ease-in-out infinite alternate; }
+.lb-glow.g1 { width: 260px; height: 260px; background: #e0456e; left: -60px; top: 10%; }
+.lb-glow.g2 { width: 220px; height: 220px; background: #9b6be0; right: -50px; top: 35%; animation-duration: 17s; animation-delay: -5s; }
+.lb-glow.g3 { width: 200px; height: 200px; background: #f6a35a; left: 30%; bottom: -80px; opacity: .35; animation-duration: 20s; animation-delay: -9s; }
+@keyframes lbDrift { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -30px) scale(1.15); } 100% { transform: translate(-30px, 20px) scale(.9); } }
+.lb-heart { position: absolute; bottom: -40px; width: var(--s); height: var(--s); color: var(--c); opacity: 0; filter: drop-shadow(0 0 8px rgba(240,107,143,.55)); animation: lbFloat var(--d) linear infinite; }
+.lb-heart svg { width: 100%; height: 100%; display: block; fill: currentColor; animation: lbSway calc(var(--d) / 3) ease-in-out infinite alternate; }
+@keyframes lbFloat { 0% { transform: translateY(0) rotate(-10deg); opacity: 0; } 10% { opacity: .85; } 80% { opacity: .6; } 100% { transform: translateY(-900px) rotate(12deg); opacity: 0; } }
+@keyframes lbSway { from { transform: translateX(calc(var(--sway) * -.5)); } to { transform: translateX(calc(var(--sway) * .5)); } }
+.lb-spark { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #ffe3ec; box-shadow: 0 0 8px 2px rgba(255,200,220,.7); opacity: 0; animation: ssTwinkle 3s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .lb-glow, .lb-heart, .lb-heart svg, .lb-spark { animation: none; } .lb-heart { opacity: .4; bottom: auto; top: 50%; } }
