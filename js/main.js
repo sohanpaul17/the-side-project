@@ -729,6 +729,7 @@
         <h1 class="pdp-title reveal" style="--d:.1s">${esc(p.title)}</h1>
         <div class="pdp-price reveal" style="--d:.15s"><span class="price">${money(p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>${save ? `<span class="save-tag">Save ${save}%</span>` : ""}${p.priceNote ? `<span class="ship-tag">${I.check} ${esc(p.priceNote)}</span>` : ""}</div>
         ${p.shippingNote ? `<p class="intl-note reveal" style="--d:.17s">✈ ${esc(p.shippingNote)}</p>` : ""}
+        ${p.framingNote ? `<div class="frame-note reveal" style="--d:.19s" role="note"><span class="frame-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg></span><span><b>Framing costs extra</b><small>${esc(p.framingNote)}. Want it framed? Just ask when you order.</small></span></div>` : ""}
         <p class="pdp-short reveal" style="--d:.2s">${esc(p.short)}</p>
         ${fmts.length ? `
         <div class="delivery reveal" style="--d:.25s">

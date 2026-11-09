@@ -122,6 +122,7 @@ const PRODUCTS = [
     title: "Customised Love Letter",
     category: "Letters & Cards",
     price: 399,
+    framingNote: "The print is delivered without a frame",
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
     featured: true,
@@ -133,6 +134,7 @@ const PRODUCTS = [
     description:
       "Some feelings deserve more than a text. The Customised Love Letter pairs your own words with one big, hand-drawn illustration of your favourite moment together — the first trip, the proposal, an ordinary Tuesday — with characters drawn to look just like you. Write what you feel and I'll lay it out in a beautiful handwritten style, printed and ready to frame. Perfect for proposals, anniversaries and long-distance surprises, for your girlfriend, boyfriend, husband, wife, mom, dad or best friend.",
     details: [
+      "Frame not included — framing costs extra",
       "One custom illustration of your favourite moment, with characters that look like you",
       "Your letter, laid out in a handwritten style",
       "Choose A4 (21 × 29.7 cm) or A3 (29.7 × 42 cm) — both fit a standard frame",
@@ -187,6 +189,7 @@ const PRODUCTS = [
     title: "Customised Journey Map",
     category: "Wall Art",
     price: 399,
+    framingNote: "The print is delivered without a frame",
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
     featured: true,
@@ -198,6 +201,7 @@ const PRODUCTS = [
     description:
       "Where you met, the first coffee, the first date, the proposal, home — every place that matters, drawn as one illustrated map. Each place gets its own pin and a little note in your words, with cute characters that look like you and your names on top. Make one for your partner, your family or your best friends. You name the places, I draw the journey.",
     details: [
+      "Frame not included — framing costs extra",
       "An illustrated map of your places, with a pin and note for each",
       "Your names and cute characters that look like you",
       "Choose A3 (29.7 × 42 cm), A4 (21 × 29.7 cm) or A5 (14.8 × 21 cm)",
@@ -287,6 +291,7 @@ const PRODUCTS = [
     title: "Customised Night Sky",
     category: "Wall Art",
     price: 349,
+    framingNote: "The print is delivered without a frame",
     priceNote: "Including shipping within India",
     shippingNote: "International shipping costs extra",
     featured: true,
@@ -298,6 +303,7 @@ const PRODUCTS = [
     description:
       "The sky on your night, exactly as it was. Tell me your date and the city it happened in, and I'll map the stars as they shone that night — then draw the two of you in beneath it, with your names and a line you love. Perfect for anniversaries, proposals and birthdays, for your girlfriend, boyfriend, husband, wife — or new parents celebrating the night their little one arrived.",
     details: [
+      "Frame not included — framing costs extra",
       "A star map of your special date and place",
       "You two drawn in, with your names and a line you love",
       "Printed and ready to frame, delivered to you",
