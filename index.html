@@ -63,9 +63,19 @@
   <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
 
   <section class="bestseller" id="bestseller" hidden>
-    <div class="wrap bs-grid">
-      <div class="bs-copy reveal reveal-l"></div>
-      <div class="flipbook-wrap reveal reveal-r"><div class="flipbook" aria-label="Pages of our bestseller"></div></div>
+    <div class="wrap">
+      <div class="spot-head"><span class="eyebrow reveal">In the spotlight</span><h2 class="h-display h2"><span class="split-line"><span>Two little favourites</span></span></h2></div>
+      <div class="spot-grid">
+        <article class="spot-card spot-book reveal reveal-l">
+          <div class="spot-visual"><div class="flipbook-wrap"><div class="flipbook" aria-label="Pages of our bestseller"></div></div></div>
+          <div class="bs-copy"></div>
+        </article>
+        <article class="spot-card sky reveal reveal-r" id="sky-spot">
+          <div class="ss-field" aria-hidden="true"></div>
+          <div class="spot-visual ss-art"></div>
+          <div class="ss-copy"></div>
+        </article>
+      </div>
     </div>
     <div class="bs-notes" aria-hidden="true"></div>
   </section>
@@ -89,15 +99,6 @@
         </div>
       </div>
     </div>
-  </section>
-
-  <section class="sky-spot" id="sky-spot" hidden>
-    <div class="ss-field" aria-hidden="true"></div>
-    <div class="wrap ss-grid">
-      <div class="ss-art reveal reveal-l"></div>
-      <div class="ss-copy reveal reveal-r"></div>
-    </div>
-    <div class="bs-notes ss-notes" aria-hidden="true"></div>
   </section>
 
   <section class="section home-reviews" id="home-reviews" hidden style="padding-top:0">

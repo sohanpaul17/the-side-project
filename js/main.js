@@ -487,30 +487,19 @@
       : `<div class="bk-face bk-${side} bk-backcover"><span>${STAR()}</span><b>The Side Project</b><small>a little bit of everything</small></div>`;
     const N = leaves.length;
 
-    sec.querySelector(".bs-copy").innerHTML = `
-      <span class="bs-pill">${STAR()} Bestseller</span>
-      <h2 class="h-display bs-title">${esc(p.title)}</h2>
-      <p class="bs-rating" id="bs-rating"></p>
-      <p class="bs-short">${esc(p.short)}</p>
-      <div class="bs-price"><span class="price">${money(p.price)}</span>${p.priceNote ? `<small>${esc(p.priceNote)}</small>` : ""}</div>
-      <div class="bs-actions">
-        <a class="btn btn-lg bs-buy" href="${productUrl(p)}" data-buy="${esc(p.id)}">${I.bag} Buy now</a>
-        <a class="btn btn-lg btn-ghost bs-view" href="${productUrl(p)}">See the book ${I.arrow}</a>
-      </div>`;
+    sec.querySelector(".bs-copy").innerHTML = spotCopy(p, "Bestseller", "See the book");
     sec.querySelector(".flipbook").innerHTML = `
       <div class="bk-stage">
         <div class="bk-inner bk-inner-left"></div><div class="bk-inner bk-inner-right"></div>
         ${leaves.map((l, i) => `<div class="bk-leaf" style="z-index:${N - i}">${face(l.front, "front")}${face(l.back, "back")}</div>`).join("")}
       </div>`;
-    const notes = [...(p.details || []), p.short].filter(Boolean);
+    const sky = PRODUCTS.find((x) => x.spotlight);
+    const notes = [...(p.details || []), ...((sky && sky.details) || [])].filter(Boolean);
     const strip = notes.map((t) => `<span>${esc(t)}</span><i>${STAR()}</i>`).join("");
     sec.querySelector(".bs-notes").innerHTML = `<div class="bs-notes-track">${strip}${strip}</div>`;
     sec.hidden = false;
 
-    loadReviews().then((all) => {
-      const list = all.filter((r) => r.product === p.id);
-      if (list.length) { const avg = avgRating(list); $("#bs-rating").innerHTML = `${starsHtml(avg)} <b>${avg.toFixed(1)}</b> · ${list.length} happy review${list.length > 1 ? "s" : ""}`; }
-    });
+    fillRating(sec.querySelector(".spot-book"), p);
 
     const stage = $(".bk-stage", sec), els = $$(".bk-leaf", sec);
     let turned = 0;
@@ -549,64 +538,97 @@
     return p.id;
   }
 
-  /* ---------- Home page: Night Sky spotlight ----------
-     A framed star map whose sky slowly turns and twinkles, with an occasional shooting star. */
+  /* ---------- Home page: Night Sky spotlight card ----------
+     A framed star map: bright stars sparkle, shooting stars streak across, and constellations
+     draw themselves in one after another while the whole sky slowly turns. */
   function skySpotlight() {
-    const sec = $("#sky-spot"); if (!sec) return;
-    const p = PRODUCTS.find((x) => x.spotlight) ; if (!p) return;
-    // a seeded scatter of stars inside the circle
+    const card = $("#sky-spot"); if (!card) return;
+    const p = PRODUCTS.find((x) => x.spotlight); if (!p) { card.hidden = true; return; }
     let seed = 7; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
     const W = 400, H = 540, cx = 200, cy = 205, R = 160;
-    const stars = [];
-    while (stars.length < 90) {
-      const x = (rnd() * 2 - 1) * R, y = (rnd() * 2 - 1) * R;
-      if (x * x + y * y < (R - 10) ** 2) stars.push([cx + x, cy + y, [0.9, 0.9, 1.2, 1.6, 2.2][Math.floor(rnd() * 5)], (rnd() * 4).toFixed(2)]);
+    const inCircle = (x, y, pad = 12) => (x - cx) ** 2 + (y - cy) ** 2 < (R - pad) ** 2;
+    // faint background stars, some twinkling
+    let dots = "";
+    for (let n = 0; n < 110;) {
+      const x = cx + (rnd() * 2 - 1) * R, y = cy + (rnd() * 2 - 1) * R;
+      if (!inCircle(x, y)) continue; n++;
+      const r = [0.7, 0.9, 1.1, 1.4][Math.floor(rnd() * 4)];
+      dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="#fff" class="${n % 2 ? "tw" : "tw2"}" style="animation-delay:-${(rnd() * 5).toFixed(2)}s"/>`;
     }
-    const dots = stars.map(([x, y, r, d], i) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="#fff" class="${i % 3 ? "" : "tw"}" style="animation-delay:-${d}s"/>`).join("");
-    const pick = [3, 17, 29, 41, 52, 64, 71, 80, 88].map((i) => stars[i]);
-    const lines = pick.slice(0, -1).map((a, i) => `<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${pick[i + 1][0].toFixed(1)}" y2="${pick[i + 1][1].toFixed(1)}"/>`).join("");
+    // bright sparkling stars (four-point glints with a glow)
+    const glint = (x, y, s, d) => `<g class="glint" style="animation-delay:-${d}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${s * .55}" fill="#fff" filter="url(#ss-glow)"/><path d="M${x} ${y - s * 2.6}Q${x + s * .3} ${y - s * .3} ${x + s * 2.6} ${y}Q${x + s * .3} ${y + s * .3} ${x} ${y + s * 2.6}Q${x - s * .3} ${y + s * .3} ${x - s * 2.6} ${y}Q${x - s * .3} ${y - s * .3} ${x} ${y - s * 2.6}Z" fill="#fff"/></g>`;
+    let glints = "";
+    for (let n = 0; n < 9;) {
+      const x = cx + (rnd() * 2 - 1) * R, y = cy + (rnd() * 2 - 1) * R;
+      if (!inCircle(x, y, 26)) continue; n++;
+      glints += glint(x.toFixed(1), y.toFixed(1), 2 + rnd() * 1.6, (rnd() * 4).toFixed(2));
+    }
+    // three constellations that draw in one after another
+    const shapes = [
+      { at: [118, 128], pts: [[0, 0], [26, 8], [50, 4], [72, 18], [80, 46], [108, 50], [104, 22], [72, 18]] },   // dipper
+      { at: [205, 250], pts: [[0, 0], [22, 26], [44, 6], [66, 30], [90, 4]] },                                   // the W
+      { at: [140, 210], pts: [[30, 0], [0, 40], [34, 46], [62, 44], [44, 88], [10, 84], [34, 46]] },              // the hunter
+    ];
+    const cons = shapes.map((c, k) => {
+      const pts = c.pts.map(([x, y]) => [c.at[0] + x, c.at[1] + y]);
+      const nodes = [...new Set(pts.map((q) => q.join(",")))].map((q) => { const [x, y] = q.split(","); return `<circle cx="${x}" cy="${y}" r="2.3" fill="#fff"/>`; }).join("");
+      return `<g class="cons" style="animation-delay:${k * 4}s"><polyline points="${pts.map((q) => q.join(",")).join(" ")}" pathLength="1"/>${nodes}</g>`;
+    }).join("");
+    const shooters = [[30, 60, 26, 0], [120, 30, 34, 2.6], [40, 150, 18, 5.1]]
+      .map(([x, y, a, d]) => `<g class="shoot" style="animation-delay:${d}s;--sx:${x}px;--sy:${y}px;--ang:${a}deg"><rect x="-80" y="-1.3" width="80" height="2.6" rx="1.3" fill="url(#ss-tail)"/><circle r="2.6" fill="#fff" filter="url(#ss-glow)"/></g>`).join("");
     const fw = 130, fh = fw * 312 / 462;
-    const names = (p.spotlightNames || "RIYA & AARAV"), when = (p.spotlightLine || "14 · 02 · 2019 · PUNE");
-    sec.querySelector(".ss-art").innerHTML = `
+    card.querySelector(".ss-art").innerHTML = `
       <div class="ss-frame"><div class="ss-mat">
         <svg class="ss-poster" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.title)}">
-          <defs><clipPath id="ss-clip"><circle cx="${cx}" cy="${cy}" r="${R - 4}"/></clipPath>
-            <linearGradient id="ss-shoot" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></linearGradient></defs>
+          <defs>
+            <clipPath id="ss-clip"><circle cx="${cx}" cy="${cy}" r="${R - 4}"/></clipPath>
+            <linearGradient id="ss-tail" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></linearGradient>
+            <filter id="ss-glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="2.4"/></filter>
+            <radialGradient id="ss-skyfill" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#2f3a78"/><stop offset="1" stop-color="#222a58"/></radialGradient>
+          </defs>
           <rect width="${W}" height="${H}" fill="#1e2549"/>
-          <circle cx="${cx}" cy="${cy}" r="${R}" fill="#26305e"/>
+          <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#ss-skyfill)"/>
           <g clip-path="url(#ss-clip)">
-            <g class="ss-wheel" style="transform-origin:${cx}px ${cy}px">${dots}<g class="ss-lines">${lines}</g></g>
-            <g class="ss-shooting"><rect x="0" y="-1.2" width="90" height="2.4" rx="1.2" fill="url(#ss-shoot)"/></g>
+            <g class="ss-wheel" style="transform-origin:${cx}px ${cy}px">${dots}${cons}</g>
           </g>
-          <g transform="translate(${cx + R * .62} ${cy - R * .62})"><circle r="14" fill="#f6dc8f"/><circle cx="6" cy="-4" r="13" fill="#26305e"/></g>
+          <g transform="translate(${cx + R * .62} ${cy - R * .62})" class="ss-moon"><circle r="15" fill="#f6dc8f" filter="url(#ss-glow)" opacity=".6"/><circle r="14" fill="#f6dc8f"/><circle cx="6" cy="-4" r="13" fill="#283163"/></g>
           <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#e2b75a" stroke-width="2.5"/>
           <circle cx="${cx}" cy="${cy}" r="${R - 7}" fill="none" stroke="#e2b75a" stroke-opacity=".5" stroke-width="1"/>
           <image href="assets/products/night-sky-faces.png" x="${cx - fw / 2}" y="${cy + R - fh * .42}" width="${fw}" height="${fh}"/>
           <text x="${cx}" y="458" text-anchor="middle" class="ss-t1">the night we met</text>
-          <text x="${cx}" y="488" text-anchor="middle" class="ss-t2">${esc(names)}</text>
-          <text x="${cx}" y="515" text-anchor="middle" class="ss-t3">${esc(when)}</text>
+          <text x="${cx}" y="488" text-anchor="middle" class="ss-t2">RIYA &amp; AARAV</text>
+          <text x="${cx}" y="515" text-anchor="middle" class="ss-t3">14 · 02 · 2019 · PUNE</text>
         </svg>
       </div></div>`;
-    sec.querySelector(".ss-copy").innerHTML = `
-      <span class="bs-pill ss-pill">${STAR()} In the spotlight</span>
-      <h2 class="h-display bs-title">${esc(p.title)}</h2>
-      <p class="bs-rating" id="ss-rating"></p>
+    card.querySelector(".ss-copy").innerHTML = spotCopy(p, "New · Star map", "See the star map");
+    // the card's own sky, behind the poster: twinkling dots, sparkling stars and shooting stars
+    const pos = () => `left:${(rnd() * 100).toFixed(1)}%;top:${(rnd() * 100).toFixed(1)}%`;
+    card.querySelector(".ss-field").innerHTML =
+      Array.from({ length: 55 }, () => `<i style="${pos()};animation-delay:-${(rnd() * 4).toFixed(1)}s;transform:scale(${(0.5 + rnd()).toFixed(2)})"></i>`).join("") +
+      Array.from({ length: 12 }, () => `<span class="sp" style="${pos()};animation-delay:-${(rnd() * 3.2).toFixed(1)}s;--s:${(10 + rnd() * 14).toFixed(0)}px">${STAR()}</span>`).join("") +
+      [[8, 6, 22, 0], [40, 2, 28, 2.4], [-5, 30, 18, 4.6], [55, 12, 32, 6.4]].map(([x, y, a, d]) =>
+        `<b class="shoot" style="left:${x}%;top:${y}%;--ang:${a}deg;animation-delay:${d}s"></b>`).join("");
+    fillRating(card, p);
+    return p;
+  }
+
+  // shared copy block for a spotlight card
+  function spotCopy(p, pill, viewLabel) {
+    return `
+      <span class="bs-pill">${STAR()} ${esc(pill)}</span>
+      <h3 class="h-display spot-title">${esc(p.title)}</h3>
+      <p class="bs-rating"></p>
       <p class="bs-short">${esc(p.short)}</p>
       <div class="bs-price"><span class="price">${money(p.price)}</span>${p.priceNote ? `<small>${esc(p.priceNote)}</small>` : ""}</div>
       <div class="bs-actions">
         <a class="btn btn-lg bs-buy" href="${productUrl(p)}" data-buy="${esc(p.id)}">${I.bag} Buy now</a>
-        <a class="btn btn-lg btn-ghost bs-view" href="${productUrl(p)}">See the star map ${I.arrow}</a>
+        <a class="btn btn-lg btn-ghost bs-view" href="${productUrl(p)}">${esc(viewLabel)} ${I.arrow}</a>
       </div>`;
-    const notes = [...(p.details || []), p.short].filter(Boolean);
-    const strip = notes.map((t) => `<span>${esc(t)}</span><i>${STAR()}</i>`).join("");
-    sec.querySelector(".ss-notes").innerHTML = `<div class="bs-notes-track">${strip}${strip}</div>`;
-    // a field of tiny twinkling stars behind everything
-    sec.querySelector(".ss-field").innerHTML = Array.from({ length: 60 }, () =>
-      `<i style="left:${(rnd() * 100).toFixed(1)}%;top:${(rnd() * 100).toFixed(1)}%;animation-delay:-${(rnd() * 4).toFixed(1)}s;transform:scale(${(0.5 + rnd()).toFixed(2)})"></i>`).join("");
-    sec.hidden = false;
+  }
+  function fillRating(card, p) {
     loadReviews().then((all) => {
-      const list = all.filter((r) => r.product === p.id);
-      if (list.length) { const avg = avgRating(list); $("#ss-rating").innerHTML = `${starsHtml(avg)} <b>${avg.toFixed(1)}</b> · ${list.length} happy review${list.length > 1 ? "s" : ""}`; }
+      const list = all.filter((r) => r.product === p.id), el = card.querySelector(".bs-rating");
+      if (list.length && el) { const avg = avgRating(list); el.innerHTML = `${starsHtml(avg)} <b>${avg.toFixed(1)}</b> · ${list.length} happy review${list.length > 1 ? "s" : ""}`; }
     });
   }
 
