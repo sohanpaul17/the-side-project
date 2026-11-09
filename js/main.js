@@ -168,7 +168,7 @@
         <div class="footer-top">
           <div>
             <img class="footer-logo" src="assets/logo-light.png" alt="${esc(STORE.name)} logo">
-            <p style="opacity:.7;max-width:34ch;margin:0">Customised, hand-illustrated Lovebooks — printed, delivered, and with a PDF copy to keep.</p>
+            <p style="opacity:.7;max-width:34ch;margin:0">Customised, hand-illustrated gifts about you and your favourite people — made to order and delivered to your door.</p>
           </div>
           <div><h4>Explore</h4><ul>${NAV.map(([h, l]) => `<li><a href="${h}">${l}</a></li>`).join("")}</ul></div>
           <div><h4>Shop</h4><ul>${PRODUCTS.slice(0, 5).map((p) => `<li><a href="${productUrl(p)}">${esc(p.title)}</a></li>`).join("")}</ul></div>
@@ -454,14 +454,20 @@
     sec.hidden = false;
     const avg = avgRating(list);
     $("#home-rv-score").innerHTML = `${starsHtml(avg)} <b>${avg.toFixed(1)}</b> from ${list.length} review${list.length > 1 ? "s" : ""}`;
-    // two rows moving in opposite directions once there are enough reviews
-    const rows = list.length >= 6 ? [list.filter((_, i) => i % 2 === 0), list.filter((_, i) => i % 2 === 1)] : [list];
-    $("#home-rv-rows").innerHTML = rows.map((items, r) => {
-      let set = items.slice();
-      while (set.length < 6) set = set.concat(items); // enough cards to fill wide screens
-      const cards = set.map((x) => reviewCard(x)).join("");
-      return `<div class="rv-row-track ${r % 2 ? "rev" : ""}" style="--dur:${set.length * 7}s"><div class="rv-row-set">${cards}</div><div class="rv-row-set" aria-hidden="true">${cards}</div></div>`;
-    }).join("");
+    // two rows moving in opposite directions once there are enough reviews — but always one row on phones
+    const phone = matchMedia("(max-width: 600px)");
+    const render = () => {
+      const rows = list.length >= 6 && !phone.matches ? [list.filter((_, i) => i % 2 === 0), list.filter((_, i) => i % 2 === 1)] : [list];
+      $("#home-rv-rows").innerHTML = rows.map((items, r) => {
+        let set = items.slice();
+        while (set.length < 6) set = set.concat(items); // enough cards to fill wide screens
+        const cards = set.map((x) => reviewCard(x)).join("");
+        return `<div class="rv-row-track ${r % 2 ? "rev" : ""}" style="--dur:${set.length * 7}s"><div class="rv-row-set">${cards}</div><div class="rv-row-set" aria-hidden="true">${cards}</div></div>`;
+      }).join("");
+    };
+    let wasPhone = phone.matches;
+    render();
+    addEventListener("resize", () => { if (phone.matches !== wasPhone) { wasPhone = phone.matches; render(); } });
   }
 
   /* ================= PAGES ================= */
