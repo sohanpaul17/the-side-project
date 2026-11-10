@@ -47,6 +47,7 @@ const CATEGORY_INFO = {
   "Wall Art": "Maps and skies of the moments that made you, ready to frame.",
   "Letters & Cards": "Little love notes to read again and again.",
   "Keepsakes": "Everyday things, made yours — for the desk and the fridge.",
+  "Digital": "Instant little gifts, sent to your inbox the same day.",
 };
 
 const PRODUCTS = [
@@ -421,6 +422,34 @@ const PRODUCTS = [
       "assets/products/bookmark-3.webp",
       "assets/products/bookmark-4.webp",
       "assets/products/bookmark-5.webp",
+    ],
+  },
+  {
+    id: "customised-wallpaper",
+    title: "Customised Wallpaper",
+    category: "Digital",
+    price: 99,
+    priceNote: "Same-day delivery by email",
+    featured: true,
+    badge: "New",
+    formats: ["digital"],   // nothing to print or ship
+    palette: ["#ffd3e2", "#1b1b1b", "#e0456e"],
+    motif: "circles",
+    short: "See them every time you unlock — a custom phone wallpaper with your favourite people drawn in.",
+    description:
+      "Your favourite people, right on your phone. I'll draw you and yours as cute characters with names, a date or a line you love, as a matching lock screen and home screen set made to fit any phone. It's fully digital — nothing to print and nothing to ship — so your wallpapers arrive by email the same day, as both PDF and PNG files. A quick, sweet gift for your partner, best friend, siblings, parents or someone far away, or a cute add-on to any order.",
+    details: [
+      "A matching lock screen + home screen set",
+      "Cute characters with names, dates or a line you love",
+      "Made to fit any phone",
+      "Sent by email as PDF and PNG files",
+      "Same-day delivery — nothing to print, nothing to ship",
+      "Perfect for partners, best friends, siblings, parents and long distance",
+    ],
+    images: [
+      "assets/products/wallpaper-1.webp",
+      "assets/products/wallpaper-2.webp",
+      "assets/products/wallpaper-3.webp",
     ],
   },
 ];

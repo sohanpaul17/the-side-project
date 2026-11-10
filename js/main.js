@@ -33,7 +33,7 @@
   const igProfile = () => `https://instagram.com/${STORE.instagramHandle}`;
   const productUrl = (p) => `product.html?id=${encodeURIComponent(p.id)}`;
   const buyMessage = (p, format, size) =>
-    `Hi! I'd like to buy "${p.title}"${size ? ` — ${size.label} size` : ""} (${money(size ? size.price : p.price)}${p.unit ? ` for a ${p.unit}` : ""}${p.priceNote ? ", " + p.priceNote.charAt(0).toLowerCase() + p.priceNote.slice(1) : ""})${format ? ` as a ${format === "print" ? "printed copy" : "PDF"}` : ""}. Is it available?`;
+    `Hi! I'd like to buy "${p.title}"${size ? ` — ${size.label} size` : ""} (${money(size ? size.price : p.price)}${p.unit ? ` for a ${p.unit}` : ""}${p.priceNote ? ", " + p.priceNote.charAt(0).toLowerCase() + p.priceNote.slice(1) : ""})${format ? ` as a ${(format === "print" ? "printed copy" : format === "digital" ? "digital download (PDF + PNG by email)" : "PDF")}` : ""}. Is it available?`;
 
   /* ---------- Illustrated product previews (used when a product has no photos) ---------- */
   const starPath = (cx, cy, s) =>
@@ -325,8 +325,8 @@
     $(".modal-prod b", modal).textContent = p.title;
     $(".modal-prod .price", modal).textContent = money(p.price);
     $(".modal-fmt", modal).innerHTML = fmts.length > 1
-      ? fmts.map((f) => `<label><input type="radio" name="mfmt" value="${f}" ${f === buyState.format ? "checked" : ""}><span>${f === "print" ? I.print + " Printed copy" : I.pdf + " PDF"}</span></label>`).join("")
-      : fmts.length ? `<label><input type="radio" name="mfmt" value="${fmts[0]}" checked><span>${fmts[0] === "print" ? I.print + " Printed copy" : I.pdf + " PDF only"}</span></label>` : "";
+      ? fmts.map((f) => `<label><input type="radio" name="mfmt" value="${f}" ${f === buyState.format ? "checked" : ""}><span>${f === "print" ? I.print + " Printed copy" : f === "digital" ? I.bolt + " PDF + PNG by email" : I.pdf + " PDF"}</span></label>`).join("")
+      : fmts.length ? `<label><input type="radio" name="mfmt" value="${fmts[0]}" checked><span>${fmts[0] === "print" ? I.print + " Printed copy" : fmts[0] === "digital" ? I.bolt + " PDF + PNG by email" : I.pdf + " PDF only"}</span></label>` : "";
     modal.classList.add("open");
     document.body.style.overflow = "hidden";
     updateModal();
@@ -748,9 +748,10 @@
         <p class="pdp-short reveal" style="--d:.2s">${esc(p.short)}</p>
         ${fmts.length ? `
         <div class="delivery reveal" style="--d:.25s">
-          <div class="delivery-title">${I.check.replace("<svg", '<svg width="14"')} ${fmts.length > 1 ? "Delivered as a printed copy or a PDF" : fmts[0] === "pdf" ? "Delivered as a PDF" : "Delivered as a printed copy"}</div>
+          <div class="delivery-title">${I.check.replace("<svg", '<svg width="14"')} ${fmts.length > 1 ? "Delivered as a printed copy or a PDF" : fmts[0] === "pdf" ? "Delivered as a PDF" : fmts[0] === "digital" ? "Digital delivery — nothing to ship" : "Delivered as a printed copy"}</div>
           <div class="delivery-opts ${fmts.length === 1 ? "one" : ""}">
             ${fmts.includes("print") ? `<label class="dopt"><input type="radio" name="fmt" value="print" ${fmts[0] === "print" ? "checked" : ""}><span class="dico">${I.print}</span><span><b>Printed copy</b><small>Printed & delivered to your door</small></span></label>` : ""}
+            ${fmts.includes("digital") ? `<label class="dopt"><input type="radio" name="fmt" value="digital" checked><span class="dico">${I.bolt}</span><span><b>PDF + PNG by email</b><small>Same-day delivery, straight to your inbox</small></span></label>` : ""}
             ${fmts.includes("pdf") ? `<label class="dopt"><input type="radio" name="fmt" value="pdf" ${fmts[0] === "pdf" ? "checked" : ""}><span class="dico">${I.pdf}</span><span><b>PDF download</b><small>Sent to you instantly</small></span></label>` : ""}
           </div>
         </div>` : ""}
@@ -762,7 +763,7 @@
         <div class="reveal" style="--d:.4s">
           <div class="acc open"><button class="acc-head">Description <i></i></button><div class="acc-body"><div><p>${esc(p.description)}</p></div></div></div>
           <div class="acc"><button class="acc-head">What's included <i></i></button><div class="acc-body"><div><ul>${p.details.map((d) => `<li>${I.check}<span>${esc(d)}</span></li>`).join("")}</ul></div></div></div>
-          <div class="acc"><button class="acc-head">Delivery & ordering <i></i></button><div class="acc-body"><div><p>${fmts.includes("pdf") ? "PDF orders are sent to you on WhatsApp or email as soon as your order is confirmed. " : ""}${fmts.includes("print") ? "Printed copies are made to order and usually ship within 3–5 days. " : ""}Message me on WhatsApp or Instagram and I'll help with payment, sizes and anything else.</p></div></div></div>
+          <div class="acc"><button class="acc-head">Delivery & ordering <i></i></button><div class="acc-body"><div><p>${fmts.includes("digital") ? "This is a digital product, so there's nothing to print or ship: your files (PDF and PNG) are emailed to you the same day your order is confirmed. " : ""}${fmts.includes("pdf") ? "PDF orders are sent to you on WhatsApp or email as soon as your order is confirmed. " : ""}${fmts.includes("print") ? "Printed copies are made to order and usually ship within 3–5 days. " : ""}Message me on WhatsApp or Instagram and I'll help with payment, sizes and anything else.</p></div></div></div>
         </div>
       </div>`;
 
