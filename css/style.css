@@ -902,3 +902,7 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 .sopt small { display: block; color: var(--muted); font-size: 12.5px; }
 .sopt em { font-style: normal; font-family: var(--display); font-size: 19px; }
 @media (max-width: 420px) { .size-opts { grid-template-columns: 1fr; } }
+
+/* "/ set of 3" next to a price */
+.price-unit { font-family: var(--sans); font-size: .5em; font-weight: 600; color: var(--muted); letter-spacing: .01em; white-space: nowrap; }
+.bestseller .price-unit { color: rgba(244,236,223,.7); }

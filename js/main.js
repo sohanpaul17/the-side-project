@@ -33,7 +33,7 @@
   const igProfile = () => `https://instagram.com/${STORE.instagramHandle}`;
   const productUrl = (p) => `product.html?id=${encodeURIComponent(p.id)}`;
   const buyMessage = (p, format, size) =>
-    `Hi! I'd like to buy "${p.title}"${size ? ` — ${size.label} size` : ""} (${money(size ? size.price : p.price)}${p.priceNote ? ", " + p.priceNote.charAt(0).toLowerCase() + p.priceNote.slice(1) : ""})${format ? ` as a ${format === "print" ? "printed copy" : "PDF"}` : ""}. Is it available?`;
+    `Hi! I'd like to buy "${p.title}"${size ? ` — ${size.label} size` : ""} (${money(size ? size.price : p.price)}${p.unit ? ` for a ${p.unit}` : ""}${p.priceNote ? ", " + p.priceNote.charAt(0).toLowerCase() + p.priceNote.slice(1) : ""})${format ? ` as a ${format === "print" ? "printed copy" : "PDF"}` : ""}. Is it available?`;
 
   /* ---------- Illustrated product previews (used when a product has no photos) ---------- */
   const starPath = (cx, cy, s) =>
@@ -227,7 +227,7 @@
           <div class="card-cat">${esc(p.category)}</div>
           <div class="card-title">${esc(p.title)}</div>
           <div class="card-row">
-            <span class="price">${p.sizes ? '<small class="price-from">From</small> ' : ""}${money(p.sizes ? Math.min(...p.sizes.map((s) => s.price)) : p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}${p.priceNote ? `<small class="price-note">${esc(p.priceNote)}</small>` : ""}</span>
+            <span class="price">${p.sizes ? '<small class="price-from">From</small> ' : ""}${money(p.sizes ? Math.min(...p.sizes.map((s) => s.price)) : p.price)}${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}${p.priceNote ? `<small class="price-note">${esc(p.priceNote)}</small>` : ""}</span>
             <span class="formats-mini">${p.formats.includes("print") ? "<span>Print</span>" : ""}${p.formats.includes("pdf") ? "<span>PDF</span>" : ""}</span>
           </div>
         </div>
@@ -295,7 +295,7 @@
 
   function updateModal() {
     const { p, format, size } = buyState;
-    $(".modal-prod .price", modal).textContent = money(size ? size.price : p.price);
+    $(".modal-prod .price", modal).textContent = money(size ? size.price : p.price) + (p.unit ? ` / ${p.unit}` : "");
     $(".buy-link.wa", modal).href = waLink(buyMessage(p, format, size));
     $(".buy-link.ig", modal).href = igLink();
     $(".wa-sub", modal).textContent = "Your order message is typed in for you";
@@ -644,7 +644,7 @@
       <h3 class="h-display spot-title">${esc(p.title)}</h3>
       <p class="bs-rating"></p>
       <p class="bs-short">${esc(p.short)}</p>
-      <div class="bs-price"><span class="price">${money(p.price)}</span>${p.priceNote ? `<small>${esc(p.priceNote)}</small>` : ""}</div>
+      <div class="bs-price"><span class="price">${money(p.price)}${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}</span>${p.priceNote ? `<small>${esc(p.priceNote)}</small>` : ""}</div>
       <div class="bs-actions">
         <a class="btn btn-lg bs-buy" href="${productUrl(p)}" data-buy="${esc(p.id)}">${I.bag} Buy now</a>
         <a class="btn btn-lg btn-ghost bs-view" href="${productUrl(p)}">${esc(viewLabel)} ${I.arrow}</a>
@@ -741,7 +741,7 @@
         <nav class="breadcrumb reveal"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <a href="shop.html?cat=${encodeURIComponent(p.category)}">${esc(p.category)}</a></nav>
         <span class="card-cat reveal" style="--d:.05s">${esc(p.category)}${p.badge ? " · " + esc(p.badge) : ""}</span>
         <h1 class="pdp-title reveal" style="--d:.1s">${esc(p.title)}</h1>
-        <div class="pdp-price reveal" style="--d:.15s"><span class="price" id="pdp-price-val">${money(p.sizes ? p.sizes[0].price : p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>${save ? `<span class="save-tag">Save ${save}%</span>` : ""}${p.priceNote ? `<span class="ship-tag">${I.check} ${esc(p.priceNote)}</span>` : ""}</div>
+        <div class="pdp-price reveal" style="--d:.15s"><span class="price"><span id="pdp-price-val">${money(p.sizes ? p.sizes[0].price : p.price)}</span>${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>${save ? `<span class="save-tag">Save ${save}%</span>` : ""}${p.priceNote ? `<span class="ship-tag">${I.check} ${esc(p.priceNote)}</span>` : ""}</div>
         ${p.sizes ? `<div class="size-pick reveal" style="--d:.16s"><div class="delivery-title">Choose your size</div><div class="size-opts">${p.sizes.map((s, i) => `<label class="sopt"><input type="radio" name="size" value="${i}" ${i ? "" : "checked"}><span><b>${esc(s.label)}</b>${s.dims ? `<small>${esc(s.dims)}</small>` : ""}</span><em>${money(s.price)}</em></label>`).join("")}</div></div>` : ""}
         ${p.shippingNote ? `<p class="intl-note reveal" style="--d:.17s">✈ ${esc(p.shippingNote)}</p>` : ""}
         ${p.framingNote ? `<div class="frame-note reveal" style="--d:.19s" role="note"><span class="frame-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg></span><span><b>Framing costs extra</b><small>${esc(p.framingNote)}. Want it framed? Just ask when you order.</small></span></div>` : ""}
