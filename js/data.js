@@ -389,6 +389,39 @@ const PRODUCTS = [
       "assets/products/stickers-6.webp",
     ],
   },
+  {
+    id: "customised-bookmark",
+    title: "Customised Bookmark",
+    category: "Keepsakes",
+    price: 299,
+    priceNote: "Including shipping within India",
+    shippingNote: "International shipping costs extra",
+    featured: true,
+    badge: "New",
+    formats: ["print"],
+    palette: ["#fde2ea", "#1b1b1b", "#e0456e"],
+    motif: "dots",
+    short: "A cute bookmark with your people drawn in and your words on the back — never lose your page again.",
+    description:
+      "A little bookmark that's all yours. The front has your people drawn as cute characters with a line like \"our chapter\" or \"read on\", finished with a tassel; the back carries your own message — \"you're my favourite chapter, love, Riya\". Make one for your partner, for her, for nani & nana, for your bestie or for the little ones who love story time.",
+    details: [
+      "Your people drawn in as cute characters",
+      "Front & back, all yours — your words and a message on the back",
+      "Finished with a tassel",
+      "For couples, her, nani & nana, besties and little ones",
+      "Gift-ready, delivered to your door",
+      "Price is for one bookmark — message me for a set",
+      "Design preview shared with you before it's printed",
+      "Price includes shipping within India — international shipping costs extra",
+    ],
+    images: [
+      "assets/products/bookmark-1.webp",
+      "assets/products/bookmark-2.webp",
+      "assets/products/bookmark-3.webp",
+      "assets/products/bookmark-4.webp",
+      "assets/products/bookmark-5.webp",
+    ],
+  },
 ];
 
 /* ---------------------------------------------------------
