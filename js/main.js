@@ -32,8 +32,8 @@
   const igLink = () => `https://ig.me/m/${STORE.instagramHandle}`;
   const igProfile = () => `https://instagram.com/${STORE.instagramHandle}`;
   const productUrl = (p) => `product.html?id=${encodeURIComponent(p.id)}`;
-  const buyMessage = (p, format) =>
-    `Hi! I'd like to buy "${p.title}" (${money(p.price)}${p.priceNote ? ", " + p.priceNote.charAt(0).toLowerCase() + p.priceNote.slice(1) : ""})${format ? ` as a ${format === "print" ? "printed copy" : "PDF"}` : ""}. Is it available?`;
+  const buyMessage = (p, format, size) =>
+    `Hi! I'd like to buy "${p.title}"${size ? ` — ${size.label} size` : ""} (${money(size ? size.price : p.price)}${p.priceNote ? ", " + p.priceNote.charAt(0).toLowerCase() + p.priceNote.slice(1) : ""})${format ? ` as a ${format === "print" ? "printed copy" : "PDF"}` : ""}. Is it available?`;
 
   /* ---------- Illustrated product previews (used when a product has no photos) ---------- */
   const starPath = (cx, cy, s) =>
@@ -227,7 +227,7 @@
           <div class="card-cat">${esc(p.category)}</div>
           <div class="card-title">${esc(p.title)}</div>
           <div class="card-row">
-            <span class="price">${money(p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}${p.priceNote ? `<small class="price-note">${esc(p.priceNote)}</small>` : ""}</span>
+            <span class="price">${p.sizes ? '<small class="price-from">From</small> ' : ""}${money(p.sizes ? Math.min(...p.sizes.map((s) => s.price)) : p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}${p.priceNote ? `<small class="price-note">${esc(p.priceNote)}</small>` : ""}</span>
             <span class="formats-mini">${p.formats.includes("print") ? "<span>Print</span>" : ""}${p.formats.includes("pdf") ? "<span>PDF</span>" : ""}</span>
           </div>
         </div>
@@ -265,7 +265,8 @@
         </div>
         <div class="modal-main">
           <h4 class="buy-head">How would you like to order?</h4>
-          <div class="modal-format"></div>
+          <div class="modal-format modal-size"></div>
+          <div class="modal-format modal-fmt"></div>
           <div class="buy-links">
             <a class="buy-link wa" target="_blank" rel="noopener">
               <span class="bl-ico">${I.wa}</span>
@@ -286,12 +287,16 @@
     $(".modal-backdrop", modal).addEventListener("click", close);
     $(".modal-close", modal).addEventListener("click", close);
     addEventListener("keydown", (e) => e.key === "Escape" && close());
-    modal.addEventListener("change", (e) => { if (e.target.name === "mfmt") { buyState.format = e.target.value; syncPageFormat(); updateModal(); } });
+    modal.addEventListener("change", (e) => {
+      if (e.target.name === "mfmt") { buyState.format = e.target.value; syncPageFormat(); updateModal(); }
+      if (e.target.name === "msize") { buyState.size = buyState.p.sizes[+e.target.value]; syncPageSize(); updateModal(); }
+    });
   }
 
   function updateModal() {
-    const { p, format } = buyState;
-    $(".buy-link.wa", modal).href = waLink(buyMessage(p, format));
+    const { p, format, size } = buyState;
+    $(".modal-prod .price", modal).textContent = money(size ? size.price : p.price);
+    $(".buy-link.wa", modal).href = waLink(buyMessage(p, format, size));
     $(".buy-link.ig", modal).href = igLink();
     $(".wa-sub", modal).textContent = "Your order message is typed in for you";
     $(".ig-sub", modal).textContent = `DM @${STORE.instagramHandle} — mention “${p.title}”`;
@@ -303,14 +308,23 @@
     if (r) r.checked = true;
   }
 
-  function openBuy(p, format) {
+  function syncPageSize() {
+    const i = buyState.p.sizes ? buyState.p.sizes.indexOf(buyState.size) : -1;
+    const r = $(`.size-pick input[value="${i}"]`);
+    if (r && !r.checked) { r.checked = true; r.dispatchEvent(new Event("change", { bubbles: true })); }
+  }
+
+  function openBuy(p, format, size) {
     if (!modal) buildModal();
     const fmts = p.formats || [];
-    buyState = { p, format: format || (fmts.length ? fmts[0] : null) };
+    buyState = { p, format: format || (fmts.length ? fmts[0] : null), size: p.sizes ? size || p.sizes[0] : null };
+    $(".modal-size", modal).innerHTML = p.sizes
+      ? p.sizes.map((s, i) => `<label><input type="radio" name="msize" value="${i}" ${s === buyState.size ? "checked" : ""}><span>${esc(s.label)} · ${money(s.price)}</span></label>`).join("")
+      : "";
     $(".modal-prod img", modal).src = imagesOf(p)[0];
     $(".modal-prod b", modal).textContent = p.title;
     $(".modal-prod .price", modal).textContent = money(p.price);
-    $(".modal-format", modal).innerHTML = fmts.length > 1
+    $(".modal-fmt", modal).innerHTML = fmts.length > 1
       ? fmts.map((f) => `<label><input type="radio" name="mfmt" value="${f}" ${f === buyState.format ? "checked" : ""}><span>${f === "print" ? I.print + " Printed copy" : I.pdf + " PDF"}</span></label>`).join("")
       : fmts.length ? `<label><input type="radio" name="mfmt" value="${fmts[0]}" checked><span>${fmts[0] === "print" ? I.print + " Printed copy" : I.pdf + " PDF only"}</span></label>` : "";
     modal.classList.add("open");
@@ -727,7 +741,8 @@
         <nav class="breadcrumb reveal"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <a href="shop.html?cat=${encodeURIComponent(p.category)}">${esc(p.category)}</a></nav>
         <span class="card-cat reveal" style="--d:.05s">${esc(p.category)}${p.badge ? " · " + esc(p.badge) : ""}</span>
         <h1 class="pdp-title reveal" style="--d:.1s">${esc(p.title)}</h1>
-        <div class="pdp-price reveal" style="--d:.15s"><span class="price">${money(p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>${save ? `<span class="save-tag">Save ${save}%</span>` : ""}${p.priceNote ? `<span class="ship-tag">${I.check} ${esc(p.priceNote)}</span>` : ""}</div>
+        <div class="pdp-price reveal" style="--d:.15s"><span class="price" id="pdp-price-val">${money(p.sizes ? p.sizes[0].price : p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>${save ? `<span class="save-tag">Save ${save}%</span>` : ""}${p.priceNote ? `<span class="ship-tag">${I.check} ${esc(p.priceNote)}</span>` : ""}</div>
+        ${p.sizes ? `<div class="size-pick reveal" style="--d:.16s"><div class="delivery-title">Choose your size</div><div class="size-opts">${p.sizes.map((s, i) => `<label class="sopt"><input type="radio" name="size" value="${i}" ${i ? "" : "checked"}><span><b>${esc(s.label)}</b>${s.dims ? `<small>${esc(s.dims)}</small>` : ""}</span><em>${money(s.price)}</em></label>`).join("")}</div></div>` : ""}
         ${p.shippingNote ? `<p class="intl-note reveal" style="--d:.17s">✈ ${esc(p.shippingNote)}</p>` : ""}
         ${p.framingNote ? `<div class="frame-note reveal" style="--d:.19s" role="note"><span class="frame-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg></span><span><b>Framing costs extra</b><small>${esc(p.framingNote)}. Want it framed? Just ask when you order.</small></span></div>` : ""}
         <p class="pdp-short reveal" style="--d:.2s">${esc(p.short)}</p>
@@ -795,7 +810,12 @@
     $$(".acc-head").forEach((h) => h.addEventListener("click", () => h.parentElement.classList.toggle("open")));
 
     // buy + share
-    $("#buy-now").addEventListener("click", () => openBuy(p, $(".delivery input:checked")?.value));
+    const pickedSize = () => (p.sizes ? p.sizes[+($(".size-pick input:checked")?.value || 0)] : null);
+    $$(".size-pick input").forEach((r) => r.addEventListener("change", () => {
+      const s = pickedSize(); const el = $("#pdp-price-val");
+      el.textContent = money(s.price); el.animate([{ transform: "scale(1.12)" }, { transform: "scale(1)" }], { duration: 300, easing: "ease-out" });
+    }));
+    $("#buy-now").addEventListener("click", () => openBuy(p, $(".delivery input:checked")?.value, pickedSize()));
     $("#share").addEventListener("click", async () => {
       try {
         if (navigator.share) await navigator.share({ title: p.title, url: location.href });

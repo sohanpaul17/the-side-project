@@ -351,6 +351,44 @@ const PRODUCTS = [
       "assets/products/scrapbook-5.webp",
     ],
   },
+  {
+    id: "customised-stickers",
+    title: "Customised Stickers",
+    category: "Keepsakes",
+    price: 249,
+    // each size has its own price; the first one is selected by default
+    sizes: [
+      { label: "A5", dims: "14.8 × 21 cm sheet", price: 249 },
+      { label: "A4", dims: "21 × 29.7 cm sheet", price: 299 },
+    ],
+    priceNote: "Including shipping within India",
+    shippingNote: "International shipping costs extra",
+    featured: true,
+    badge: "New",
+    formats: ["print"],
+    palette: ["#e6f4ea", "#1b1b1b", "#e0456e"],
+    motif: "dots",
+    short: "A sheet of stickers made from your faces, your people and your inside jokes.",
+    description:
+      "Anything can be a sticker. Your faces drawn as cute characters, the whole family — even the grandparents — your inside jokes like \"chai date?\" and \"love you 3000\", plus little hearts, stars and doodles. Big ones, tiny ones or a mix: fill the sheet with as many as you like, then stick them on laptops, bottles, journals and phone cases.",
+    details: [
+      "Your faces, your people and your words, drawn as stickers",
+      "Choose an A5 sheet (14.8 × 21 cm) or an A4 sheet (21 × 29.7 cm)",
+      "Fill it with as many stickers as you like — big, tiny or a mix",
+      "Cute doodles like hearts and stars included",
+      "Great for laptops, bottles, journals and phone cases",
+      "Design preview shared with you before it's printed",
+      "Price includes shipping within India — international shipping costs extra",
+    ],
+    images: [
+      "assets/products/stickers-1.webp",
+      "assets/products/stickers-2.webp",
+      "assets/products/stickers-3.webp",
+      "assets/products/stickers-4.webp",
+      "assets/products/stickers-5.webp",
+      "assets/products/stickers-6.webp",
+    ],
+  },
 ];
 
 /* ---------------------------------------------------------
