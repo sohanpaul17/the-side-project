@@ -658,8 +658,223 @@
   }
 
   /* ================= PAGES ================= */
+  /* ---------- Home hero: occasion slide + product slides ----------
+     The first slide is always the next upcoming gifting occasion (Christmas, Valentine's Day, …)
+     with the Lovebook wrapped up as a present. The products follow. */
+  const nthSunday = (y, m, n) => { const d = new Date(y, m - 1, 1); d.setDate(1 + ((7 - d.getDay()) % 7) + (n - 1) * 7); return d; };
+  const OCCASIONS = [
+    { key: "christmas", name: "Christmas", theme: "christmas", date: (y) => new Date(y, 11, 25),
+      title: ["Wrap up your story", "this <em>Christmas.</em>"],
+      lead: "Give your favourite person a Lovebook — your memories, inside jokes and little moments, drawn as a story starring the two of you. The gift they'll unwrap, read and keep.",
+      tagTo: "my favourite person", today: "Merry Christmas!" },
+    { key: "valentines", name: "Valentine's Day", theme: "love", date: (y) => new Date(y, 1, 14),
+      title: ["Say it with", "<em>your story.</em>"],
+      lead: "This Valentine's Day, give them a Lovebook — the day you met, your first trip, your silly inside jokes, all drawn as a little book about the two of you.",
+      tagTo: "my valentine", today: "Happy Valentine's Day!" },
+    { key: "mothers", name: "Mother's Day", theme: "love", date: (y) => nthSunday(y, 5, 2),
+      title: ["A story for", "<em>Mum.</em>"],
+      lead: "Turn your favourite memories with her into a Lovebook — drawn just like the two of you, page by page.",
+      tagTo: "the best mum", today: "Happy Mother's Day!" },
+    { key: "fathers", name: "Father's Day", theme: "love", date: (y) => nthSunday(y, 6, 3),
+      title: ["A story for", "<em>Dad.</em>"],
+      lead: "Turn your favourite memories with him into a Lovebook — drawn just like the two of you, page by page.",
+      tagTo: "the best dad", today: "Happy Father's Day!" },
+    { key: "friendship", name: "Friendship Day", theme: "love", date: (y) => nthSunday(y, 8, 1),
+      title: ["For your", "<em>best friend.</em>"],
+      lead: "All your inside jokes and adventures in one little book — a Lovebook drawn just like the two of you.",
+      tagTo: "my best friend", today: "Happy Friendship Day!" },
+  ];
+  function nextOccasion(now = new Date()) {
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let best = null;
+    OCCASIONS.forEach((o) => [now.getFullYear(), now.getFullYear() + 1].forEach((y) => {
+      const d = o.date(y);
+      if (d >= today && (!best || d < best.when)) best = { ...o, when: d, days: Math.round((d - today) / 864e5) };
+    }));
+    return best;
+  }
+
+  const SNOWFLAKE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7M12 2l-2.4 2.4M12 2l2.4 2.4M12 22l-2.4-2.4M12 22l2.4-2.4"/></svg>`;
+  const HEART = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.4 2.3 4.5 6 4.5c2.2 0 3.6 1.3 4.5 2.6.3.4.9.4 1.2 0 .9-1.3 2.3-2.6 4.5-2.6 3.7 0 5.6 3.9 4 7.2C19.5 16.4 12 21 12 21z"/></svg>`;
+  const ARROW = `<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+
+  function occasionSlide(o, p) {
+    const pages = (p.flipPages || imagesOf(p)).slice(1);
+    const cover = (p.flipPages || imagesOf(p))[0];
+    const xmas = o.theme === "christmas";
+    // string of fairy lights: two swags across the top
+    const N = 22, sag = (x) => 6 + 30 * Math.sin(Math.PI * ((x * 2) % 1));
+    const wire = Array.from({ length: 81 }, (_, i) => `${i ? "L" : "M"}${(i * 100) / 80} ${sag(i / 80).toFixed(2)}`).join(" ");
+    const bulbs = Array.from({ length: N }, (_, i) => {
+      const x = (i + 0.5) / N;
+      return `<i class="bulb b${i % 4}" style="left:${(x * 100).toFixed(2)}%;top:${sag(x).toFixed(1)}px;--i:${i};--r:${(((i * 37) % 21) - 10)}deg"></i>`;
+    }).join("");
+    const days = o.days === 0 ? `<b>${esc(o.today)}</b>` : `<b data-days>${o.days}</b> ${o.days === 1 ? "day" : "days"} to ${esc(o.name)}`;
+    return `
+      <div class="hs-slide hs-occ occ-${o.theme}" data-dur="10000" aria-roledescription="slide" aria-label="${esc(o.name)} gift">
+        <canvas class="occ-fx" aria-hidden="true"></canvas>
+        ${xmas ? `<div class="occ-lights" aria-hidden="true"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><path d="${wire}"/></svg>${bulbs}</div>
+        <div class="occ-baubles" aria-hidden="true"><span class="bauble r" style="--len:70px"></span><span class="bauble g" style="--len:120px"></span><span class="bauble y" style="--len:46px"></span></div>
+        <div class="occ-drift" aria-hidden="true"><svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <g class="trees">${[60, 130, 190, 1020, 1090, 1150].map((x, i) => { const h = [70, 95, 60, 85, 110, 65][i]; return `<path d="M${x} ${115 - h}l${h * 0.32} ${h * 0.45}h-${h * 0.13}l${h * 0.22} ${h * 0.3}h-${h * 0.14}l${h * 0.2} ${h * 0.25}H${x - h * 0.45}l${h * 0.2}-${h * 0.25}h-${h * 0.14}l${h * 0.22}-${h * 0.3}h-${h * 0.13}z"/>`; }).join("")}</g>
+          <path class="snow" d="M0 92C150 70 260 104 420 88S700 64 860 86 1080 100 1200 80V120H0z"/></svg></div>` : ""}
+        <div class="hs-grid">
+          <div class="hs-copy">
+            <span class="occ-pill hs-in" style="--d:.1s">${xmas ? SNOWFLAKE : HEART} ${days}</span>
+            <h1 class="hs-title">${o.title.map((l, i) => `<span class="hs-line"><span style="--d:${0.2 + i * 0.12}s">${l}</span></span>`).join("")}</h1>
+            <p class="hs-lead hs-in" style="--d:.5s">${esc(o.lead)}</p>
+            <div class="hs-actions hs-in" style="--d:.62s">
+              <a href="${productUrl(p)}" class="btn btn-lg occ-btn">Gift a Lovebook ${ARROW}</a>
+              <a href="shop.html" class="btn btn-lg btn-ghost occ-ghost">See all gifts</a>
+            </div>
+            <p class="occ-note hs-in" style="--d:.74s">From <b>${money(p.price)}</b> · ${p.priceNote ? esc(p.priceNote.toLowerCase()) + " · " : ""}printed copies ship in 3–5 days, so order early — or get it as a PDF for a last-minute gift.</p>
+          </div>
+          <div class="hs-visual">
+            <div class="xb-glow" aria-hidden="true"></div>
+            <div class="xb-book" aria-label="The Lovebook, wrapped as a gift">
+              <div class="xb-page">${pages.map((src, i) => `<img src="${esc(src)}" alt="" ${i ? 'loading="lazy"' : 'class="on"'}>`).join("")}</div>
+              <div class="xb-cover">
+                <div class="xb-front"><img src="${esc(cover)}" alt="Lovebook cover">
+                  <i class="rib v"></i><i class="rib h"></i>
+                </div>
+                <div class="xb-back"></div>
+              </div>
+              <svg class="xb-bow" viewBox="0 0 120 80" aria-hidden="true"><path d="M60 40C40 8 8 6 10 30s34 18 50 10zM60 40c20-32 52-34 50-10S76 48 60 40z"/><path d="M58 42l-22 34 12-4 6 10 6-38zM62 42l22 34-12-4-6 10-6-38z" class="tail"/><circle cx="60" cy="40" r="8"/></svg>
+              <div class="xb-tag"><span>To:</span> ${esc(o.tagTo)} ${HEART}<small>From: me</small></div>
+            </div>
+            ${[[8, 18], [86, 10], [92, 62], [4, 70], [70, 90]].map(([x, y], i) => `<span class="xb-glint" style="left:${x}%;top:${y}%;--i:${i}">${STAR()}</span>`).join("")}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function productSlide(p, i) {
+    const imgs = imagesOf(p);
+    const pal = p.palette || [];
+    const dark = pal[0] && parseInt(pal[0].slice(1, 3), 16) < 90;
+    const price = p.sizes ? `<small>From</small> ${money(Math.min(...p.sizes.map((s) => s.price)))}` : money(p.price);
+    return `
+      <div class="hs-slide hs-prod ${dark ? "dark" : ""}" data-dur="6000" style="--bg:${pal[0] || "var(--cream-2)"};--ac:${pal[2] || "var(--accent)"}" aria-roledescription="slide" aria-label="${esc(p.title)}">
+        <span class="hs-blob a" aria-hidden="true"></span><span class="hs-blob b" aria-hidden="true"></span>
+        <div class="hs-grid">
+          <div class="hs-copy">
+            <span class="hs-kicker hs-in" style="--d:.1s">${esc(p.category || "")}${p.badge ? ` · ${esc(p.badge)}` : ""}</span>
+            <h2 class="hs-title"><span class="hs-line"><span style="--d:.2s">${esc(p.title)}</span></span></h2>
+            <p class="hs-lead hs-in" style="--d:.38s">${esc(p.short || "")}</p>
+            <div class="hs-price hs-in" style="--d:.48s"><span>${price}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ""}</span>${p.priceNote ? `<small>${esc(p.priceNote)}</small>` : ""}</div>
+            <div class="hs-actions hs-in" style="--d:.58s">
+              <a href="${productUrl(p)}" class="btn btn-lg">See it ${ARROW}</a>
+              <button type="button" class="btn btn-lg btn-ghost" data-buy="${esc(p.id)}">Buy now</button>
+            </div>
+          </div>
+          <a class="hs-visual hs-photos" href="${productUrl(p)}" tabindex="-1" aria-hidden="true">
+            ${imgs[1] ? `<img class="ph back" src="${esc(imgs[1])}" alt="" loading="lazy">` : ""}
+            <img class="ph front" src="${esc(imgs[0])}" alt="" loading="${i < 2 ? "eager" : "lazy"}">
+          </a>
+        </div>
+      </div>`;
+  }
+
+  function heroSlider() {
+    const root = $("#hero-slider");
+    if (!root) return;
+    const track = $(".hs-track", root), dotsEl = $(".hs-dots", root);
+    const hero = PRODUCTS.find((p) => p.id === "customised-lovebook") || PRODUCTS[0];
+    const occ = nextOccasion();
+    const order = ["customised-night-sky", "customised-scrapbook", "customised-journey-map", "customised-love-letter", "customised-mini-lovebook", "customised-52-reasons-box", "customised-wallpaper", "customised-calendar-magnet"];
+    const rest = order.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean);
+    PRODUCTS.forEach((p) => { if (p !== hero && !rest.includes(p) && rest.length < 8) rest.push(p); });
+    const slides = (occ ? [occasionSlide(occ, hero)] : []).concat(rest.map(productSlide));
+    track.innerHTML = slides.join("");
+    const els = $$(".hs-slide", track);
+    dotsEl.innerHTML = els.map((s, i) => `<button type="button" aria-label="Slide ${i + 1}: ${esc(s.getAttribute("aria-label"))}"><i></i></button>`).join("");
+    const dots = $$("button", dotsEl);
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let index = -1, timer = null, paused = false, pageTimer = null;
+    function go(n) {
+      n = (n + els.length) % els.length;
+      if (n === index) return;
+      els.forEach((s, i) => { s.classList.toggle("is-active", i === n); s.classList.toggle("is-prev", i === index); s.setAttribute("aria-hidden", i === n ? "false" : "true"); s.inert = i !== n; });
+      dots.forEach((d, i) => { d.classList.toggle("on", i === n); d.style.setProperty("--dur", (els[n].dataset.dur || 6000) + "ms"); });
+      index = n;
+      // the Lovebook's pages turn over once the gift is unwrapped
+      clearInterval(pageTimer);
+      const imgs = $$(".xb-page img", els[n]);
+      if (imgs.length > 1) {
+        let k = 0;
+        imgs.forEach((im, i) => im.classList.toggle("on", i === 0));
+        setTimeout(() => { pageTimer = setInterval(() => { imgs[k].classList.remove("on"); k = (k + 1) % imgs.length; imgs[k].classList.add("on"); }, 1900); }, 3400);
+      }
+      fx.toggle(els[n].classList.contains("hs-occ") && !reduce);
+      schedule();
+    }
+    function schedule() {
+      clearTimeout(timer);
+      root.classList.toggle("paused", paused || reduce);
+      if (paused || reduce) return;
+      timer = setTimeout(() => go(index + 1), +els[index].dataset.dur || 6000);
+    }
+    // restart the dot's progress bar when resuming
+    const setPaused = (v) => { if (paused === v) return; paused = v; if (!v) { const d = dots[index]; d.classList.remove("on"); void d.offsetWidth; d.classList.add("on"); } schedule(); };
+
+    // snow (Christmas) or floating hearts (other occasions) on the occasion slide
+    const fx = (() => {
+      const cv = $(".occ-fx", track);
+      if (!cv) return { toggle() {} };
+      const ctx = cv.getContext("2d"), xmas = cv.parentElement.classList.contains("occ-christmas");
+      let w = 0, h = 0, dpr = 1, flakes = [], raf = 0, on = false, last = 0;
+      const make = (top) => ({ x: Math.random() * w, y: top ? Math.random() * h : -10, r: xmas ? 1 + Math.random() * 2.6 : 5 + Math.random() * 7, v: xmas ? 18 + Math.random() * 38 : -(14 + Math.random() * 22), a: Math.random() * 6.28, s: 0.6 + Math.random() * 1.2, o: 0.35 + Math.random() * 0.6 });
+      const size = () => {
+        dpr = Math.min(2, devicePixelRatio || 1); w = cv.clientWidth; h = cv.clientHeight;
+        cv.width = w * dpr; cv.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const n = Math.round((w * h) / (xmas ? 5200 : 26000));
+        flakes = Array.from({ length: n }, () => make(true));
+      };
+      const heart = (x, y, r) => { ctx.beginPath(); ctx.moveTo(x, y + r * 0.35); ctx.bezierCurveTo(x - r, y - r * 0.4, x - r * 0.4, y - r, x, y - r * 0.35); ctx.bezierCurveTo(x + r * 0.4, y - r, x + r, y - r * 0.4, x, y + r * 0.35); ctx.fill(); };
+      const tick = (t) => {
+        const dt = Math.min(0.05, (t - (last || t)) / 1000); last = t;
+        ctx.clearRect(0, 0, w, h);
+        flakes.forEach((f, i) => {
+          f.y += f.v * dt; f.a += f.s * dt; const x = f.x + Math.sin(f.a) * (xmas ? 14 : 20);
+          if (xmas ? f.y > h + 10 : f.y < -20) { flakes[i] = make(false); if (!xmas) flakes[i].y = h + 15; return; }
+          ctx.globalAlpha = f.o;
+          if (xmas) { ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(x, f.y, f.r, 0, 6.283); ctx.fill(); }
+          else { ctx.fillStyle = i % 3 ? "#ff8fb0" : "#fff"; heart(x, f.y, f.r); }
+        });
+        ctx.globalAlpha = 1;
+        raf = requestAnimationFrame(tick);
+      };
+      addEventListener("resize", () => { if (on) size(); });
+      document.addEventListener("visibilitychange", () => { if (!on) return; cancelAnimationFrame(raf); last = 0; if (!document.hidden) raf = requestAnimationFrame(tick); });
+      return { toggle(v) { if (v === on) return; on = v; cancelAnimationFrame(raf); last = 0; if (v) { size(); raf = requestAnimationFrame(tick); } else ctx.clearRect(0, 0, w, h); } };
+    })();
+
+    $(".hs-prev", root).addEventListener("click", () => go(index - 1));
+    $(".hs-next", root).addEventListener("click", () => go(index + 1));
+    dots.forEach((d, i) => d.addEventListener("click", () => go(i)));
+    root.addEventListener("mouseenter", () => setPaused(true));
+    root.addEventListener("mouseleave", () => setPaused(false));
+    root.addEventListener("focusin", () => setPaused(true));
+    root.addEventListener("focusout", (e) => { if (!root.contains(e.relatedTarget)) setPaused(false); });
+    document.addEventListener("visibilitychange", () => setPaused(document.hidden));
+    root.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") go(index + 1); if (e.key === "ArrowLeft") go(index - 1); });
+    // swipe
+    let sx = null, sy = 0;
+    track.addEventListener("pointerdown", (e) => { if (e.pointerType !== "mouse") { sx = e.clientX; sy = e.clientY; } });
+    track.addEventListener("pointerup", (e) => {
+      if (sx === null) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy; sx = null;
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) go(index + (dx < 0 ? 1 : -1));
+    });
+    track.addEventListener("pointercancel", () => (sx = null));
+    // on phones, pause while the hero is scrolled out of view
+    new IntersectionObserver(([en]) => setPaused(!en.isIntersecting && !root.matches(":hover"))).observe(root);
+    go(0);
+  }
+
   function homePage() {
-    initLogoOrbit();
+    heroSlider();
     homeReviews();
     const words = ["Lovebooks", "Love letters", "Journey maps", "Notebooks", "Calendar magnets", "52 Reasons boxes", "Drawn just for you", "Made with love"];
     const mq = words.map((w) => `<span>${w} ${STAR()}</span>`).join("");

@@ -15,47 +15,18 @@
 </head>
 <body data-page="home">
 <main>
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <span class="eyebrow reveal">Hand-illustrated · Personalised · Delivered</span>
-        <h1 class="h-display h1" style="margin-top:20px">
-          <span class="split-line"><span>Made for</span></span>
-          <span class="split-line"><span style="--d:.1s">your everyday</span></span>
-          <span class="split-line"><span style="--d:.2s;color:var(--accent)">side quests.</span></span>
-        </h1>
-        <p class="lead reveal" style="--d:.35s">Customised gifts that tell your story — Lovebooks, love letters, journey maps, notebooks and more, with little characters drawn to look just like you.</p>
-        <div class="hero-actions reveal" style="--d:.45s">
-          <a href="shop.html" class="btn btn-lg">Explore the shop <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          <a href="about.html" class="btn btn-ghost btn-lg">Meet the maker</a>
+  <section class="hs" id="hero-slider" aria-roledescription="carousel" aria-label="Gifts from The Side Project">
+    <div class="wrap">
+      <div class="hs-frame">
+        <div class="hs-track" aria-live="polite"></div>
+        <div class="hs-ui">
+          <span class="hs-tag"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z"/></svg> Made for your everyday <em>side quests</em></span>
+          <div class="hs-dots" role="group" aria-label="Choose a slide"></div>
+          <div class="hs-arrows">
+            <button type="button" class="hs-prev" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+            <button type="button" class="hs-next" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </div>
         </div>
-      </div>
-      <div class="hero-logo reveal reveal-scale" style="--d:.15s">
-        <div class="logo-stage">
-          <img src="assets/logo-nostar.png" alt="The Side Project — a little bit of everything">
-          <!-- The logo's star, animated along the orbit line (see initLogoOrbit in js/main.js) -->
-          <svg class="logo-orbit" viewBox="0 0 1131 641" aria-hidden="true">
-            <defs>
-              <mask id="orbit-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1131" height="641">
-                <rect width="1131" height="641" fill="#fff"/>
-                <!-- the wordmark sits in front of the orbit, so the star passes behind it -->
-                <rect x="158" y="134" width="334" height="130" rx="18" fill="#000"/>
-                <rect x="164" y="251" width="475" height="148" rx="18" fill="#000"/>
-                <rect x="166" y="384" width="840" height="138" rx="18" fill="#000"/>
-                <rect x="150" y="570" width="880" height="54" rx="18" fill="#000"/>
-              </mask>
-            </defs>
-            <g mask="url(#orbit-mask)">
-              <g class="orbit-trail"></g>
-              <g class="orbit-star" transform="translate(761 120)">
-                <path d="M0 -92C2.5 -32 22 -3.7 62 0C22 3.7 2.5 32 0 92C-2.5 32 -22 3.7 -62 0C-22 -3.7 -2.5 -32 0 -92Z" fill="#161513"/>
-              </g>
-            </g>
-          </svg>
-        </div>
-        <span class="hero-star s1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z"/></svg></span>
-        <span class="hero-star s2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z"/></svg></span>
-        <span class="hero-star s3"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z"/></svg></span>
       </div>
     </div>
   </section>
