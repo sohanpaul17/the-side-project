@@ -711,7 +711,7 @@
     }).join("");
     const days = o.days === 0 ? `<b>${esc(o.today)}</b>` : `<b data-days>${o.days}</b> ${o.days === 1 ? "day" : "days"} to ${esc(o.name)}`;
     return `
-      <div class="hs-slide hs-occ occ-${o.theme}" data-dur="10000" aria-roledescription="slide" aria-label="${esc(o.name)} gift">
+      <div class="hs-slide hs-occ occ-${o.theme}" data-dur="5000" aria-roledescription="slide" aria-label="${esc(o.name)} gift">
         <canvas class="occ-fx" aria-hidden="true"></canvas>
         ${xmas ? `<div class="occ-lights" aria-hidden="true"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><path d="${wire}"/></svg>${bulbs}</div>
         <div class="occ-baubles" aria-hidden="true"><span class="bauble r" style="--len:70px"></span><span class="bauble g" style="--len:120px"></span><span class="bauble y" style="--len:46px"></span></div>
@@ -748,14 +748,31 @@
       </div>`;
   }
 
+  // drifting things behind a product slide: twinkling stars + shooting stars on dark slides,
+  // hearts and sparkles floating up on light ones
+  function bgFx(dark) {
+    const r = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
+    let h = "";
+    if (dark) {
+      for (let i = 0; i < 46; i++) h += `<i class="tw" style="left:${r(0, 100)}%;top:${r(0, 100)}%;--s:${r(1.5, 3.6)}px;--t:${r(1.8, 4.2)}s;--dl:-${r(0, 4)}s"></i>`;
+      for (let i = 0; i < 6; i++) h += `<span class="tw big" style="left:${r(4, 96)}%;top:${r(4, 92)}%;--s:${r(12, 20)}px;--t:${r(2.4, 4)}s;--dl:-${r(0, 3)}s">${STAR()}</span>`;
+      [[8, 6, 0], [40, 2, 1.7], [22, 30, 3.4]].forEach(([x, y, d]) => (h += `<i class="shoot" style="left:${x}%;top:${y}%;--dl:${d}s"></i>`));
+    } else {
+      const shapes = [HEART, STAR(), HEART, `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg>`];
+      for (let i = 0; i < 16; i++) h += `<span class="fl" style="left:${r(0, 96)}%;--s:${r(10, 26)}px;--t:${r(7, 13)}s;--dl:-${r(0, 13)}s;--o:${r(0.25, 0.6)};--sw:${r(-40, 40)}px">${shapes[i % shapes.length]}</span>`;
+    }
+    return `<div class="hs-bgfx" aria-hidden="true">${h}</div>`;
+  }
+
   function productSlide(p, i) {
     const imgs = imagesOf(p);
     const pal = p.palette || [];
     const dark = pal[0] && parseInt(pal[0].slice(1, 3), 16) < 90;
     const price = p.sizes ? `<small>From</small> ${money(Math.min(...p.sizes.map((s) => s.price)))}` : money(p.price);
     return `
-      <div class="hs-slide hs-prod ${dark ? "dark" : ""}" data-dur="6000" style="--bg:${pal[0] || "var(--cream-2)"};--ac:${pal[2] || "var(--accent)"}" aria-roledescription="slide" aria-label="${esc(p.title)}">
+      <div class="hs-slide hs-prod ${dark ? "dark" : ""}" data-dur="5000" style="--bg:${pal[0] || "var(--cream-2)"};--ac:${pal[2] || "var(--accent)"}" aria-roledescription="slide" aria-label="${esc(p.title)}">
         <span class="hs-blob a" aria-hidden="true"></span><span class="hs-blob b" aria-hidden="true"></span>
+        ${bgFx(dark)}
         <div class="hs-grid">
           <div class="hs-copy">
             <span class="hs-kicker hs-in" style="--d:.1s">${esc(p.category || "")}${p.badge ? ` · ${esc(p.badge)}` : ""}</span>
@@ -768,6 +785,8 @@
             </div>
           </div>
           <a class="hs-visual hs-photos" href="${productUrl(p)}" tabindex="-1" aria-hidden="true">
+            <span class="hs-ring"></span>
+            ${[[10, 14], [88, 20], [84, 82], [14, 78]].map(([x, y], i) => `<span class="xb-glint" style="left:${x}%;top:${y}%;--i:${i}">${STAR()}</span>`).join("")}
             ${imgs[1] ? `<img class="ph back" src="${esc(imgs[1])}" alt="" loading="lazy">` : ""}
             <img class="ph front" src="${esc(imgs[0])}" alt="" loading="${i < 2 ? "eager" : "lazy"}">
           </a>
@@ -781,9 +800,10 @@
     const track = $(".hs-track", root), dotsEl = $(".hs-dots", root);
     const hero = PRODUCTS.find((p) => p.id === "customised-lovebook") || PRODUCTS[0];
     const occ = nextOccasion();
-    const order = ["customised-night-sky", "customised-scrapbook", "customised-journey-map", "customised-love-letter", "customised-mini-lovebook", "customised-52-reasons-box", "customised-wallpaper", "customised-calendar-magnet"];
+    const order = ["customised-night-sky", "customised-scrapbook", "customised-journey-map", "customised-love-letter"];
     const rest = order.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean);
-    PRODUCTS.forEach((p) => { if (p !== hero && !rest.includes(p) && rest.length < 8) rest.push(p); });
+    PRODUCTS.forEach((p) => { if (p !== hero && !rest.includes(p)) rest.push(p); });
+    rest.length = Math.min(rest.length, 4);
     const slides = (occ ? [occasionSlide(occ, hero)] : []).concat(rest.map(productSlide));
     track.innerHTML = slides.join("");
     const els = $$(".hs-slide", track);
@@ -791,7 +811,28 @@
     const dots = $$("button", dotsEl);
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    let index = -1, timer = null, paused = false, pageTimer = null;
+    let index = -1, timer = null, paused = false, flipTimers = [];
+    // once the cover is open, the pages turn over one by one like a real book
+    function turnPages(slide) {
+      flipTimers.forEach(clearTimeout); flipTimers = [];
+      $$(".xb-leaf").forEach((l) => l.remove());
+      const book = $(".xb-book", slide), imgs = $$(".xb-page img", slide);
+      if (!book || imgs.length < 2) return;
+      let k = 0;
+      imgs.forEach((im, i) => im.classList.toggle("on", i === 0));
+      const flip = () => {
+        const leaf = document.createElement("div");
+        leaf.className = "xb-leaf";
+        leaf.innerHTML = `<div class="xb-leaf-f"><img src="${imgs[k].getAttribute("src")}" alt=""></div><div class="xb-leaf-b"></div>`;
+        book.insertBefore(leaf, $(".xb-cover", book));
+        imgs[k].classList.remove("on"); k = (k + 1) % imgs.length; imgs[k].classList.add("on");
+        void leaf.offsetWidth; // start from flat, then turn
+        leaf.classList.add("go");
+        flipTimers.push(setTimeout(() => leaf.remove(), 1300));
+        flipTimers.push(setTimeout(flip, 1150));
+      };
+      flipTimers.push(setTimeout(flip, reduce ? 0 : 2300));
+    }
     function go(n) {
       n = (n + els.length) % els.length;
       if (n === index) return;
@@ -799,13 +840,7 @@
       dots.forEach((d, i) => { d.classList.toggle("on", i === n); d.style.setProperty("--dur", (els[n].dataset.dur || 6000) + "ms"); });
       index = n;
       // the Lovebook's pages turn over once the gift is unwrapped
-      clearInterval(pageTimer);
-      const imgs = $$(".xb-page img", els[n]);
-      if (imgs.length > 1) {
-        let k = 0;
-        imgs.forEach((im, i) => im.classList.toggle("on", i === 0));
-        setTimeout(() => { pageTimer = setInterval(() => { imgs[k].classList.remove("on"); k = (k + 1) % imgs.length; imgs[k].classList.add("on"); }, 1900); }, 3400);
-      }
+      turnPages(els[n]);
       fx.toggle(els[n].classList.contains("hs-occ") && !reduce);
       schedule();
     }
@@ -853,10 +888,6 @@
     $(".hs-prev", root).addEventListener("click", () => go(index - 1));
     $(".hs-next", root).addEventListener("click", () => go(index + 1));
     dots.forEach((d, i) => d.addEventListener("click", () => go(i)));
-    root.addEventListener("mouseenter", () => setPaused(true));
-    root.addEventListener("mouseleave", () => setPaused(false));
-    root.addEventListener("focusin", () => setPaused(true));
-    root.addEventListener("focusout", (e) => { if (!root.contains(e.relatedTarget)) setPaused(false); });
     document.addEventListener("visibilitychange", () => setPaused(document.hidden));
     root.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") go(index + 1); if (e.key === "ArrowLeft") go(index - 1); });
     // swipe
@@ -869,8 +900,9 @@
     });
     track.addEventListener("pointercancel", () => (sx = null));
     // on phones, pause while the hero is scrolled out of view
-    new IntersectionObserver(([en]) => setPaused(!en.isIntersecting && !root.matches(":hover"))).observe(root);
-    go(0);
+
+    // wait for the page's loading curtain to lift so the first slide's animation is seen in full
+    setTimeout(() => { if (index < 0) go(0); }, 650);
   }
 
   function homePage() {
