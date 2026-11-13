@@ -147,7 +147,7 @@
     header.className = "site-header";
     header.innerHTML = `
       <div class="wrap nav">
-        <a class="brand" href="index.html" aria-label="${esc(STORE.name)} home">${brandMark}<span>THE SIDE PROJECT.</span></a>
+        <a class="brand" href="index.html" aria-label="${esc(STORE.name)} home">${brandMark}<span>THE SIDE PROJECT.<small>A little bit of everything</small></span></a>
         <nav class="nav-links" aria-label="Main">
           ${NAV.map(([h, l, k]) => `<a href="${h}" class="${k === page ? "active" : ""}">${l}</a>`).join("")}
           <a href="shop.html" class="nav-cta">Shop now</a>
