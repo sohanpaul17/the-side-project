@@ -1044,6 +1044,10 @@
     track.innerHTML = featured.map(card).join("");
     track.classList.toggle("few", featured.length <= 2);
     initCarousel($("#featured-carousel"));
+    // keep the side arrows level with the middle of the product photos
+    const fc = $("#featured-carousel");
+    const levelArrows = () => { const m = $(".card-media", fc); if (m) fc.style.setProperty("--arrow-y", Math.round(m.getBoundingClientRect().top - fc.getBoundingClientRect().top + m.offsetHeight / 2) + "px"); };
+    levelArrows(); addEventListener("resize", levelArrows); addEventListener("load", levelArrows);
     if ($("#latest-grid")) $("#latest-grid").innerHTML = PRODUCTS.slice(0, 4).map(card).join("");
     $$(".js-wa").forEach((a) => (a.href = waLink("Hi! I'd love to know more about your products.")));
     $$(".js-ig").forEach((a) => (a.href = igProfile()));

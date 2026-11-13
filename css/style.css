@@ -1452,3 +1452,16 @@ body[data-page="shop"] main .wrap { width: min(1060px, 100% - 64px); }
   .ps-ll { width: 215px; }
   .ps-sb .sb-book { width: 128px; }
 }
+
+/* "Our products": arrows on either side of the row (counter + progress line stay below) */
+#featured-carousel .circle-btn { position: absolute; z-index: 5; top: var(--arrow-y, 40%); transform: translateY(-50%); width: 50px; height: 50px; background: var(--cream); box-shadow: 0 10px 24px -10px rgba(0,0,0,.45), inset 0 0 0 1.5px var(--ink); }
+#featured-carousel .circle-btn:hover { background: var(--ink); color: var(--cream); }
+#featured-carousel .prev { left: -26px; }
+#featured-carousel .next { right: -26px; }
+#featured-carousel .carousel-controls { gap: 14px; }
+@media (max-width: 1300px) { #featured-carousel .prev { left: -10px; } #featured-carousel .next { right: -10px; } }
+@media (max-width: 600px) {
+  #featured-carousel .circle-btn { width: 40px; height: 40px; }
+  #featured-carousel .prev { left: -6px; } #featured-carousel .next { right: -6px; }
+}
+#featured-carousel .circle-btn:hover { transform: translateY(-50%) scale(1.06); }
