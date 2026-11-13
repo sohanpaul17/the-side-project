@@ -1519,3 +1519,37 @@ body[data-page="shop"] main .wrap { width: min(1060px, 100% - 64px); }
   body.xmas-nav .hd-sky { display: none; }
   body.xmas-nav .nav-links > a, .hd-lights i, body.xmas-nav .nav-cta::after { animation: none !important; }
 }
+
+/* ===================== Christmas on the Shop & Reviews pages and the logo ===================== */
+/* logo: a Santa hat on the mark, and its star twinkles gold */
+body.xmas-nav .brand-mark::after { content: ""; position: absolute; left: -5px; top: -13px; width: 26px; height: 22px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 34'%3E%3Cpath d='M6 26C9 12 18 3 28 5c5 1 8 6 7 11-2-3-5-4-8-3l-3 13z' fill='%23d42c3c'/%3E%3Crect x='3' y='24' width='26' height='8' rx='4' fill='%23fff' stroke='%23e6dccb'/%3E%3Ccircle cx='34' cy='18' r='4.5' fill='%23fff' stroke='%23e6dccb'/%3E%3C/svg%3E") center / contain no-repeat; transform: rotate(-22deg); transform-origin: 70% 90%; animation: brandHat 3.4s ease-in-out infinite; pointer-events: none; }
+@keyframes brandHat { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-12deg) translateY(-1px); } }
+body.xmas-nav .brand-mark svg path { fill: #e0a930; transform-box: fill-box; transform-origin: center; animation: brandStar 2.6s ease-in-out infinite; }
+@keyframes brandStar { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.25) rotate(45deg); } }
+@media (max-width: 480px) { body.xmas-nav .brand-mark::after { width: 21px; height: 18px; left: -4px; top: -10px; } }
+
+/* page tops: snow, floating doodles, a countdown pill and a Santa hat on the title */
+.ph-xmas { position: absolute; inset: 0; pointer-events: none; z-index: 0; --sc: 1; }
+.page-hero .wrap { position: relative; z-index: 1; }
+.ph-xmas .sf { opacity: .5; }
+@media (max-width: 760px) { .ph-xmas { --sc: .62; } .ph-xmas .dd:nth-of-type(n+4) { display: none; } }
+.ph-pill { display: inline-flex; align-items: center; gap: 8px; margin: 14px 0 clamp(26px, 4vw, 44px); padding: 7px 14px 7px 11px; border-radius: 999px; background: #fff; color: #b3243a; font-size: 13.5px; font-weight: 600; box-shadow: 0 0 0 1.5px rgba(196,42,60,.25), 0 8px 18px -12px rgba(0,0,0,.35); }
+.ph-pill b { font-family: var(--display); font-weight: 400; font-size: 15px; }
+.ph-pill svg { width: 15px; height: 15px; animation: hsSpin 8s linear infinite; }
+@media (max-width: 520px) { .ph-pill { font-size: 12px; } }
+body.xmas-nav[data-page="shop"] .page-hero h1, body.xmas-nav[data-page="reviews"] .page-hero h1 { position: relative; }
+body.xmas-nav[data-page="shop"] .page-hero h1::before, body.xmas-nav[data-page="reviews"] .page-hero h1::before { content: ""; position: absolute; z-index: 2; left: -.14em; top: -.34em; width: .72em; height: .62em; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 34'%3E%3Cpath d='M6 26C9 12 18 3 28 5c5 1 8 6 7 11-2-3-5-4-8-3l-3 13z' fill='%23d42c3c'/%3E%3Crect x='3' y='24' width='26' height='8' rx='4' fill='%23fff' stroke='%23e6dccb'/%3E%3Ccircle cx='34' cy='18' r='4.5' fill='%23fff' stroke='%23e6dccb'/%3E%3C/svg%3E") center / contain no-repeat; transform: rotate(-20deg); animation: brandHat 3.4s ease-in-out infinite; }
+
+/* shop: red active filter, holly on category headings, festive card hover */
+body.xmas-nav .chip.active { background: #c42a3c; color: #fff; }
+body.xmas-nav .chip:hover { box-shadow: inset 0 0 0 1.5px #c42a3c; }
+body.xmas-nav #grid .shop-cat-head h2 { display: inline-flex; align-items: center; gap: 10px; }
+body.xmas-nav #grid .shop-cat-head h2::after { content: ""; width: 36px; height: 24px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 32'%3E%3Cpath d='M24 18C18 8 8 6 2 10c4 1 4 4 2 6 4-1 6 1 6 4 3-3 7-2 9 1 0-3 2-4 5-3z' fill='%232f8a5c'/%3E%3Cpath d='M24 18c6-10 16-12 22-8-4 1-4 4-2 6-4-1-6 1-6 4-3-3-7-2-9 1 0-3-2-4-5-3z' fill='%233a9e6a'/%3E%3Ccircle cx='21' cy='19' r='4' fill='%23d42c3c'/%3E%3Ccircle cx='28' cy='19' r='4' fill='%23e03049'/%3E%3Ccircle cx='24.5' cy='13.5' r='4' fill='%23c41e36'/%3E%3C/svg%3E") center / contain no-repeat; }
+body.xmas-nav .card .card-media { transition: box-shadow .35s var(--ease), transform .45s var(--ease); }
+body.xmas-nav .card:hover .card-media { box-shadow: 0 0 0 3px #c42a3c, 0 18px 30px -18px rgba(196,42,60,.6); transform: rotate(-.6deg); }
+
+/* reviews: holly on each card, gold stars, festive summary */
+body.xmas-nav .rv-card { position: relative; }
+body.xmas-nav .rv-card::after { content: ""; position: absolute; right: 12px; top: 10px; width: 34px; height: 22px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 32'%3E%3Cpath d='M24 18C18 8 8 6 2 10c4 1 4 4 2 6 4-1 6 1 6 4 3-3 7-2 9 1 0-3 2-4 5-3z' fill='%232f8a5c'/%3E%3Cpath d='M24 18c6-10 16-12 22-8-4 1-4 4-2 6-4-1-6 1-6 4-3-3-7-2-9 1 0-3-2-4-5-3z' fill='%233a9e6a'/%3E%3Ccircle cx='21' cy='19' r='4' fill='%23d42c3c'/%3E%3Ccircle cx='28' cy='19' r='4' fill='%23e03049'/%3E%3Ccircle cx='24.5' cy='13.5' r='4' fill='%23c41e36'/%3E%3C/svg%3E") center / contain no-repeat; opacity: .95; }
+body.xmas-nav[data-page="reviews"] .rv-summary { background: linear-gradient(135deg, #fff6ec, #f6e6d6); box-shadow: inset 0 0 0 2px rgba(196,42,60,.18); }
+@media (prefers-reduced-motion: reduce) { body.xmas-nav .brand-mark::after, body.xmas-nav .brand-mark svg path, .ph-pill svg { animation: none; } }

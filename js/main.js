@@ -894,10 +894,10 @@
       </div>`;
   }
 
-  /* ---------- Hero side gutters (wide screens): floating sticker doodles, falling snow, a little note ---------- */
-  function heroSides(root, theme) {
+  // little sticker doodles (gift, tree, candy cane, bauble, snowflake, star, heart, letter)
+  function doodleSvgs() {
     const K = "#161513", sw = 'stroke="#161513" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"';
-    const D = {
+    return {
       gift: `<svg viewBox="0 0 64 64"><rect x="10" y="27" width="44" height="29" rx="3" fill="#e03049" ${sw}/><rect x="7" y="19" width="50" height="10" rx="3" fill="#f05a6e" ${sw}/><path d="M29 19h6v37h-6z" fill="#f2c46d" ${sw}/><path d="M32 19c-5-10-15-11-14-4 1 5 14 4 14 4zM32 19c5-10 15-11 14-4-1 5-14 4-14 4z" fill="#f2c46d" ${sw}/></svg>`,
       tree: `<svg viewBox="0 0 64 64"><path d="M32 8 47 29h-7l12 17H12l12-17h-7z" fill="#2f8a5c" ${sw}/><rect x="28" y="46" width="8" height="10" rx="1" fill="#a0603a" ${sw}/><path d="M32 2l2 4.5 4.6.6-3.4 3.2.9 4.6L32 12.7l-4.1 2.2.9-4.6-3.4-3.2 4.6-.6z" fill="#f2c46d" ${sw} stroke-width="1.6"/><circle cx="27" cy="27" r="2.6" fill="#f2c46d"/><circle cx="37" cy="36" r="2.6" fill="#e03049"/><circle cx="24" cy="41" r="2.6" fill="#6cc6ff"/><circle cx="41" cy="43" r="2.6" fill="#f2c46d"/></svg>`,
       candy: `<svg viewBox="0 0 64 64"><path d="M40 58V22a10 10 0 0 0-20 0" fill="none" stroke="${K}" stroke-width="11" stroke-linecap="round"/><path d="M40 58V22a10 10 0 0 0-20 0" fill="none" stroke="#fff" stroke-width="6.6" stroke-linecap="round"/><path d="M40 58V22a10 10 0 0 0-20 0" fill="none" stroke="#e03049" stroke-width="6.6" stroke-dasharray="5 6"/></svg>`,
@@ -907,6 +907,11 @@
       heart: `<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.4 2.3 4.5 6 4.5c2.2 0 3.6 1.3 4.5 2.6.3.4.9.4 1.2 0 .9-1.3 2.3-2.6 4.5-2.6 3.7 0 5.6 3.9 4 7.2C19.5 16.4 12 21 12 21z" fill="#e0456e" stroke="${K}" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
       letter: `<svg viewBox="0 0 64 64"><rect x="6" y="16" width="52" height="34" rx="3" fill="#fde8d8" ${sw}/><path d="M6 18l26 19 26-19" fill="none" ${sw}/><path d="M32 33c-2-3-7-2-6 2 1 3 6 5 6 5s5-2 6-5c1-4-4-5-6-2z" fill="#e0456e"/></svg>`,
     };
+  }
+
+  /* ---------- Hero side gutters (wide screens): floating sticker doodles, falling snow, a little note ---------- */
+  function heroSides(root, theme) {
+    const D = doodleSvgs();
     const xmas = theme === "christmas";
     // [left %, top %, width px, kind, tilt, parallax depth]
     const L = xmas
@@ -1076,6 +1081,25 @@
     if ($("#latest-grid")) $("#latest-grid").innerHTML = PRODUCTS.slice(0, 4).map(card).join("");
     $$(".js-wa").forEach((a) => (a.href = waLink("Hi! I'd love to know more about your products.")));
     $$(".js-ig").forEach((a) => (a.href = igProfile()));
+  }
+
+  // Christmas season: snow, floating doodles, a countdown and a Santa hat on the Shop and Reviews pages
+  function festivePage() {
+    if (!document.body.classList.contains("xmas-nav") || !["shop", "reviews"].includes(page)) return;
+    const hero = $(".page-hero"); if (!hero) return;
+    const occ = nextOccasion(), D = doodleSvgs();
+    const r = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
+    const snow = Array.from({ length: 22 }, () => `<i class="sf" style="left:${r(0, 100)}%;--s:${r(8, 14)}px;--t:${r(8, 14)}s;--dl:-${r(0, 14)}s;--sw:${r(-24, 24)}px">${D.snow}</i>`).join("");
+    const list = page === "shop"
+      ? [[70, 30, 66, "gift", -10], [87, 62, 76, "tree", 6], [93, 20, 32, "star", 0], [60, 78, 52, "candy", 14], [78, 86, 42, "bauble", -8]]
+      : [[72, 28, 54, "bauble", 8], [88, 60, 72, "tree", -6], [62, 76, 56, "letter", -8], [93, 20, 30, "star", 0], [80, 88, 40, "gift", 10]];
+    const doodles = list.map(([x, y, w, k, rot], i) =>
+      `<span class="dd" style="left:${x}%;top:${y}%;--w:${w}px;--r:${rot}deg;--z:0;--k:${i}"><span class="dd-p"><span class="dd-f" style="--t:${r(4.5, 7)}s;--dl:-${r(0, 5)}s">${D[k]}</span></span></span>`).join("");
+    hero.insertAdjacentHTML("afterbegin", `<div class="ph-xmas" aria-hidden="true">${snow}${doodles}</div>`);
+    const days = occ && occ.days ? `<b>${occ.days}</b> ${occ.days === 1 ? "day" : "days"} to Christmas` : "<b>Merry Christmas!</b>";
+    const note = page === "shop" ? " · printed gifts ship in 3–5 days, so order early" : " · see what people loved gifting";
+    const crumb = $(".breadcrumb", hero);
+    if (crumb) crumb.insertAdjacentHTML("afterend", `<span class="ph-pill reveal">${D.snow} ${days}${note}</span>`);
   }
 
   function shopPage() {
@@ -1491,6 +1515,7 @@
   renderChrome();
   initTransitions();
   ({ home: homePage, shop: shopPage, product: (...a) => { productPage(...a); productReviews(PRODUCTS.find((x) => x.id === new URLSearchParams(location.search).get("id")) || PRODUCTS[0]); }, about: aboutPage, contact: contactPage, reviews: reviewsPage }[page] || (() => {}))();
+  festivePage();
   observeReveals();
   // looping animations only run while their section is on screen (keeps scrolling smooth)
   const animIO = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle("anim-off", !e.isIntersecting)), { rootMargin: "120px 0px" });
