@@ -1278,3 +1278,60 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 .dd-note path + path { animation-delay: 2.7s; animation-duration: .4s; }
 @keyframes ddDraw { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) { .dd-f, .sf { animation: none; } .sf { display: none; } .dd-note path { stroke-dashoffset: 0; animation: none; } }
+
+/* ===================== performance ===================== */
+/* no live blur behind the sticky header / slider pill: it re-blurred the animated hero every frame */
+.site-header { backdrop-filter: none; -webkit-backdrop-filter: none; background: color-mix(in srgb, var(--cream) 96%, transparent); }
+.hs-tag { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255,255,255,.95); }
+/* soft glows drawn with gradients instead of a big animated blur filter */
+.lb-glow { filter: none; opacity: .5; will-change: transform; }
+.lb-glow.g1 { background: radial-gradient(closest-side, #e0456e, rgba(224,69,110,0)); }
+.lb-glow.g2 { background: radial-gradient(closest-side, #9b6be0, rgba(155,107,224,0)); }
+.lb-glow.g3 { background: radial-gradient(closest-side, #f6a35a, rgba(246,163,90,0)); }
+.hs-blob { filter: none; will-change: transform; }
+/* the book's shadow: a static ellipse instead of a drop-shadow recalculated on every page turn */
+.flipbook { filter: none; }
+.flipbook-wrap { position: relative; }
+.flipbook-wrap::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: -6px; height: 26px; border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,.45), transparent); z-index: -1; }
+/* fairy lights: fade only (cheap), no animated glow/filter */
+.bulb { animation-name: bulbFade; will-change: opacity; }
+@keyframes bulbFade { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+/* paused while off screen, and on slides that aren't showing */
+.anim-off *, .anim-off *::before, .anim-off *::after,
+.hs-slide:not(.is-active) *, .hs-slide:not(.is-active) *::before, .hs-slide:not(.is-active) *::after { animation-play-state: paused !important; }
+
+/* ===================== header logo on one line ===================== */
+.brand { font-size: 24px; line-height: 1; gap: 12px; white-space: nowrap; }
+.brand-mark { width: 40px; height: 40px; }
+@media (max-width: 1080px) { .brand { font-size: 21px; } }
+@media (max-width: 480px) { .brand { font-size: 18px; gap: 8px; } .brand-mark { width: 32px; height: 32px; } }
+
+/* ===================== free delivery, made visible ===================== */
+.top-bar { position: relative; z-index: 51; background: var(--ink); color: var(--cream); text-align: center; font-size: 13.5px; font-weight: 500; padding: 8px 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.top-bar b { color: #9fe0ad; font-weight: 800; }
+.tb-truck { display: inline-flex; color: #9fe0ad; animation: tbDrive 2.4s ease-in-out infinite; }
+.tb-truck svg { width: 18px; height: 18px; }
+@keyframes tbDrive { 0%, 100% { transform: translateX(-3px); } 50% { transform: translateX(3px); } }
+.card-ship { position: absolute; z-index: 2; left: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; background: #2f7a45; color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .01em; box-shadow: 0 6px 14px -8px rgba(0,0,0,.5); transition: opacity .3s; }
+.card-ship svg { width: 14px; height: 14px; }
+.card:hover .card-ship { opacity: 0; }
+@media (hover: none) { .card:hover .card-ship { opacity: 1; } }
+.ship-tag { font-size: 14px; padding: 7px 14px; background: #2f7a45; color: #fff; gap: 7px; }
+.ship-tag svg { width: 16px; height: 16px; }
+.ship-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #2f7a45; color: #fff; font-family: var(--sans); font-size: 13px; font-weight: 700; }
+.ship-pill svg { width: 15px; height: 15px; }
+
+/* ===================== shop: more compact cards ===================== */
+#grid.product-grid { gap: 22px 20px; }
+body[data-page="shop"] main .wrap { width: min(1060px, 100% - 64px); }
+@media (max-width: 719px) { body[data-page="shop"] main .wrap { width: calc(100% - 32px); } }
+#grid .card-media { aspect-ratio: 1 / 1; border-radius: 16px; }
+#grid .card-body { padding: 10px 2px 2px; }
+#grid .card-title { font-size: 16px; margin: 2px 0 6px; }
+#grid .price { font-size: 18px; }
+#grid .card-cat { font-size: 10.5px; }
+@media (max-width: 760px) {
+  #grid.product-grid { gap: 14px 12px; }
+  .card-ship { left: 8px; bottom: 8px; padding: 4px 8px; font-size: 10px; gap: 4px; }
+  .card-ship svg { width: 11px; height: 11px; }
+}

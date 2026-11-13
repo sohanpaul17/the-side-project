@@ -13,6 +13,7 @@
     left: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>`,
     right: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
     close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+    truck: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v10H2zM13 9h4.5L21 12.5V16h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>`,
     bag: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1 13H5L6 7z"/><path d="M9 7a3 3 0 016 0"/></svg>`,
     print: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>`,
     pdf: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6M12 18v-6M9 15l3 3 3-3"/></svg>`,
@@ -146,7 +147,7 @@
     header.className = "site-header";
     header.innerHTML = `
       <div class="wrap nav">
-        <a class="brand" href="index.html" aria-label="${esc(STORE.name)} home">${brandMark}<span>THE SIDE<br>PROJECT.</span></a>
+        <a class="brand" href="index.html" aria-label="${esc(STORE.name)} home">${brandMark}<span>THE SIDE PROJECT.</span></a>
         <nav class="nav-links" aria-label="Main">
           ${NAV.map(([h, l, k]) => `<a href="${h}" class="${k === page ? "active" : ""}">${l}</a>`).join("")}
           <a href="shop.html" class="nav-cta">Shop now</a>
@@ -154,6 +155,10 @@
         <button class="menu-btn" aria-label="Menu"><span></span><span></span><span></span></button>
       </div>`;
     document.body.prepend(header);
+    const bar = document.createElement("div");
+    bar.className = "top-bar";
+    bar.innerHTML = `<span class="tb-truck">${I.truck}</span> <b>Free delivery</b> on every order across India`;
+    header.before(bar);
 
     const curtain = document.createElement("div");
     curtain.className = "curtain";
@@ -221,13 +226,14 @@
           ${p.badge ? `<span class="card-badge">${esc(p.badge)}</span>` : ""}
           <img src="${imgs[0]}" alt="${esc(p.title)}" loading="lazy">
           ${imgs[1] ? `<img class="alt" src="${imgs[1]}" alt="" loading="lazy">` : ""}
+          ${p.priceNote ? `<span class="card-ship">${p.formats && p.formats.includes("digital") ? I.bolt : I.truck} ${esc(p.priceNote)}</span>` : ""}
           <span class="card-quick" data-buy="${esc(p.id)}">${I.bag} Buy now</span>
         </div>
         <div class="card-body">
           <div class="card-cat">${esc(p.category)}</div>
           <div class="card-title">${esc(p.title)}</div>
           <div class="card-row">
-            <span class="price">${p.sizes ? '<small class="price-from">From</small> ' : ""}${money(p.sizes ? Math.min(...p.sizes.map((s) => s.price)) : p.price)}${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}${p.priceNote ? `<small class="price-note">${esc(p.priceNote)}</small>` : ""}</span>
+            <span class="price">${p.sizes ? '<small class="price-from">From</small> ' : ""}${money(p.sizes ? Math.min(...p.sizes.map((s) => s.price)) : p.price)}${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>
             <span class="formats-mini">${p.formats.includes("print") ? "<span>Print</span>" : ""}${p.formats.includes("pdf") ? "<span>PDF</span>" : ""}</span>
           </div>
         </div>
@@ -650,7 +656,7 @@
       <h3 class="h-display spot-title">${esc(p.title)}</h3>
       <p class="bs-rating"></p>
       <p class="bs-short">${esc(p.short)}</p>
-      <div class="bs-price"><span class="price">${money(p.price)}${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}</span>${p.priceNote ? `<small>${esc(p.priceNote)}</small>` : ""}</div>
+      <div class="bs-price"><span class="price">${money(p.price)}${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}</span>${p.priceNote ? `<span class="ship-pill">${p.formats && p.formats.includes("digital") ? I.bolt : I.truck} ${esc(p.priceNote)}</span>` : ""}</div>
       <div class="bs-actions">
         <a class="btn btn-lg bs-buy" href="${productUrl(p)}" data-buy="${esc(p.id)}">${I.bag} Buy now</a>
         <a class="btn btn-lg btn-ghost bs-view" href="${productUrl(p)}">${esc(viewLabel)} ${I.arrow}</a>
@@ -831,7 +837,7 @@
             <span class="hs-kicker hs-in" style="--d:.1s">${esc(p.category || "")}${p.badge ? ` · ${esc(p.badge)}` : ""}</span>
             <h2 class="hs-title"><span class="hs-line"><span style="--d:.2s">${esc(p.title)}</span></span></h2>
             <p class="hs-lead hs-in" style="--d:.38s">${esc(p.short || "")}</p>
-            <div class="hs-price hs-in" style="--d:.48s"><span>${price}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ""}</span>${p.priceNote ? `<small>${esc(p.priceNote)}</small>` : ""}</div>
+            <div class="hs-price hs-in" style="--d:.48s"><span>${price}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ""}</span>${p.priceNote ? `<span class="ship-pill">${p.formats && p.formats.includes("digital") ? I.bolt : I.truck} ${esc(p.priceNote)}</span>` : ""}</div>
             <div class="hs-actions hs-in" style="--d:.58s">
               <a href="${productUrl(p)}" class="btn btn-lg">See it ${ARROW}</a>
               <button type="button" class="btn btn-lg btn-ghost" data-buy="${esc(p.id)}">Buy now</button>
@@ -908,7 +914,11 @@
     const dots = $$("button", dotsEl);
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    let index = -1, timer = null, paused = false, flipTimers = [];
+    let index = -1, timer = null, paused = false, flipTimers = [], heroOnScreen = true;
+    new IntersectionObserver(([en]) => {
+      heroOnScreen = en.isIntersecting;
+      if (index >= 0) fx.toggle(els[index].classList.contains("hs-occ") && !reduce && heroOnScreen);
+    }).observe(root);
     // once the cover is open, the pages turn over one by one like a real book
     function turnPages(slide) {
       flipTimers.forEach(clearTimeout); flipTimers = [];
@@ -938,7 +948,7 @@
       index = n;
       // the Lovebook's pages turn over once the gift is unwrapped
       turnPages(els[n]);
-      fx.toggle(els[n].classList.contains("hs-occ") && !reduce);
+      fx.toggle(els[n].classList.contains("hs-occ") && !reduce && heroOnScreen);
       schedule();
     }
     function schedule() {
@@ -1085,7 +1095,7 @@
         <nav class="breadcrumb reveal"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <a href="shop.html?cat=${encodeURIComponent(p.category)}">${esc(p.category)}</a></nav>
         <span class="card-cat reveal" style="--d:.05s">${esc(p.category)}${p.badge ? " · " + esc(p.badge) : ""}</span>
         <h1 class="pdp-title reveal" style="--d:.1s">${esc(p.title)}</h1>
-        <div class="pdp-price reveal" style="--d:.15s"><span class="price"><span id="pdp-price-val">${money(p.sizes ? p.sizes[0].price : p.price)}</span>${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>${save ? `<span class="save-tag">Save ${save}%</span>` : ""}${p.priceNote ? `<span class="ship-tag">${I.check} ${esc(p.priceNote)}</span>` : ""}</div>
+        <div class="pdp-price reveal" style="--d:.15s"><span class="price"><span id="pdp-price-val">${money(p.sizes ? p.sizes[0].price : p.price)}</span>${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>${save ? `<span class="save-tag">Save ${save}%</span>` : ""}${p.priceNote ? `<span class="ship-tag">${p.formats && p.formats.includes("digital") ? I.bolt : I.truck} ${esc(p.priceNote)}</span>` : ""}</div>
         ${p.sizes ? `<div class="size-pick reveal" style="--d:.16s"><div class="delivery-title">Choose your size</div><div class="size-opts">${p.sizes.map((s, i) => `<label class="sopt"><input type="radio" name="size" value="${i}" ${i ? "" : "checked"}><span><b>${esc(s.label)}</b>${s.dims ? `<small>${esc(s.dims)}</small>` : ""}</span><em>${money(s.price)}</em></label>`).join("")}</div></div>` : ""}
         ${p.shippingNote ? `<p class="intl-note reveal" style="--d:.17s">✈ ${esc(p.shippingNote)}</p>` : ""}
         ${p.framingNote ? `<div class="frame-note reveal" style="--d:.19s" role="note"><span class="frame-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg></span><span><b>Framing costs extra</b><small>${esc(p.framingNote)}. Want it framed? Just ask when you order.</small></span></div>` : ""}
@@ -1427,5 +1437,8 @@
   initTransitions();
   ({ home: homePage, shop: shopPage, product: (...a) => { productPage(...a); productReviews(PRODUCTS.find((x) => x.id === new URLSearchParams(location.search).get("id")) || PRODUCTS[0]); }, about: aboutPage, contact: contactPage, reviews: reviewsPage }[page] || (() => {}))();
   observeReveals();
+  // looping animations only run while their section is on screen (keeps scrolling smooth)
+  const animIO = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle("anim-off", !e.isIntersecting)), { rootMargin: "120px 0px" });
+  $$("main > section, main > .marquee, .site-footer").forEach((el) => animIO.observe(el));
   window.SP = { STAR, I };
 })();
