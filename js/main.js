@@ -1185,6 +1185,7 @@
         </div>
         <div class="li-bar">
           <span class="li-hint">Click a page, swipe, or use ← → to turn</span>
+          <span class="li-rotate">Turn your phone sideways for a bigger view</span>
           <span class="li-count" aria-live="polite"></span>
           <button type="button" class="li-full">${FULL} Full screen</button>
         </div>
@@ -1253,12 +1254,20 @@
       else go(f + (side(e) === "r" ? 1 : -1));
     });
     // full screen
-    $(".li-full", sec).addEventListener("click", () => {
-      if (document.fullscreenElement) document.exitFullscreen();
-      else (sec.requestFullscreen || sec.webkitRequestFullscreen)?.call(sec);
-    });
+    // full screen: the book fills the screen as an overlay (works on phones too, where the browser's own full screen doesn't)
+    const fsBtn = $(".li-full", sec);
+    const setFull = (on) => {
+      sec.classList.toggle("li-full-on", on);
+      document.documentElement.classList.toggle("li-lock", on);
+      fsBtn.innerHTML = on ? `${I.close} Close` : `${FULL} Full screen`;
+      fsBtn.setAttribute("aria-pressed", String(on));
+      if (on) book.focus({ preventScroll: true });
+      else sec.scrollIntoView({ block: "start" });
+    };
+    fsBtn.addEventListener("click", () => setFull(!sec.classList.contains("li-full-on")));
     document.addEventListener("keydown", (e) => {
-      if (document.fullscreenElement !== sec) return;
+      if (!sec.classList.contains("li-full-on")) return;
+      if (e.key === "Escape") setFull(false);
       if (e.key === "ArrowRight") go(f + 1);
       if (e.key === "ArrowLeft") go(f - 1);
     });
