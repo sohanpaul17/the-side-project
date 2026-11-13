@@ -861,6 +861,64 @@
         </div>
       </div>`;
     }
+    if (p.id === "customised-mini-lovebook") {
+      return `<div class="ps ps-sb ps-mini">
+        <div class="xb-book sb-book" aria-label="${esc(p.title)}">
+          <div class="xb-page"><img class="on" src="${H}mini-right.webp" alt=""></div>
+          <div class="xb-cover">
+            <div class="xb-front"><img src="${H}mini-cover.webp" alt="${esc(p.title)} cover"></div>
+            <div class="xb-back"><img src="${H}mini-left.webp" alt=""></div>
+          </div>
+          ${[0, 1, 2, 3, 4].map((i) => `<i class="sb-pop" style="--i:${i};--x:${[-50, -16, 26, 60, 6][i]}px">${i % 2 ? STAR() : HEART}</i>`).join("")}
+        </div>
+        <span class="ps-tagline">fits in your pocket ♡</span>
+      </div>`;
+    }
+    if (p.id === "customised-notebook") {
+      const lines = ["Dear diary,", "today we laughed so", "hard at the silliest", "thing ♡", "", "Things I love:", "♡ rainy evenings", "♡ chai at 5"];
+      return `<div class="ps ps-nb">
+        <div class="nb-book">
+          <div class="nb-page">${lines.map((l, i) => `<span style="--i:${i}">${esc(l) || "&nbsp;"}</span>`).join("")}<i class="nb-pencil"></i></div>
+          <div class="nb-cover"><div class="nb-front"><img src="${H}notebook-cover.webp" alt="${esc(p.title)}"></div><div class="nb-back"></div></div>
+        </div>
+      </div>`;
+    }
+    if (p.id === "customised-calendar-magnet") {
+      return `<div class="ps ps-cal">
+        <div class="cal-fridge"><i class="cal-handle"></i>
+          <img class="cal-mag" src="${H}calendar-magnet.webp" alt="${esc(p.title)}">
+          <div class="cal-note"><i class="cal-pin"></i>date night<br>friday ${HEART}</div>
+          <i class="cal-heart">${HEART}</i>
+        </div>
+      </div>`;
+    }
+    if (p.id === "customised-52-reasons-box") {
+      const fan = [-30, -18, -6, 6, 18, 30];
+      return `<div class="ps ps-rb">
+        <div class="rb-cards">${fan.map((r, i) => `<img class="rb-card" src="${H}reason-${i + 1}.webp" alt="" style="--r:${r}deg;--i:${i};--x:${(i - 2.5) * 30}px">`).join("")}</div>
+        <img class="rb-box" src="${H}reasons-box.webp" alt="${esc(p.title)}">
+      </div>`;
+    }
+    if (p.id === "customised-stickers") {
+      const st = [["st-girl", 16, 14, -12, 70], ["st-boy", 84, 12, 10, 64], ["st-heart", 12, 56, -8, 52], ["st-chai", 86, 44, 6, 92], ["st-nani", 84, 80, -6, 60], ["st-love", 24, 88, -4, 104], ["st-star", 60, 94, 14, 40]];
+      return `<div class="ps ps-st">
+        <img class="st-sheet" src="${H}sticker-sheet.webp" alt="${esc(p.title)}">
+        ${st.map(([n, x, y, r, w], i) => `<img class="st-one" src="${H}${n}.webp" alt="" style="--x:${x}%;--y:${y}%;--r:${r}deg;--w:${w}px;--i:${i}">`).join("")}
+      </div>`;
+    }
+    if (p.id === "customised-bookmark") {
+      return `<div class="ps ps-bm">
+        <div class="bm-set">${[1, 2, 3, 4].map((n, i) => `<img class="bm" src="${H}bookmark-${n}.webp" alt="" style="--i:${i};--r:${(i - 1.5) * 9}deg;--x:${(i - 1.5) * 56}px">`).join("")}</div>
+        <div class="bm-book"><i></i><i></i></div>
+      </div>`;
+    }
+    if (p.id === "customised-wallpaper") {
+      return `<div class="ps ps-wp">
+        <img class="wp-home" src="${H}phone-home.webp" alt="">
+        <div class="wp-lock"><img src="${H}phone-lock.webp" alt="${esc(p.title)}"><i class="wp-glow"></i></div>
+        ${[0, 1, 2, 3].map((i) => `<i class="wp-heart" style="--i:${i};--x:${[-30, 10, 40, -6][i]}px">${HEART}</i>`).join("")}
+      </div>`;
+    }
     return "";
   }
 
@@ -958,7 +1016,8 @@
     const now = new Date(), day = Math.floor((now - now.getTimezoneOffset() * 60000) / 864e5);
     const start = pool.length ? (day * 3) % pool.length : 0;
     const daily = Array.from({ length: Math.min(3, pool.length) }, (_, i) => pool[(start + i) % pool.length]);
-    const rest = (sky ? [sky] : []).concat(daily);
+    // ?allslides in the address shows every product (handy for checking them all)
+    const rest = (sky ? [sky] : []).concat(new URLSearchParams(location.search).has("allslides") ? pool : daily);
     const slides = (occ ? [occasionSlide(occ, hero)] : []).concat(rest.map(productSlide));
     track.innerHTML = slides.join("");
     const els = $$(".hs-slide", track);
