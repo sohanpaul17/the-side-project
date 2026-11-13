@@ -53,6 +53,8 @@ const CATEGORY_INFO = {
 const PRODUCTS = [
   {
     id: "customised-lovebook",
+    // "Look inside": a sample book (watermarked) visitors can flip through on the product page
+    lookInside: { dir: "assets/products/look-inside/", pages: 20, label: "Ethan & Lily" },
     // pages shown in the home page flipbook (cover first, then pages in reading order)
     flipPages: ["assets/products/lovebook-pages/cover.webp", "assets/products/lovebook-pages/p1.webp", "assets/products/lovebook-pages/p2.webp", "assets/products/lovebook-pages/p3.webp", "assets/products/lovebook-pages/p4.webp"],
     title: "Customised Lovebook",

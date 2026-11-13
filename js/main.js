@@ -1147,6 +1147,106 @@
     render();
   }
 
+  /* ---------- "Look inside": a flippable sample book on the product page ---------- */
+  function lookInside(p) {
+    const sec = $("#look-inside");
+    if (!sec || !p.lookInside) return;
+    const L = p.lookInside, n = L.pages, leaves = Math.ceil(n / 2);
+    const file = (i, sm) => `${L.dir}${sm ? "sm/" : ""}p${String(i).padStart(2, "0")}.webp`;
+    const BOOK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5c3-1.5 7-1.5 10 1 3-2.5 7-2.5 10-1v14c-3-1.5-7-1.5-10 1-3-2.5-7-2.5-10-1z"/><path d="M12 6v14"/></svg>`;
+    const FULL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>`;
+    // spreads you can jump to: cover, 2–3, 4–5 … back cover
+    const spreads = Array.from({ length: leaves + 1 }, (_, f) => (f === 0 ? [1] : f === leaves ? [n] : [2 * f, 2 * f + 1]));
+    sec.hidden = false;
+    sec.innerHTML = `
+      <div class="wrap">
+        <div class="li-head">
+          <span class="eyebrow reveal">Look inside</span>
+          <h2 class="h-display h2"><span class="split-line"><span>Flip through a Lovebook</span></span></h2>
+          <p class="muted reveal">A sample book, ${esc(L.label)}'s story. Yours is drawn about the two of you, with your own moments and words.</p>
+        </div>
+        <div class="li-stage reveal">
+          <button class="circle-btn li-nav prev" aria-label="Previous page">${I.left}</button>
+          <div class="li-book at-start" tabindex="0" role="group" aria-label="Sample Lovebook — use the arrow keys or click a page to turn it">
+            ${Array.from({ length: leaves }, (_, k) => `<div class="li-leaf" data-k="${k}">
+              <div class="li-face front${k === 0 ? " cover" : ""}"><img data-src="${file(2 * k + 1)}" alt="Page ${2 * k + 1}" draggable="false"></div>
+              <div class="li-face back${2 * k + 2 === n ? " cover" : ""}">${2 * k + 2 <= n ? `<img data-src="${file(2 * k + 2)}" alt="Page ${2 * k + 2}" draggable="false">` : ""}</div>
+            </div>`).join("")}
+          </div>
+          <button class="circle-btn li-nav next" aria-label="Next page">${I.right}</button>
+        </div>
+        <div class="li-bar">
+          <span class="li-hint">Click a page, swipe, or use ← → to turn</span>
+          <span class="li-count" aria-live="polite"></span>
+          <button type="button" class="li-full">${FULL} Full screen</button>
+        </div>
+        <div class="li-thumbs">${spreads.map((pg, f) => `<button type="button" class="li-th" data-f="${f}" aria-label="${f === 0 ? "Cover" : f === leaves ? "Back cover" : `Pages ${pg[0]}–${pg[1]}`}">${pg.map((i) => `<img src="${file(i, true)}" alt="" loading="lazy">`).join("")}</button>`).join("")}</div>
+      </div>`;
+    // a shortcut next to the price
+    const price = $(".pdp-price");
+    if (price) price.insertAdjacentHTML("afterend", `<a class="li-link reveal" href="#look-inside">${BOOK} Flip through a sample book</a>`);
+
+    const book = $(".li-book", sec), lv = $$(".li-leaf", book), thumbs = $$(".li-th", sec), count = $(".li-count", sec);
+    let f = 0;
+    const load = () => lv.forEach((leaf, k) => { if (Math.abs(k - f) <= 2) $$("img[data-src]", leaf).forEach((im) => { im.src = im.dataset.src; im.removeAttribute("data-src"); }); });
+    const stack = () => lv.forEach((leaf, k) => { leaf.style.zIndex = k < f ? k + 1 : leaves * 2 - k; });
+    const render = (turning = []) => {
+      lv.forEach((leaf, k) => leaf.classList.toggle("flipped", k < f));
+      stack();
+      turning.forEach((leaf, j) => { leaf.style.zIndex = 100 + j; leaf.style.transitionDelay = j * 0.08 + "s"; });
+      setTimeout(() => { lv.forEach((l) => (l.style.transitionDelay = "")); stack(); }, 950 + turning.length * 80);
+      book.classList.toggle("at-start", f === 0);
+      book.classList.toggle("at-end", f === leaves);
+      count.textContent = f === 0 ? "Cover" : f === leaves ? "Back cover" : `Pages ${2 * f}–${2 * f + 1} of ${n}`;
+      thumbs.forEach((t, i) => t.classList.toggle("on", i === f));
+      $(".li-th.on", sec)?.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+      $(".li-nav.prev", sec).disabled = f === 0;
+      $(".li-nav.next", sec).disabled = f === leaves;
+      load();
+    };
+    const go = (to) => {
+      to = Math.max(0, Math.min(leaves, to));
+      if (to === f) return;
+      const turning = to > f ? lv.slice(f, to) : lv.slice(to, f).reverse();
+      f = to;
+      lv.forEach((l) => l.classList.remove("peek"));
+      render(turning);
+    };
+    $(".li-nav.prev", sec).addEventListener("click", () => go(f - 1));
+    $(".li-nav.next", sec).addEventListener("click", () => go(f + 1));
+    thumbs.forEach((t) => t.addEventListener("click", () => go(+t.dataset.f)));
+    book.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") { e.preventDefault(); go(f + 1); } if (e.key === "ArrowLeft") { e.preventDefault(); go(f - 1); } });
+    // which half of the book is under the pointer
+    const side = (e) => { const r = book.getBoundingClientRect(); return e.clientX > r.left + r.width / 2 ? "r" : "l"; };
+    // hover: the page corner lifts a little
+    book.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse") return;
+      const s = side(e);
+      lv.forEach((l, k) => l.classList.toggle("peek", (s === "r" && k === f) || (s === "l" && k === f - 1)));
+    });
+    book.addEventListener("pointerleave", () => lv.forEach((l) => l.classList.remove("peek")));
+    // click a page or swipe to turn
+    let sx = null;
+    book.addEventListener("pointerdown", (e) => { sx = e.clientX; });
+    book.addEventListener("pointerup", (e) => {
+      if (sx === null) return;
+      const dx = e.clientX - sx; sx = null;
+      if (Math.abs(dx) > 40) go(f + (dx < 0 ? 1 : -1));
+      else go(f + (side(e) === "r" ? 1 : -1));
+    });
+    // full screen
+    $(".li-full", sec).addEventListener("click", () => {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else (sec.requestFullscreen || sec.webkitRequestFullscreen)?.call(sec);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (document.fullscreenElement !== sec) return;
+      if (e.key === "ArrowRight") go(f + 1);
+      if (e.key === "ArrowLeft") go(f - 1);
+    });
+    render();
+  }
+
   function productPage() {
     const id = new URLSearchParams(location.search).get("id");
     const p = PRODUCTS.find((x) => x.id === id) || PRODUCTS[0];
@@ -1254,6 +1354,7 @@
     const related = PRODUCTS.filter((x) => x.id !== p.id).sort((a, b) => (b.category === p.category) - (a.category === p.category)).slice(0, 4);
     $("#related").innerHTML = related.map(card).join("");
     $("#related").classList.toggle("few", related.length <= 3);
+    lookInside(p);
   }
 
   function aboutPage() {
