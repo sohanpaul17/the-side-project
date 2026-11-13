@@ -163,6 +163,31 @@
     bar.className = "top-bar";
     bar.innerHTML = `<span class="tb-truck">${I.truck}</span> <b>Free delivery</b> on every order across India`;
     header.before(bar);
+    // Christmas season (desktop): festive menu, fairy lights under the header and Santa's sleigh flying across
+    const occNow = typeof nextOccasion === "function" ? nextOccasion() : null;
+    if (occNow && occNow.theme === "christmas" && occNow.days <= 45) {
+      document.body.classList.add("xmas-nav");
+      const reindeer = (x, y, lead) => `<g class="rd" transform="translate(${x} ${y})">
+        <g class="rd-b"><ellipse cx="22" cy="30" rx="13" ry="6.2" fill="#8a5a3c"/><path d="M11 27 7 18" stroke="#8a5a3c" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="5.5" cy="17" rx="5.4" ry="3.6" fill="#8a5a3c"/><path d="M8 14l2-7M10 9l3-2M5 14l-1-7M4.5 9l-3-2" stroke="#5b3b26" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <circle cx="4" cy="15.6" r=".9" fill="#222"/><path d="M34 27l4-3" stroke="#8a5a3c" stroke-width="3" stroke-linecap="round"/>
+        ${lead ? '<circle cx=".6" cy="17.6" r="2.3" fill="#ff3048" class="rd-nose"/>' : '<circle cx=".8" cy="17.6" r="1.4" fill="#3a2418"/>'}
+        <path d="M13 26q9 4 17 0" stroke="#d4283c" stroke-width="2" fill="none"/><circle cx="21" cy="29" r="1.4" fill="#f2c46d"/></g>
+        <g class="rd-legs" stroke="#6b4429" stroke-width="2.2" stroke-linecap="round"><path class="lf" d="M14 34l-5 8M18 35l-2 9"/><path class="lb" d="M27 35l4 8M31 33l6 7"/></g></g>`;
+      const sleigh = `<svg viewBox="0 0 236 62" aria-hidden="true">
+        <path d="M6 22Q70 34 132 33" stroke="#c8a24a" stroke-width="1.2" fill="none"/>
+        ${reindeer(0, 0, true)}${reindeer(42, 3, false)}${reindeer(84, 0, false)}
+        <g class="sl"><circle cx="190" cy="16" r="10" fill="#9b6b3f"/><rect x="183" y="5" width="9" height="8" rx="1.5" fill="#3b7bd6"/><rect x="191" y="3" width="8" height="9" rx="1.5" fill="#2f8a5c"/><path d="M187 5v8M195 3v9" stroke="#f2c46d" stroke-width="1.4"/>
+          <circle cx="168" cy="20" r="9.5" fill="#d42c3c"/><path d="M160 14l-14 14" stroke="#d42c3c" stroke-width="4" stroke-linecap="round"/><circle cx="146" cy="28" r="2.3" fill="#fff"/>
+          <circle cx="165" cy="9" r="5" fill="#f6d2b8"/><path d="M160 10q4 9 10 1q-1 7-5 7t-5-8z" fill="#fff"/><path d="M160 6q5-9 12-1z" fill="#d42c3c"/><path d="M172 5l5 4" stroke="#d42c3c" stroke-width="3" stroke-linecap="round"/><circle cx="178" cy="10" r="2.2" fill="#fff"/><path d="M159.5 6.5h13" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M138 30h46q10 0 12-12l7-2q-2 24-21 28h-41q-8 0-6-14z" fill="#d42c3c"/><path d="M142 33h38" stroke="#f2c46d" stroke-width="1.6" stroke-dasharray="2 3"/>
+          <path d="M146 44v6M176 44v6" stroke="#c8a24a" stroke-width="2"/><path d="M134 51h62q11 0 13-9" stroke="#f2c46d" stroke-width="2.8" fill="none" stroke-linecap="round"/></g>
+      </svg>`;
+      const N = 44;
+      const lights = Array.from({ length: N }, (_, i) => `<i class="b${i % 4}" style="left:${((i + 0.5) / N * 100).toFixed(2)}%;--i:${i}"></i>`).join("");
+      header.insertAdjacentHTML("afterbegin", `<div class="hd-sky" aria-hidden="true"><div class="hd-sleigh">${sleigh}</div></div>
+        <div class="hd-lights" aria-hidden="true"><svg viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 2${Array.from({ length: 11 }, (_, k) => ` Q${k * 10 - 5} 9 ${k * 10} 2`).join("").replace(" Q-5 9 0 2", "")}"/></svg>${lights}</div>`);
+    }
 
     const curtain = document.createElement("div");
     curtain.className = "curtain";

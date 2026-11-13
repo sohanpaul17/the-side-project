@@ -1465,3 +1465,57 @@ body[data-page="shop"] main .wrap { width: min(1060px, 100% - 64px); }
   #featured-carousel .prev { left: -6px; } #featured-carousel .next { right: -6px; }
 }
 #featured-carousel .circle-btn:hover { transform: translateY(-50%) scale(1.06); }
+
+/* ===================== Christmas desktop menu (only in the run-up to Christmas) ===================== */
+.hd-sky, .hd-lights { display: none; }
+@media (min-width: 821px) {
+  body.xmas-nav .site-header { position: sticky; }
+  body.xmas-nav .nav { position: relative; z-index: 2; height: 86px; padding-top: 22px; }
+  /* Santa's sleigh, flying right-to-left across the header, again and again */
+  body.xmas-nav .hd-sky { display: block; position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+  .hd-sleigh { position: absolute; top: 1px; left: 0; width: 118px; animation: sleighFly 26s linear infinite; will-change: transform; }
+  .hd-sleigh svg { display: block; width: 100%; height: auto; overflow: visible; animation: sleighBob 1.6s ease-in-out infinite alternate; }
+  .hd-sleigh::after { content: ""; position: absolute; left: 92%; top: 66%; width: 120px; height: 3px; border-radius: 3px;
+    background: radial-gradient(circle, #f2c46d 0 1.2px, transparent 1.6px) 0 0 / 9px 3px, linear-gradient(90deg, rgba(242,196,109,.7), rgba(242,196,109,0)); }
+  @keyframes sleighFly { 0% { transform: translateX(calc(100vw + 60px)) translateY(2px); } 30% { transform: translateX(calc(50vw - 60px)) translateY(-1px); } 60% { transform: translateX(-260px) translateY(2px); } 100% { transform: translateX(-260px) translateY(2px); } }
+  @keyframes sleighBob { from { transform: translateY(-2px) rotate(-1deg); } to { transform: translateY(3px) rotate(1.5deg); } }
+  .hd-sleigh .rd { transform-box: fill-box; }
+  .hd-sleigh .rd-legs .lf { animation: legF .45s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 0; }
+  .hd-sleigh .rd-legs .lb { animation: legF .45s ease-in-out infinite alternate-reverse; transform-box: fill-box; transform-origin: 50% 0; }
+  @keyframes legF { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+  .hd-sleigh .rd-nose { animation: noseGlow 1.2s ease-in-out infinite alternate; }
+  @keyframes noseGlow { from { opacity: .6; } to { opacity: 1; } }
+
+  /* fairy lights strung along the bottom of the header */
+  body.xmas-nav .hd-lights { display: block; position: absolute; left: 0; right: 0; bottom: -9px; height: 16px; pointer-events: none; z-index: 3; }
+  .hd-lights svg { position: absolute; left: 0; top: 0; width: 100%; height: 10px; }
+  .hd-lights path { fill: none; stroke: #3a3127; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+  .hd-lights i { position: absolute; top: 5px; width: 6px; height: 9px; margin-left: -3px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: var(--c); box-shadow: 0 0 6px 1px var(--c); animation: hdTwinkle 2.6s ease-in-out calc(var(--i) * -.29s) infinite; }
+  .hd-lights i.b0 { --c: #ff4d5e; } .hd-lights i.b1 { --c: #ffc94a; } .hd-lights i.b2 { --c: #4fd18f; } .hd-lights i.b3 { --c: #5cb8ff; }
+  @keyframes hdTwinkle { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+
+  /* the links: they jingle now and then like bells; on hover a snowflake spins in and a candy-cane underline draws */
+  body.xmas-nav .nav-links > a:not(.nav-cta) { transition: color .3s, transform .35s var(--ease); animation: jingle 9s ease-in-out calc(2s + var(--i) * .35s) infinite; transform-origin: 50% 0; }
+  @keyframes jingle { 0%, 6%, 100% { rotate: 0deg; } 1.5% { rotate: 6deg; } 3% { rotate: -5deg; } 4.5% { rotate: 3deg; } }
+  body.xmas-nav .nav-links > a:not(.nav-cta):hover { color: #c42a3c; transform: translateY(-2px); }
+  body.xmas-nav .nav-links > a:not(.nav-cta)::after { height: 3px; border-radius: 3px; background: repeating-linear-gradient(-45deg, #e03049 0 4px, #fff 4px 8px); box-shadow: 0 0 0 1px rgba(224,48,73,.35); }
+  body.xmas-nav .nav-links > a:not(.nav-cta)::before { content: ""; position: absolute; left: 50%; top: -9px; width: 13px; height: 13px; margin-left: -6.5px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236aa8d8' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7M12 2l-2.4 2.4M12 2l2.4 2.4M12 22l-2.4-2.4M12 22l2.4-2.4'/%3E%3C/svg%3E") center / contain no-repeat; opacity: 0; transform: translateY(6px) scale(.4) rotate(-90deg); transition: opacity .3s, transform .5s var(--ease); }
+  body.xmas-nav .nav-links > a:not(.nav-cta):hover::before { opacity: 1; transform: none; animation: flakeSpin 3s linear .5s infinite; }
+  @keyframes flakeSpin { to { rotate: 360deg; } }
+  /* the page you're on wears a Santa hat */
+  body.xmas-nav .nav-links > a.active::before { opacity: 1; left: 2px; top: -8px; width: 22px; height: 19px; margin: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 34'%3E%3Cpath d='M6 26C9 12 18 3 28 5c5 1 8 6 7 11-2-3-5-4-8-3l-3 13z' fill='%23d42c3c'/%3E%3Crect x='3' y='24' width='26' height='8' rx='4' fill='%23fff'/%3E%3Ccircle cx='34' cy='18' r='4.5' fill='%23fff'/%3E%3C/svg%3E"); transform: rotate(-18deg); animation: hatWobble 3s ease-in-out infinite; }
+  body.xmas-nav .nav-links > a.active:hover::before { animation: hatWobble 3s ease-in-out infinite; }
+  @keyframes hatWobble { 0%, 100% { transform: rotate(-18deg); } 50% { transform: rotate(-8deg) translateY(-1px); } }
+  /* Shop now: snow on top and a shimmer sweeping across */
+  body.xmas-nav .nav-cta { background: #c42a3c; overflow: visible; }
+  body.xmas-nav .nav-cta:hover { background: #2f7a45; }
+  body.xmas-nav .nav-cta::before { content: ""; position: absolute; left: 8px; right: 8px; top: -5px; height: 9px; border-radius: 10px 10px 4px 4px;
+    background: radial-gradient(circle at 10% 100%, #fff 5px, transparent 5.5px), radial-gradient(circle at 35% 100%, #fff 6px, transparent 6.5px), radial-gradient(circle at 62% 100%, #fff 5px, transparent 5.5px), radial-gradient(circle at 88% 100%, #fff 6px, transparent 6.5px), linear-gradient(#fff, #fff) 0 100% / 100% 4px no-repeat;
+    filter: drop-shadow(0 1px 0 rgba(0,0,0,.08)); }
+  body.xmas-nav .nav-cta::after { content: ""; display: block; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.45) 50%, transparent 65%) -150% 0 / 250% 100% no-repeat; animation: ctaShine 4.5s ease-in-out infinite; transform: none; height: auto; left: 0; right: 0; bottom: 0; }
+  @keyframes ctaShine { 0%, 55% { background-position: 150% 0; } 85%, 100% { background-position: -150% 0; } }
+}
+@media (min-width: 821px) and (prefers-reduced-motion: reduce) {
+  body.xmas-nav .hd-sky { display: none; }
+  body.xmas-nav .nav-links > a, .hd-lights i, body.xmas-nav .nav-cta::after { animation: none !important; }
+}
