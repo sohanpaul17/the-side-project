@@ -952,10 +952,13 @@
     const hero = PRODUCTS.find((p) => p.id === "customised-lovebook") || PRODUCTS[0];
     const occ = nextOccasion();
     heroSides(root, occ ? occ.theme : "");
-    const order = ["customised-night-sky", "customised-scrapbook", "customised-journey-map", "customised-love-letter"];
-    const rest = order.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean);
-    PRODUCTS.forEach((p) => { if (p !== hero && !rest.includes(p)) rest.push(p); });
-    rest.length = Math.min(rest.length, 4);
+    // The Night Sky is always shown; the other 3 product slides change every day, cycling through everything else
+    const sky = PRODUCTS.find((p) => p.id === "customised-night-sky");
+    const pool = PRODUCTS.filter((p) => p !== hero && p !== sky);
+    const now = new Date(), day = Math.floor((now - now.getTimezoneOffset() * 60000) / 864e5);
+    const start = pool.length ? (day * 3) % pool.length : 0;
+    const daily = Array.from({ length: Math.min(3, pool.length) }, (_, i) => pool[(start + i) % pool.length]);
+    const rest = (sky ? [sky] : []).concat(daily);
     const slides = (occ ? [occasionSlide(occ, hero)] : []).concat(rest.map(productSlide));
     track.innerHTML = slides.join("");
     const els = $$(".hs-slide", track);
