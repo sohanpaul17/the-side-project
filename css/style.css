@@ -1687,3 +1687,8 @@ html.li-lock, html.li-lock body { overflow: hidden; }
   .look-inside.li-full-on .li-nav.prev { order: -1; }
   .look-inside.li-full-on .li-bar { margin-top: 4px; }
 }
+
+/* product page reviews: rating summary + 'See all' */
+.pdp-rv-summary { margin-bottom: 22px; }
+.pdp-rv-more { margin-top: 22px; text-align: center; }
+.pdp-rv-more .btn svg.arrow { transform: rotate(90deg); }

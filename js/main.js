@@ -1620,14 +1620,29 @@
         ${reviewFormHtml(p)}
       </div>`;
     const list = (await loadReviews()).filter((r) => r.product === p.id);
+    const FIRST = 3; // reviews shown before "See all"
+    let expanded = false;
     const render = (highlight) => {
       $("#pdp-rv-title").textContent = list.length ? "What people say" : "No reviews yet";
+      const avg = avgRating(list);
+      const summary = list.length ? `<div class="rv-summary pdp-rv-summary"><div class="rv-score"><strong>${avg.toFixed(1)}</strong>${starsHtml(avg, "lg")}<span>${list.length} review${list.length > 1 ? "s" : ""}</span></div>
+        <div class="rv-bars">${[5, 4, 3, 2, 1].map((n) => {
+          const c = list.filter((r) => Math.round(r.rating) === n).length;
+          return `<div class="rv-bar"><span>${n}★</span><i><b style="width:${(c / list.length) * 100}%"></b></i><span>${c}</span></div>`;
+        }).join("")}</div></div>` : "";
+      const shown = expanded ? list : list.slice(0, FIRST);
       $("#pdp-rv-list").innerHTML = list.length
-        ? `<div class="rv-grid">${list.slice(0, 6).map(reviewCard).join("")}</div>` + (list.length > 6 ? `<p style="margin-top:24px"><a class="btn" href="reviews.html">See all ${list.length} reviews ${I.arrow}</a></p>` : "")
+        ? summary + `<div class="rv-grid">${shown.map(reviewCard).join("")}</div>` +
+          (list.length > FIRST ? `<p class="pdp-rv-more"><button type="button" class="btn btn-ghost" id="pdp-rv-toggle">${expanded ? "Show fewer reviews" : `See all ${list.length} reviews`} ${I.arrow}</button></p>` : "")
         : `<p class="muted">Got this? Your review would be the very first — write it just below.</p>`;
+      const tog = $("#pdp-rv-toggle");
+      if (tog) tog.addEventListener("click", () => {
+        expanded = !expanded; render();
+        if (!expanded) $("#pdp-reviews").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
       const prev = $(".pdp-rating"); if (prev) prev.parentNode.removeChild(prev);
       if (list.length) {
-        const avg = avgRating(list), title = $(".pdp-title");
+        const title = $(".pdp-title");
         if (title) title.insertAdjacentHTML("afterend", `<a class="pdp-rating" href="#pdp-reviews">${starsHtml(avg)} <span>${avg.toFixed(1)} · ${list.length} review${list.length > 1 ? "s" : ""}</span></a>`);
       }
       if (highlight) {
