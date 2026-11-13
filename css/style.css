@@ -1440,3 +1440,34 @@ body[data-page="shop"] main .wrap { width: min(1060px, 100% - 64px); }
   .nav-links { transition: none; }
   .nav-links > a, .nav-extra { transition: none; }
 }
+
+/* ===================== phone menu v2: the three lines become the panel ===================== */
+.menu-morph { display: none; }
+/* menu colours — beige (to go back to black: --menu-bg: var(--ink); --menu-fg: var(--cream); --menu-mute: rgba(244,236,223,.42); --menu-line: rgba(244,236,223,.14);) */
+.site-header { --menu-bg: var(--cream); --menu-fg: var(--ink); --menu-mute: var(--muted); --menu-line: rgba(22,21,19,.12); }
+@media (max-width: 820px) {
+  .menu-morph { display: block; position: fixed; left: 0; right: 0; top: var(--menu-top, 72px); bottom: 0; z-index: 48; pointer-events: none; }
+  .menu-morph i { position: absolute; left: 0; width: 100%; height: calc(100% / 3 + 1px); background: var(--menu-bg); transform-origin: 0 0; transform: var(--closed); opacity: 0;
+    transition: transform .5s cubic-bezier(.7,0,.3,1) calc(.18s + (2 - var(--n)) * .05s), opacity .12s linear calc(.62s + (2 - var(--n)) * .05s); }
+  .menu-morph i:nth-child(1) { top: 0; --n: 0; }
+  .menu-morph i:nth-child(2) { top: calc(100% / 3); --n: 1; }
+  .menu-morph i:nth-child(3) { top: calc(200% / 3); --n: 2; }
+  body.menu-open .menu-morph i { transform: none; opacity: 1; transition: transform .6s cubic-bezier(.7,0,.2,1) calc(var(--n) * .07s), opacity 0s; }
+  /* a hairline under the header so the beige panel and header don't blur together */
+  body.menu-open .site-header { border-bottom: 1px solid var(--line) !important; }
+
+  .nav-links { background: transparent; color: var(--menu-fg); clip-path: none !important; visibility: hidden; transition: visibility 0s .7s; }
+  body.menu-open .nav-links { visibility: visible; transition: visibility 0s; }
+  .nav-links::before { border-color: var(--menu-line); }
+  .nav-links > a:not(.nav-cta) { color: var(--menu-fg); border-bottom-color: var(--menu-line); }
+  .nav-links > a:not(.nav-cta)::before { color: var(--menu-mute); }
+  .nav-links > a.active, .nav-links > a.active::before { color: var(--accent); }
+  .nav-tag { color: var(--menu-mute); }
+  .nav-social a { color: var(--menu-fg); border-color: var(--menu-line); }
+  /* contents arrive after the bars have opened, and leave before they fold back */
+  .nav-links > a, .nav-extra { transition: opacity .25s ease, transform .3s ease; }
+  body.menu-open .nav-links > a, body.menu-open .nav-extra { transition: opacity .45s var(--ease), transform .6s var(--ease); transition-delay: calc(.42s + var(--i) * .06s); }
+}
+@media (max-width: 820px) and (prefers-reduced-motion: reduce) {
+  .menu-morph i { transition: none !important; }
+}

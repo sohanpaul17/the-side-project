@@ -195,11 +195,28 @@
 
     // phone menu: a full-screen panel that opens just below the header
     const menuBtn = $(".menu-btn");
+    // three bars that grow out of the button's three lines to become the panel, and fold back into them
+    const morph = document.createElement("div");
+    morph.className = "menu-morph";
+    morph.setAttribute("aria-hidden", "true");
+    morph.innerHTML = "<i></i><i></i><i></i>";
+    header.append(morph);
+    const placeMorph = () => {
+      const top = Math.max(0, header.getBoundingClientRect().bottom);
+      document.documentElement.style.setProperty("--menu-top", top + "px");
+      const r = menuBtn.getBoundingClientRect(), W = innerWidth, h3 = (innerHeight - top) / 3;
+      [...morph.children].forEach((bar, i) => {
+        const x = r.left + 12, y = r.top + 16 + i * 5; // where this line of the icon sits
+        bar.style.setProperty("--closed", `translate(${x.toFixed(1)}px, ${(y - top - i * h3).toFixed(1)}px) scale(${(20 / W).toFixed(4)}, ${(2 / h3).toFixed(4)})`);
+      });
+    };
     const setMenu = (open) => {
-      if (open) document.documentElement.style.setProperty("--menu-top", Math.max(0, header.getBoundingClientRect().bottom) + "px");
+      if (open) { placeMorph(); void morph.offsetWidth; } // start from the icon's lines, wherever the header is now
       document.body.classList.toggle("menu-open", open);
       menuBtn.setAttribute("aria-expanded", String(open));
     };
+    placeMorph(); addEventListener("load", placeMorph);
+    addEventListener("resize", () => { if (!document.body.classList.contains("menu-open")) placeMorph(); });
     menuBtn.addEventListener("click", () => setMenu(!document.body.classList.contains("menu-open")));
     addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
     addEventListener("resize", () => { if (innerWidth > 820) setMenu(false); });
