@@ -566,9 +566,8 @@
   /* ---------- Home page: Night Sky spotlight card ----------
      A framed star map: bright stars sparkle, shooting stars streak across, and constellations
      draw themselves in one after another while the whole sky slowly turns. */
-  function skySpotlight() {
-    const card = $("#sky-spot"); if (!card) return;
-    const p = PRODUCTS.find((x) => x.spotlight); if (!p) { card.hidden = true; return; }
+  // the Night Sky star-map poster (animated SVG): used by the spotlight card and the home slider
+  function nightSkyArt(p, uid) {
     let seed = 7; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
     const W = 400, H = 540, cx = 200, cy = 205, R = 160;
     const inCircle = (x, y, pad = 12) => (x - cx) ** 2 + (y - cy) ** 2 < (R - pad) ** 2;
@@ -581,7 +580,7 @@
       dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="#fff" class="${n % 2 ? "tw" : "tw2"}" style="animation-delay:-${(rnd() * 5).toFixed(2)}s"/>`;
     }
     // bright sparkling stars (four-point glints with a glow)
-    const glint = (x, y, s, d) => `<g class="glint" style="animation-delay:-${d}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${s * .55}" fill="#fff" filter="url(#ss-glow)"/><path d="M${x} ${y - s * 2.6}Q${x + s * .3} ${y - s * .3} ${x + s * 2.6} ${y}Q${x + s * .3} ${y + s * .3} ${x} ${y + s * 2.6}Q${x - s * .3} ${y + s * .3} ${x - s * 2.6} ${y}Q${x - s * .3} ${y - s * .3} ${x} ${y - s * 2.6}Z" fill="#fff"/></g>`;
+    const glint = (x, y, s, d) => `<g class="glint" style="animation-delay:-${d}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${s * .55}" fill="#fff" filter="url(#${uid}-glow)"/><path d="M${x} ${y - s * 2.6}Q${x + s * .3} ${y - s * .3} ${x + s * 2.6} ${y}Q${x + s * .3} ${y + s * .3} ${x} ${y + s * 2.6}Q${x - s * .3} ${y + s * .3} ${x - s * 2.6} ${y}Q${x - s * .3} ${y - s * .3} ${x} ${y - s * 2.6}Z" fill="#fff"/></g>`;
     let glints = "";
     for (let n = 0; n < 9;) {
       const x = cx + (rnd() * 2 - 1) * R, y = cy + (rnd() * 2 - 1) * R;
@@ -600,23 +599,23 @@
       return `<g class="cons" style="animation-delay:${k * 4}s"><polyline points="${pts.map((q) => q.join(",")).join(" ")}" pathLength="1"/>${nodes}</g>`;
     }).join("");
     const shooters = [[30, 60, 26, 0], [120, 30, 34, 2.6], [40, 150, 18, 5.1]]
-      .map(([x, y, a, d]) => `<g class="shoot" style="animation-delay:${d}s;--sx:${x}px;--sy:${y}px;--ang:${a}deg"><rect x="-80" y="-1.3" width="80" height="2.6" rx="1.3" fill="url(#ss-tail)"/><circle r="2.6" fill="#fff" filter="url(#ss-glow)"/></g>`).join("");
+      .map(([x, y, a, d]) => `<g class="shoot" style="animation-delay:${d}s;--sx:${x}px;--sy:${y}px;--ang:${a}deg"><rect x="-80" y="-1.3" width="80" height="2.6" rx="1.3" fill="url(#${uid}-tail)"/><circle r="2.6" fill="#fff" filter="url(#${uid}-glow)"/></g>`).join("");
     const fw = 130, fh = fw * 312 / 462;
-    card.querySelector(".ss-art").innerHTML = `
+    return `
       <div class="ss-frame"><div class="ss-mat">
         <svg class="ss-poster" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.title)}">
           <defs>
-            <clipPath id="ss-clip"><circle cx="${cx}" cy="${cy}" r="${R - 4}"/></clipPath>
-            <linearGradient id="ss-tail" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></linearGradient>
-            <filter id="ss-glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="2.4"/></filter>
-            <radialGradient id="ss-skyfill" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#2f3a78"/><stop offset="1" stop-color="#222a58"/></radialGradient>
+            <clipPath id="${uid}-clip"><circle cx="${cx}" cy="${cy}" r="${R - 4}"/></clipPath>
+            <linearGradient id="${uid}-tail" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></linearGradient>
+            <filter id="${uid}-glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="2.4"/></filter>
+            <radialGradient id="${uid}-skyfill" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#2f3a78"/><stop offset="1" stop-color="#222a58"/></radialGradient>
           </defs>
           <rect width="${W}" height="${H}" fill="#1e2549"/>
-          <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#ss-skyfill)"/>
-          <g clip-path="url(#ss-clip)">
+          <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#${uid}-skyfill)"/>
+          <g clip-path="url(#${uid}-clip)">
             <g class="ss-wheel" style="transform-origin:${cx}px ${cy}px">${dots}${cons}</g>
           </g>
-          <g transform="translate(${cx + R * .62} ${cy - R * .62})" class="ss-moon"><circle r="15" fill="#f6dc8f" filter="url(#ss-glow)" opacity=".6"/><circle r="14" fill="#f6dc8f"/><circle cx="6" cy="-4" r="13" fill="#283163"/></g>
+          <g transform="translate(${cx + R * .62} ${cy - R * .62})" class="ss-moon"><circle r="15" fill="#f6dc8f" filter="url(#${uid}-glow)" opacity=".6"/><circle r="14" fill="#f6dc8f"/><circle cx="6" cy="-4" r="13" fill="#283163"/></g>
           <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#e2b75a" stroke-width="2.5"/>
           <circle cx="${cx}" cy="${cy}" r="${R - 7}" fill="none" stroke="#e2b75a" stroke-opacity=".5" stroke-width="1"/>
           <image href="assets/products/night-sky-faces.png" x="${cx - fw / 2}" y="${cy + R - fh * .42}" width="${fw}" height="${fh}"/>
@@ -625,6 +624,13 @@
           <text x="${cx}" y="515" text-anchor="middle" class="ss-t3">14 · 02 · 2019 · PUNE</text>
         </svg>
       </div></div>`;
+  }
+
+  function skySpotlight() {
+    const card = $("#sky-spot"); if (!card) return;
+    const p = PRODUCTS.find((x) => x.spotlight); if (!p) { card.hidden = true; return; }
+    let seed = 11; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+    card.querySelector(".ss-art").innerHTML = nightSkyArt(p, "ss");
     card.querySelector(".ss-copy").innerHTML = spotCopy(p, "New · Star map", "See the star map");
     // the card's own sky, behind the poster: twinkling dots, sparkling stars and shooting stars
     const pos = () => `left:${(rnd() * 100).toFixed(1)}%;top:${(rnd() * 100).toFixed(1)}%`;
@@ -764,6 +770,53 @@
     return `<div class="hs-bgfx" aria-hidden="true">${h}</div>`;
   }
 
+  // the real product, animated, for a hero slide (falls back to the shop photos)
+  function productScene(p) {
+    const H = "assets/products/hero/";
+    if (p.id === "customised-night-sky") return `<div class="ps ps-sky">${nightSkyArt(p, "hs")}</div>`;
+    if (p.id === "customised-journey-map") {
+      // pin heads on the poster (poster pixels) and the route a little heart travels
+      const pins = [[108, 228], [263, 342], [408, 255], [201, 498], [433, 529]];
+      const route = "M108 250 L263 362 L408 276 L263 362 L201 518 L433 548";
+      return `<div class="ps ps-jm">
+        <svg class="ps-string" viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M8 40 L50 2 L92 40"/></svg><i class="ps-nail"></i>
+        <div class="ps-frame"><div class="ps-mat"><img src="${H}journey-map-poster.webp" alt="${esc(p.title)}">
+          <svg class="ps-pins" viewBox="0 0 563 798" aria-hidden="true">
+            ${pins.map(([x, y], i) => `<circle class="rip" cx="${x}" cy="${y}" r="14" style="--i:${i}"/>`).join("")}
+            <path class="route" d="${route}"/>
+            <g class="mover"><path d="M0 7C-5 3-12-1-12-7c0-4 3-7 6.5-7 2.5 0 4.300 1.300 5.500 3.200C1.200-12.700 3-14 5.500-14 9-14 12-11 12-7 12-1 5 3 0 7z" fill="#e0456e" stroke="#fff" stroke-width="2"/>
+              <animateMotion dur="4.6s" repeatCount="indefinite" path="${route}" rotate="0"/></g>
+          </svg></div></div>
+      </div>`;
+    }
+    if (p.id === "customised-love-letter") {
+      const lines = ["Dear you,", "From the day we met to", "every ordinary Tuesday", "since, you've made my", "whole world softer.", "Thank you for being mine."];
+      return `<div class="ps ps-ll">
+        <img class="ps-print" src="${H}love-letter-print.webp" alt="">
+        <div class="ps-env">
+          <div class="ps-env-back"></div>
+          <div class="ps-letter">${lines.map((l, i) => `<span style="--i:${i}">${esc(l)}</span>`).join("")}</div>
+          <div class="ps-env-front"></div>
+          <div class="ps-env-flap"></div>
+          <i class="ps-seal">${HEART}</i>
+        </div>
+      </div>`;
+    }
+    if (p.id === "customised-scrapbook") {
+      return `<div class="ps ps-sb">
+        <div class="xb-book sb-book" aria-label="${esc(p.title)}">
+          <div class="xb-page"><img class="on" src="${H}scrapbook-right.webp" alt=""></div>
+          <div class="xb-cover">
+            <div class="xb-front"><img src="${H}scrapbook-cover.webp" alt="${esc(p.title)} cover"></div>
+            <div class="xb-back"><img src="${H}scrapbook-left.webp" alt=""></div>
+          </div>
+          ${[0, 1, 2, 3, 4].map((i) => `<i class="sb-pop" style="--i:${i};--x:${[-60, -20, 30, 70, 10][i]}px">${i % 2 ? STAR() : HEART}</i>`).join("")}
+        </div>
+      </div>`;
+    }
+    return "";
+  }
+
   function productSlide(p, i) {
     const imgs = imagesOf(p);
     const pal = p.palette || [];
@@ -787,8 +840,8 @@
           <a class="hs-visual hs-photos" href="${productUrl(p)}" tabindex="-1" aria-hidden="true">
             <span class="hs-ring"></span>
             ${[[10, 14], [88, 20], [84, 82], [14, 78]].map(([x, y], i) => `<span class="xb-glint" style="left:${x}%;top:${y}%;--i:${i}">${STAR()}</span>`).join("")}
-            ${imgs[1] ? `<img class="ph back" src="${esc(imgs[1])}" alt="" loading="lazy">` : ""}
-            <img class="ph front" src="${esc(imgs[0])}" alt="" loading="${i < 2 ? "eager" : "lazy"}">
+            ${productScene(p) || `${imgs[1] ? `<img class="ph back" src="${esc(imgs[1])}" alt="" loading="lazy">` : ""}
+            <img class="ph front" src="${esc(imgs[0])}" alt="" loading="${i < 2 ? "eager" : "lazy"}">`}
           </a>
         </div>
       </div>`;

@@ -1154,3 +1154,104 @@ body.menu-open .menu-btn span:nth-child(3) { transform: translateY(-5px) rotate(
 .hs-prod:not(.dark) .xb-glint { color: var(--ac); filter: none; }
 @media (max-width: 860px) { .hs-ring { width: min(64%, 230px); } }
 @media (prefers-reduced-motion: reduce) { .hs-bgfx, .hs-ring { display: none; } }
+
+/* ---------- hero: the real products, animated ---------- */
+.ps { position: relative; z-index: 2; display: grid; place-items: center; }
+/* Night Sky: the live star-map poster in its frame */
+.ps-sky .ss-frame { width: clamp(160px, 15vw, 210px); padding: 9px; opacity: 0; }
+.ps-sky .ss-mat { padding: 7px; }
+.is-active .ps-sky .ss-frame { opacity: 1; transition: opacity .8s var(--ease) .15s; }
+.ps-sky .ss-poster .cons, .ps-sky .ss-poster .cons polyline { animation-duration: 6s !important; }
+.ps-sky .ss-wheel > g.cons:nth-of-type(1) { animation-delay: .4s !important; }
+.ps-sky .ss-wheel > g.cons:nth-of-type(2) { animation-delay: 1.6s !important; }
+.ps-sky .ss-wheel > g.cons:nth-of-type(3) { animation-delay: 2.8s !important; }
+
+/* Journey Map: a framed poster hanging from a nail, pins pinging, a heart travelling the route */
+.ps-jm { padding-top: 34px; transform-origin: 50% 0; }
+.is-active .ps-jm { animation: psHang 1.2s cubic-bezier(.34,1.56,.64,1) .1s both, psSwing 5s ease-in-out 1.3s infinite; }
+@keyframes psHang { from { transform: translateY(-40px) rotate(-6deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes psSwing { 0%, 100% { transform: rotate(1.6deg); } 50% { transform: rotate(-1.6deg); } }
+.ps-nail { position: absolute; top: 0; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #8d7a64 60%); box-shadow: 0 2px 4px rgba(0,0,0,.35); z-index: 2; }
+.ps-string { position: absolute; top: 5px; left: 50%; width: 60%; height: 32px; transform: translateX(-50%); overflow: visible; }
+.ps-string path { fill: none; stroke: #6b5240; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.ps-frame { width: clamp(160px, 15vw, 210px); padding: 8px; background: linear-gradient(135deg, #d9b48a, #b8895c); border-radius: 4px; box-shadow: 0 36px 50px -26px rgba(0,0,0,.55), inset 0 0 0 3px #a87a4c; }
+.ps-mat { position: relative; background: #fff; padding: 6px; }
+.ps-mat img { display: block; width: 100%; height: auto; }
+.ps-pins { position: absolute; inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); overflow: visible; }
+.ps-pins .rip { fill: none; stroke: #e0456e; stroke-width: 3; opacity: 0; transform-box: fill-box; transform-origin: center; animation: psRip 2.4s ease-out calc(.6s + var(--i) * .45s) infinite; }
+@keyframes psRip { 0% { transform: scale(.4); opacity: .9; } 70%, 100% { transform: scale(2.4); opacity: 0; } }
+.ps-pins .route { fill: none; stroke: none; }
+.ps-pins .mover { filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+
+/* Love Letter: the envelope opens, the letter slides out and writes itself; the illustration print behind */
+.ps-ll { width: clamp(210px, 22vw, 280px); aspect-ratio: 1 / 1.05; }
+.ps-print { position: absolute; width: 58%; left: 0; top: 0; border-radius: 3px; box-shadow: 0 24px 40px -20px rgba(0,0,0,.5); transform: translate(30px, 30px) rotate(0); opacity: 0; }
+.is-active .ps-print { opacity: 1; transform: translate(-6%, 2%) rotate(-9deg); transition: opacity .7s var(--ease) .15s, transform 1.1s var(--ease) .15s; animation: psPrint 6s ease-in-out 1.3s infinite; }
+@keyframes psPrint { 50% { transform: translate(-6%, -2%) rotate(-7deg); } }
+.ps-env { position: absolute; left: 14%; right: 0; bottom: 4%; aspect-ratio: 1.55; perspective: 800px; transform: translateY(30px); opacity: 0; }
+.is-active .ps-env { opacity: 1; transform: none; transition: opacity .6s var(--ease) .1s, transform .9s cubic-bezier(.34,1.56,.64,1) .1s; }
+.ps-env-back { position: absolute; inset: 0; background: #e9a993; border-radius: 6px; }
+.ps-env-front { position: absolute; inset: 0; z-index: 3; background: linear-gradient(160deg, #f8d3c3, #f1bca7); clip-path: polygon(0 0, 50% 52%, 100% 0, 100% 100%, 0 100%); border-radius: 6px; box-shadow: 0 30px 40px -24px rgba(0,0,0,.5); }
+.ps-env-front::after { content: ""; position: absolute; inset: 0; background: linear-gradient(32deg, transparent 49.4%, rgba(0,0,0,.08) 50%, transparent 50.6%), linear-gradient(-32deg, transparent 49.4%, rgba(0,0,0,.08) 50%, transparent 50.6%); }
+.ps-env-flap { position: absolute; left: 0; right: 0; top: 0; height: 58%; z-index: 4; background: linear-gradient(180deg, #f3c2ae, #e7a58d); clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: top; }
+.is-active .ps-env-flap { animation: psFlap .7s var(--ease) .75s forwards; }
+@keyframes psFlap { 0% { transform: rotateX(0); z-index: 4; } 49% { z-index: 4; } 50% { z-index: 0; } 100% { transform: rotateX(180deg); z-index: 0; } }
+.ps-seal { position: absolute; z-index: 5; left: 50%; top: 58%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 35%, #ef5a6f, #b51f3a); color: #ffd9de; box-shadow: 0 3px 6px rgba(0,0,0,.3); }
+.ps-seal svg { width: 14px; }
+.is-active .ps-seal { animation: psSeal .5s var(--ease-in) .45s forwards; }
+@keyframes psSeal { to { transform: translateY(-14px) scale(1.4); opacity: 0; } }
+.ps-letter { position: absolute; z-index: 1; left: 7%; right: 7%; top: 6%; height: 150%; padding: 12px 12px; background: repeating-linear-gradient(#fffdf8 0 20px, #f3c9cf 20px 21px); background-color: #fffdf8; border-radius: 3px; box-shadow: 0 6px 14px -6px rgba(0,0,0,.3); font-family: "Caveat", cursive; font-size: clamp(14px, 1.3vw, 16px); line-height: 21px; color: #3a3a5a; }
+.ps-letter span { display: block; white-space: nowrap; clip-path: inset(0 100% 0 0); }
+.is-active .ps-letter { transform: translateY(-70%); transition: transform 1s cubic-bezier(.34,1.3,.64,1) 1.25s; }
+.is-active .ps-letter span { clip-path: inset(0 0 0 0); transition: clip-path .55s linear calc(2s + var(--i) * .45s); }
+
+/* Scrapbook: the cover opens to the first spread, little hearts pop out */
+.ps-sb .sb-book { width: clamp(140px, 13vw, 180px); aspect-ratio: 316 / 402; margin-left: 46%; }
+.sb-book .xb-page { background: #fffdf8; }
+.sb-book .xb-page img { object-fit: contain; background: #fffdf8; }
+.sb-book .xb-back { overflow: hidden; background: #fffdf8; }
+.sb-book .xb-back img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.is-active .sb-book .xb-cover { transform: rotateY(-176deg); transition: transform 1.3s cubic-bezier(.65,0,.25,1) .9s; }
+.sb-pop { position: absolute; left: 0; top: 40%; width: 18px; color: #e0456e; opacity: 0; z-index: 5; }
+.sb-pop:nth-of-type(even) { color: #f2b84b; }
+.is-active .sb-pop { animation: sbPop 2.4s var(--ease) calc(2.1s + var(--i) * .18s) infinite; }
+@keyframes sbPop { 0% { transform: translate(0, 0) scale(.3); opacity: 0; } 15% { opacity: 1; } 70% { opacity: .9; } 100% { transform: translate(var(--x), -120px) scale(1.1) rotate(20deg); opacity: 0; } }
+
+@media (max-width: 860px) {
+  .ps-sky .ss-frame, .ps-frame { width: 130px; }
+  .ps-jm { padding-top: 26px; }
+  .ps-ll { width: 190px; }
+  .ps-sb .sb-book { width: 112px; }
+  .ps-letter { font-size: 13px; line-height: 17px; background: repeating-linear-gradient(#fffdf8 0 16px, #f3c9cf 16px 17px); padding: 8px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ps-pins .rip, .ps-pins .mover, .sb-pop { display: none; }
+}
+
+/* "Two little favourites" spotlight — compact */
+.bestseller { padding-top: clamp(44px, 6vw, 72px); }
+.spot-head { margin-bottom: clamp(20px, 2.6vw, 32px); }
+.spot-card { padding: clamp(20px, 2.4vw, 30px); border-radius: 24px; }
+.spot-visual { height: clamp(220px, 22vw, 280px); margin-bottom: 14px; }
+.spot-book .flipbook { max-width: 380px; }
+.spot-card .ss-frame { width: clamp(150px, 14vw, 190px); padding: 9px; }
+.spot-card .ss-mat { padding: 7px; }
+.spot-card .bs-pill { font-size: 11.5px; padding: 7px 14px 7px 11px; }
+.spot-title { font-size: clamp(24px, 2.4vw, 34px); margin: 12px 0 6px; }
+.spot-card .bs-rating { margin-bottom: 8px; font-size: 13.5px; }
+.spot-card .bs-short { margin: 0 auto 14px; font-size: clamp(14.5px, 1.1vw, 16px); }
+.spot-card .bs-price { margin-bottom: 16px; }
+.spot-card .bs-price .price { font-size: 30px; }
+.spot-card .btn-lg { padding: 12px 20px; font-size: 14.5px; }
+.bs-notes { margin-top: clamp(26px, 3.5vw, 40px); padding: 14px 0; }
+.bs-notes span { font-size: clamp(20px, 2vw, 26px); }
+@media (max-width: 900px) { .spot-visual { height: auto; min-height: 200px; } }
+/* the letter stays tucked inside the envelope: clip anything below the envelope's bottom edge */
+.ps-env { clip-path: inset(-400% -60% 0 -60%); }
+.ps-ll::after { content: ""; position: absolute; left: 18%; right: 4%; bottom: 0; height: 18px; border-radius: 50%; background: radial-gradient(ellipse, rgba(0,0,0,.22), transparent 70%); z-index: -1; }
+@media (max-width: 860px) {
+  .ps-ll { width: 200px; margin-left: 30px; }
+  .is-active .ps-print { transform: translate(-34%, 14%) rotate(-12deg); animation: none; }
+}
+.spot-book .flipbook { max-width: 320px; }
+.spot-head h2 { font-size: clamp(30px, 4vw, 52px); }
