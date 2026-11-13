@@ -218,14 +218,17 @@
   }
 
   /* ---------- Product card ---------- */
+  // card-sized copy of a product photo (assets/products/sm/*.webp), much lighter to load and decode
+  const thumb = (src) => String(src).replace(/^assets\/products\/([^/]+)\.(jpe?g|webp|png)$/i, "assets/products/sm/$1.webp");
+
   function card(p, i = 0) {
-    const imgs = imagesOf(p);
+    const imgs = imagesOf(p).map(thumb);
     return `
       <a class="card" href="${productUrl(p)}" style="--d:${(i % 8) * 0.06}s">
         <div class="card-media">
           ${p.badge ? `<span class="card-badge">${esc(p.badge)}</span>` : ""}
-          <img src="${imgs[0]}" alt="${esc(p.title)}" loading="lazy">
-          ${imgs[1] ? `<img class="alt" src="${imgs[1]}" alt="" loading="lazy">` : ""}
+          <img src="${imgs[0]}" alt="${esc(p.title)}" loading="lazy" decoding="async">
+          ${imgs[1] ? `<img class="alt" src="${imgs[1]}" alt="" loading="lazy" decoding="async">` : ""}
           ${p.priceNote ? `<span class="card-ship">${p.formats && p.formats.includes("digital") ? I.bolt : I.truck} ${esc(p.priceNote)}</span>` : ""}
           <span class="card-quick" data-buy="${esc(p.id)}">${I.bag} Buy now</span>
         </div>
@@ -393,8 +396,8 @@
   function initCounters() {
     const obs = new IntersectionObserver((ents) => ents.forEach((en) => {
       if (!en.isIntersecting) return; obs.unobserve(en.target);
-      const el = en.target, end = +el.dataset.count, suf = el.dataset.suffix || "", t0 = performance.now();
-      const tick = (t) => { const k = Math.min(1, (t - t0) / 1600), e = 1 - Math.pow(1 - k, 4); el.textContent = Math.round(end * e) + suf; if (k < 1) requestAnimationFrame(tick); };
+      const el = en.target, end = +el.dataset.count, suf = el.dataset.suffix || "", dec = +el.dataset.decimals || 0, t0 = performance.now();
+      const tick = (t) => { const k = Math.min(1, (t - t0) / 1600), e = 1 - Math.pow(1 - k, 4); el.textContent = (dec ? (end * e).toFixed(dec) : Math.round(end * e)) + suf; if (k < 1) requestAnimationFrame(tick); };
       requestAnimationFrame(tick);
     }), { threshold: 0.5 });
     $$("[data-count]").forEach((el) => obs.observe(el));
@@ -583,7 +586,7 @@
       const x = cx + (rnd() * 2 - 1) * R, y = cy + (rnd() * 2 - 1) * R;
       if (!inCircle(x, y)) continue; n++;
       const r = [0.7, 0.9, 1.1, 1.4][Math.floor(rnd() * 4)];
-      dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="#fff" class="${n % 2 ? "tw" : "tw2"}" style="animation-delay:-${(rnd() * 5).toFixed(2)}s"/>`;
+      dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="#fff" class="${n % 6 === 0 ? "tw" : "st"}" style="animation-delay:-${(rnd() * 5).toFixed(2)}s"/>`;
     }
     // bright sparkling stars (four-point glints with a glow)
     const glint = (x, y, s, d) => `<g class="glint" style="animation-delay:-${d}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${s * .55}" fill="#fff" filter="url(#${uid}-glow)"/><path d="M${x} ${y - s * 2.6}Q${x + s * .3} ${y - s * .3} ${x + s * 2.6} ${y}Q${x + s * .3} ${y + s * .3} ${x} ${y + s * 2.6}Q${x - s * .3} ${y + s * .3} ${x - s * 2.6} ${y}Q${x - s * .3} ${y - s * .3} ${x} ${y - s * 2.6}Z" fill="#fff"/></g>`;
@@ -824,7 +827,7 @@
   }
 
   function productSlide(p, i) {
-    const imgs = imagesOf(p);
+    const imgs = imagesOf(p).map(thumb);
     const pal = p.palette || [];
     const dark = pal[0] && parseInt(pal[0].slice(1, 3), 16) < 90;
     const price = p.sizes ? `<small>From</small> ${money(Math.min(...p.sizes.map((s) => s.price)))}` : money(p.price);
@@ -886,12 +889,15 @@
     // a little parallax as the mouse moves
     if (matchMedia("(prefers-reduced-motion: reduce)").matches || !matchMedia("(hover: hover)").matches) return;
     let raf = 0;
+    const sides = $$(".hs-side", root);
+    if (!sides.length || !matchMedia("(min-width: 1400px)").matches) return;
     addEventListener("mousemove", (e) => {
+      if (scrollY > 900) return;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
-        root.style.setProperty("--mx", ((e.clientX / innerWidth - 0.5) * 16).toFixed(1) + "px");
-        root.style.setProperty("--my", ((e.clientY / innerHeight - 0.5) * 12).toFixed(1) + "px");
+        const mx = ((e.clientX / innerWidth - 0.5) * 16).toFixed(1) + "px", my = ((e.clientY / innerHeight - 0.5) * 12).toFixed(1) + "px";
+        sides.forEach((el) => { el.style.setProperty("--mx", mx); el.style.setProperty("--my", my); });
       });
     }, { passive: true });
   }
@@ -968,9 +974,9 @@
       let w = 0, h = 0, dpr = 1, flakes = [], raf = 0, on = false, last = 0;
       const make = (top) => ({ x: Math.random() * w, y: top ? Math.random() * h : -10, r: xmas ? 1 + Math.random() * 2.6 : 5 + Math.random() * 7, v: xmas ? 18 + Math.random() * 38 : -(14 + Math.random() * 22), a: Math.random() * 6.28, s: 0.6 + Math.random() * 1.2, o: 0.35 + Math.random() * 0.6 });
       const size = () => {
-        dpr = Math.min(2, devicePixelRatio || 1); w = cv.clientWidth; h = cv.clientHeight;
+        dpr = 1; w = cv.clientWidth; h = cv.clientHeight;
         cv.width = w * dpr; cv.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const n = Math.round((w * h) / (xmas ? 5200 : 26000));
+        const n = Math.round((w * h) / (xmas ? 7500 : 30000));
         flakes = Array.from({ length: n }, () => make(true));
       };
       const heart = (x, y, r) => { ctx.beginPath(); ctx.moveTo(x, y + r * 0.35); ctx.bezierCurveTo(x - r, y - r * 0.4, x - r * 0.4, y - r, x, y - r * 0.35); ctx.bezierCurveTo(x + r * 0.4, y - r, x + r, y - r * 0.4, x, y + r * 0.35); ctx.fill(); };
@@ -1190,7 +1196,14 @@
     $$(".js-role").forEach((el) => (el.textContent = STORE.founder.role));
     $$(".js-wa").forEach((a) => (a.href = waLink("Hi! I just read your story on the website 👋")));
     $$(".js-ig").forEach((a) => (a.href = igProfile()));
-    initCounters();
+    // live numbers: happy customers = 4★+ reviews (or STORE.happyCustomers if that's higher), average rating, number of gifts
+    const set = (id, v) => { const s = $(`#${id} strong`); if (s) s.dataset.count = v; };
+    set("stat-gifts", PRODUCTS.length);
+    loadReviews().then((list) => {
+      const happy = list.filter((r) => Number(r.rating) >= 4).length;
+      set("stat-happy", Math.max(happy, Number(STORE.happyCustomers) || 0));
+      if (list.length) set("stat-rating", avgRating(list).toFixed(1));
+    }).catch(() => {}).finally(initCounters);
   }
 
   function contactPage() {
