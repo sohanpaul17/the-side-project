@@ -739,7 +739,7 @@
               <a href="${productUrl(p)}" class="btn btn-lg occ-btn">Gift a Lovebook ${ARROW}</a>
               <a href="shop.html" class="btn btn-lg btn-ghost occ-ghost">See all gifts</a>
             </div>
-            <p class="occ-note hs-in" style="--d:.74s">From <b>${money(p.price)}</b> · ${p.priceNote ? esc(p.priceNote.toLowerCase()) + " · " : ""}printed copies ship in 3–5 days, so order early — or get it as a PDF for a last-minute gift.</p>
+            <p class="occ-note hs-in" style="--d:.74s">From <b>${money(p.price)}</b> · printed copies ship in 3–5 days, so order early — or get it as a PDF for a last-minute gift.</p>
           </div>
           <div class="hs-visual">
             <div class="xb-glow" aria-hidden="true"></div>
@@ -837,7 +837,7 @@
             <span class="hs-kicker hs-in" style="--d:.1s">${esc(p.category || "")}${p.badge ? ` · ${esc(p.badge)}` : ""}</span>
             <h2 class="hs-title"><span class="hs-line"><span style="--d:.2s">${esc(p.title)}</span></span></h2>
             <p class="hs-lead hs-in" style="--d:.38s">${esc(p.short || "")}</p>
-            <div class="hs-price hs-in" style="--d:.48s"><span>${price}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ""}</span>${p.priceNote ? `<span class="ship-pill">${p.formats && p.formats.includes("digital") ? I.bolt : I.truck} ${esc(p.priceNote)}</span>` : ""}</div>
+            <div class="hs-price hs-in" style="--d:.48s"><span>${price}${p.unit ? ` <small>/ ${esc(p.unit)}</small>` : ""}</span></div>
             <div class="hs-actions hs-in" style="--d:.58s">
               <a href="${productUrl(p)}" class="btn btn-lg">See it ${ARROW}</a>
               <button type="button" class="btn btn-lg btn-ghost" data-buy="${esc(p.id)}">Buy now</button>
@@ -1015,7 +1015,7 @@
   function homePage() {
     heroSlider();
     homeReviews();
-    const words = ["Lovebooks", "Love letters", "Journey maps", "Notebooks", "Calendar magnets", "52 Reasons boxes", "Drawn just for you", "Made with love"];
+    const words = ["Made with love", "Handcrafted", "Drawn just for you", "One of a kind", "Made to order", "Your story, illustrated", "Little things, big feelings", "Gifts that mean something"];
     const mq = words.map((w) => `<span>${w} ${STAR()}</span>`).join("");
     $("#marquee").innerHTML = mq + mq;
     const bestId = bestsellerSpotlight();
