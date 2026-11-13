@@ -1441,33 +1441,3 @@ body[data-page="shop"] main .wrap { width: min(1060px, 100% - 64px); }
   .nav-links > a, .nav-extra { transition: none; }
 }
 
-/* ===================== phone menu v3: the panel pours down like a wave ===================== */
-/* menu colours — black (beige alternative: --menu-bg: var(--cream); --menu-fg: var(--ink); --menu-mute: var(--muted); --menu-line: rgba(22,21,19,.12);) */
-.site-header { --menu-bg: var(--ink); --menu-fg: var(--cream); --menu-mute: rgba(244,236,223,.42); --menu-line: rgba(244,236,223,.14); }
-@media (max-width: 820px) {
-  .nav-links {
-    background: var(--menu-bg); color: var(--menu-fg); visibility: hidden;
-    /* closed: a thin curved sliver under the header; open: the curve has swept past the bottom */
-    clip-path: ellipse(120% 0% at 50% 0%) !important;
-    transition: clip-path .5s cubic-bezier(.7,0,.3,1) .22s, visibility 0s .75s !important;
-  }
-  body.menu-open .nav-links {
-    visibility: visible; clip-path: ellipse(150% 140% at 50% 0%) !important;
-    transition: clip-path .75s cubic-bezier(.6,0,.2,1), visibility 0s !important;
-  }
-  .nav-links::before { border-color: var(--menu-line); }
-  .nav-links > a:not(.nav-cta) { color: var(--menu-fg); border-bottom-color: var(--menu-line); }
-  .nav-links > a:not(.nav-cta)::before { color: var(--menu-mute); }
-  .nav-links > a.active, .nav-links > a.active::before { color: var(--accent); }
-  .nav-tag { color: var(--menu-mute); }
-  .nav-social a { color: var(--menu-fg); border-color: var(--menu-line); }
-  /* links drop in from above with a little tilt, one after another; on close they lift away first */
-  .nav-links > a, .nav-extra { opacity: 0; transform: translateY(-18px) rotate(-2deg); transform-origin: left center; transition: opacity .2s ease, transform .25s ease; }
-  body.menu-open .nav-links > a, body.menu-open .nav-extra { opacity: 1; transform: none; transition: opacity .45s var(--ease), transform .7s cubic-bezier(.34,1.45,.64,1); transition-delay: calc(.3s + var(--i) * .07s); }
-  /* the menu icon spins into the ✕ */
-  .menu-btn { transition: transform .5s var(--ease); }
-  body.menu-open .menu-btn { transform: rotate(180deg); }
-}
-@media (max-width: 820px) and (prefers-reduced-motion: reduce) {
-  .nav-links, body.menu-open .nav-links { transition: visibility 0s !important; }
-}
