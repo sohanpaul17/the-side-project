@@ -1699,3 +1699,16 @@ html.li-lock, html.li-lock body { overflow: hidden; }
   #related.product-grid::-webkit-scrollbar { display: none; }
   #related.product-grid > .card { flex: 0 0 64%; scroll-snap-align: start; }
 }
+
+/* phone slider: the product/book area grows to fill the slide (no empty gap at the bottom) */
+@media (max-width: 860px) {
+  .hs-slide { align-items: stretch; }
+  .hs-grid { grid-template-rows: 1fr auto; align-content: stretch; }
+  .hs-visual { min-height: 230px; height: 100%; }
+  .hs-occ .occ-note { display: none; }
+  .ps-sky .ss-frame, .ps-frame { width: 170px; }
+  .ps-ll { width: 235px; }
+  .ps-sb .sb-book { width: 140px; }
+  .hs-photos .ph { width: min(62%, 230px); }
+}
+@media (max-width: 860px) { .ps-sb { width: 100%; } .ps-sb .sb-book { justify-self: start; margin-left: 50%; } }

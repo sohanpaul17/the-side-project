@@ -782,7 +782,7 @@
             </div>
             <p class="occ-note hs-in" style="--d:.74s">From <b>${money(p.price)}</b> · printed copies ship in 3–5 days, so order early — or get it as a PDF for a last-minute gift.</p>
           </div>
-          <div class="hs-visual">
+          <a class="hs-visual" href="${productUrl(p)}" aria-label="See the ${esc(p.title)}">
             <div class="xb-glow" aria-hidden="true"></div>
             <div class="xb-book" aria-label="The Lovebook, wrapped as a gift">
               <div class="xb-page">${pages.map((src, i) => `<img src="${esc(src)}" alt="" ${i ? 'loading="lazy"' : 'class="on"'}>`).join("")}</div>
@@ -796,7 +796,7 @@
               <div class="xb-tag"><span>To:</span> ${esc(o.tagTo)} ${HEART}<small>From: me</small></div>
             </div>
             ${[[8, 18], [86, 10], [92, 62], [4, 70], [70, 90]].map(([x, y], i) => `<span class="xb-glint" style="left:${x}%;top:${y}%;--i:${i}">${STAR()}</span>`).join("")}
-          </div>
+          </a>
         </div>
       </div>`;
   }
