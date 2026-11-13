@@ -149,10 +149,14 @@
       <div class="wrap nav">
         <a class="brand" href="index.html" aria-label="${esc(STORE.name)} home">${brandMark}<span>THE SIDE PROJECT.<small>A little bit of everything</small></span></a>
         <nav class="nav-links" aria-label="Main">
-          ${NAV.map(([h, l, k]) => `<a href="${h}" class="${k === page ? "active" : ""}">${l}</a>`).join("")}
-          <a href="shop.html" class="nav-cta">Shop now</a>
+          ${NAV.map(([h, l, k], i) => `<a href="${h}" class="${k === page ? "active" : ""}" style="--i:${i}">${l}</a>`).join("")}
+          <a href="shop.html" class="nav-cta" style="--i:${NAV.length}">Shop now</a>
+          <div class="nav-extra" style="--i:${NAV.length + 1}">
+            <span class="nav-tag">A little bit of everything ✦</span>
+            <span class="nav-social"><a href="${waLink("Hi! I'd love to know more about your products.")}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a><a href="${igProfile()}" target="_blank" rel="noopener" aria-label="Instagram">${I.ig}</a></span>
+          </div>
         </nav>
-        <button class="menu-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+        <button class="menu-btn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
       </div>`;
     document.body.prepend(header);
     const bar = document.createElement("div");
@@ -189,7 +193,16 @@
     document.body.append(footer);
 
 
-    $(".menu-btn").addEventListener("click", () => document.body.classList.toggle("menu-open"));
+    // phone menu: a full-screen panel that opens just below the header
+    const menuBtn = $(".menu-btn");
+    const setMenu = (open) => {
+      if (open) document.documentElement.style.setProperty("--menu-top", Math.max(0, header.getBoundingClientRect().bottom) + "px");
+      document.body.classList.toggle("menu-open", open);
+      menuBtn.setAttribute("aria-expanded", String(open));
+    };
+    menuBtn.addEventListener("click", () => setMenu(!document.body.classList.contains("menu-open")));
+    addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
+    addEventListener("resize", () => { if (innerWidth > 820) setMenu(false); });
     const onScroll = () => header.classList.toggle("scrolled", scrollY > 10);
     addEventListener("scroll", onScroll, { passive: true }); onScroll();
   }
