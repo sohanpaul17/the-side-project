@@ -381,7 +381,7 @@
       count.textContent = `${String(index + 1).padStart(2, "0")} / ${String(m + 1).padStart(2, "0")}`;
       $(".carousel-controls", root).style.display = m === 0 ? "none" : ""; // everything already fits
     }
-    const play = () => { clearInterval(timer); timer = setInterval(() => go(index + 1), 4200); };
+    const play = () => clearInterval(timer); // no auto-scroll: it moves only with the arrows or a swipe
     const stop = () => clearInterval(timer);
     $(".prev", root).addEventListener("click", () => { go(index - 1); play(); });
     $(".next", root).addEventListener("click", () => { go(index + 1); play(); });
