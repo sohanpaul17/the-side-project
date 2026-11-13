@@ -477,7 +477,7 @@
     // two rows moving in opposite directions once there are enough reviews — but always one row on phones
     const phone = matchMedia("(max-width: 600px)");
     const render = () => {
-      const rows = list.length >= 6 && !phone.matches ? [list.filter((_, i) => i % 2 === 0), list.filter((_, i) => i % 2 === 1)] : [list];
+      const rows = [list]; // a single compact row
       $("#home-rv-rows").innerHTML = rows.map((items, r) => {
         let set = items.slice();
         while (set.length < 6) set = set.concat(items); // enough cards to fill wide screens

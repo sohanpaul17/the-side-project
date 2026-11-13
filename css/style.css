@@ -1335,3 +1335,17 @@ body[data-page="shop"] main .wrap { width: min(1060px, 100% - 64px); }
   .card-ship { left: 8px; bottom: 8px; padding: 4px 8px; font-size: 10px; gap: 4px; }
   .card-ship svg { width: 11px; height: 11px; }
 }
+
+/* home reviews — compact */
+.home-reviews { padding-bottom: clamp(40px, 5vw, 64px); }
+.home-reviews .section-head { margin-bottom: 20px; align-items: flex-end; }
+.home-reviews .h2 { font-size: clamp(28px, 3.4vw, 44px); }
+.home-reviews #home-rv-score { margin: 6px 0 0; font-size: 14px; }
+.home-reviews .btn { padding: 11px 18px; font-size: 14px; }
+.home-reviews .rv-marquee { gap: 0; padding: 4px 0 8px; }
+.home-reviews .rv-row-set { gap: 14px; padding-right: 14px; }
+.home-reviews .rv-card { width: 270px; padding: 16px 18px; border-radius: 14px; }
+.home-reviews .rv-text { font-size: 14.5px; line-height: 1.5; margin: 8px 0 10px; -webkit-line-clamp: 3; }
+.home-reviews .rv-card footer { padding-top: 10px; gap: 8px; }
+.home-reviews .rv-card footer small { font-size: 11.5px; }
+@media (max-width: 600px) { .home-reviews .rv-card { width: 240px; } }
