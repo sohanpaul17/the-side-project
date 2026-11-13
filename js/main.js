@@ -1158,8 +1158,16 @@
     // spreads you can jump to: cover, 2–3, 4–5 … back cover
     const spreads = Array.from({ length: leaves + 1 }, (_, f) => (f === 0 ? [1] : f === leaves ? [n] : [2 * f, 2 * f + 1]));
     sec.hidden = false;
+    const r = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
+    const hearts = Array.from({ length: 18 }, (_, i) => `<span class="fl" style="left:${r(2, 96)}%;--s:${r(12, 30)}px;--t:${r(8, 14)}s;--dl:-${r(0, 14)}s;--o:${r(0.35, 0.75)};--sw:${r(-40, 40)}px;color:${["#e0456e", "#f07a9a", "#d42c3c", "#f5a3b8"][i % 4]}">${HEART}</span>`).join("");
+    const bulbs = Array.from({ length: 26 }, (_, i) => `<i class="b${i % 4}" style="left:${((i + 0.5) / 26 * 100).toFixed(2)}%;--i:${i}"></i>`).join("");
     sec.innerHTML = `
       <div class="wrap">
+       <div class="li-frame">
+        <div class="li-lights" aria-hidden="true">${bulbs}</div>
+        <i class="li-holly tl" aria-hidden="true"></i><i class="li-holly tr" aria-hidden="true"></i><i class="li-holly bl" aria-hidden="true"></i><i class="li-holly br" aria-hidden="true"></i>
+        <div class="li-in">
+        <div class="li-hearts" aria-hidden="true">${hearts}</div>
         <div class="li-head">
           <span class="eyebrow reveal">Look inside</span>
           <h2 class="h-display h2"><span class="split-line"><span>Flip through a Lovebook</span></span></h2>
@@ -1181,10 +1189,19 @@
           <button type="button" class="li-full">${FULL} Full screen</button>
         </div>
         <div class="li-thumbs">${spreads.map((pg, f) => `<button type="button" class="li-th" data-f="${f}" aria-label="${f === 0 ? "Cover" : f === leaves ? "Back cover" : `Pages ${pg[0]}–${pg[1]}`}">${pg.map((i) => `<img src="${file(i, true)}" alt="" loading="lazy">`).join("")}</button>`).join("")}</div>
+        </div>
+       </div>
       </div>`;
     // a shortcut next to the price
     const price = $(".pdp-price");
-    if (price) price.insertAdjacentHTML("afterend", `<a class="li-link reveal" href="#look-inside">${BOOK} Flip through a sample book</a>`);
+    if (price) {
+      price.insertAdjacentHTML("afterend", `<a class="btn btn-lg li-cta" href="#look-inside"><span class="li-cta-ico">${BOOK}</span> Look inside the book <small>Flip through a sample</small></a>`);
+      $(".li-cta").addEventListener("click", (e) => {
+        e.preventDefault();
+        const top = sec.getBoundingClientRect().top + scrollY - ($(".site-header")?.offsetHeight || 70) - 12;
+        scrollTo({ top, behavior: "smooth" });
+      });
+    }
 
     const book = $(".li-book", sec), lv = $$(".li-leaf", book), thumbs = $$(".li-th", sec), count = $(".li-count", sec);
     let f = 0;
@@ -1199,7 +1216,8 @@
       book.classList.toggle("at-end", f === leaves);
       count.textContent = f === 0 ? "Cover" : f === leaves ? "Back cover" : `Pages ${2 * f}–${2 * f + 1} of ${n}`;
       thumbs.forEach((t, i) => t.classList.toggle("on", i === f));
-      $(".li-th.on", sec)?.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+      const th = $(".li-th.on", sec), strip = $(".li-thumbs", sec);
+      if (th && strip) strip.scrollTo({ left: th.offsetLeft - strip.clientWidth / 2 + th.offsetWidth / 2, behavior: turning.length ? "smooth" : "auto" });
       $(".li-nav.prev", sec).disabled = f === 0;
       $(".li-nav.next", sec).disabled = f === leaves;
       load();
