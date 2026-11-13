@@ -1692,3 +1692,10 @@ html.li-lock, html.li-lock body { overflow: hidden; }
 .pdp-rv-summary { margin-bottom: 22px; }
 .pdp-rv-more { margin-top: 22px; text-align: center; }
 .pdp-rv-more .btn svg.arrow { transform: rotate(90deg); }
+
+/* "You might also like" on phones: a sideways-scrolling row */
+@media (max-width: 760px) {
+  #related.product-grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: -16px; padding: 4px 16px 14px; scroll-padding-inline: 16px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  #related.product-grid::-webkit-scrollbar { display: none; }
+  #related.product-grid > .card { flex: 0 0 64%; scroll-snap-align: start; }
+}
