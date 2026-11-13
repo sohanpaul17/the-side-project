@@ -1349,3 +1349,32 @@ body[data-page="shop"] main .wrap { width: min(1060px, 100% - 64px); }
 .home-reviews .rv-card footer { padding-top: 10px; gap: 8px; }
 .home-reviews .rv-card footer small { font-size: 11.5px; }
 @media (max-width: 600px) { .home-reviews .rv-card { width: 240px; } }
+
+/* ===================== "Made for your everyday side quests" band ===================== */
+.hs-dots { margin-right: auto; }
+.tagline { position: relative; z-index: 2; padding: clamp(10px, 2vw, 24px) 0 clamp(40px, 6vw, 72px); text-align: center; overflow: hidden; }
+.tg-inner { position: relative; }
+.tg-line { margin: 0; font-family: var(--display); font-size: clamp(30px, 5.4vw, 76px); line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
+.tg-m { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .04em; }
+.tg-w { display: inline-block; transform: translateY(105%); }
+.tagline.in .tg-w { transform: none; transition: transform .9s var(--ease) calc(var(--i) * .1s); }
+.tg-hand-wrap { position: relative; display: inline-block; margin-top: -.05em; padding: 0 .3em; }
+.tg-hand { position: relative; z-index: 2; display: inline-block; font-family: "Caveat", cursive; font-weight: 600; font-size: clamp(60px, 10vw, 140px); line-height: 1.05; color: var(--accent); transform: rotate(-4deg); clip-path: inset(-20% 100% -20% 0); }
+.tagline.in .tg-hand { clip-path: inset(-20% -5% -20% 0); transition: clip-path 1.3s cubic-bezier(.5,0,.3,1) .5s; }
+.tg-under { position: absolute; left: 6%; right: 2%; bottom: -10%; width: 92%; height: .32em; font-size: clamp(60px, 10vw, 140px); overflow: visible; z-index: 1; }
+.tg-under path { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.tagline.in .tg-under path { stroke-dashoffset: 0; transition: stroke-dashoffset .9s var(--ease) 1.7s; }
+.tg-orbit { position: absolute; left: 50%; top: 50%; width: 128%; height: auto; transform: translate(-50%, -50%); overflow: visible; z-index: 0; pointer-events: none; }
+.tg-ring { fill: none; stroke: var(--ink); stroke-opacity: .35; stroke-width: 1.6; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.tagline.in .tg-ring { stroke-dashoffset: 0; transition: stroke-dashoffset 1.6s var(--ease) 1s; }
+.tg-star { opacity: 0; }
+.tagline.in .tg-star { opacity: 1; transition: opacity .6s ease 2.2s; }
+.tg-spark { position: absolute; width: clamp(12px, 1.6vw, 22px); color: var(--ink); opacity: 0; }
+.tg-spark svg { display: block; width: 100%; fill: currentColor; }
+.tg-spark:nth-of-type(even) { color: var(--accent); }
+.tagline.in .tg-spark { animation: tgSpark 3s ease-in-out calc(1.4s + var(--i) * .4s) infinite; }
+@keyframes tgSpark { 0%, 100% { opacity: 0; transform: scale(.4) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(90deg); } }
+@media (max-width: 600px) { .tg-orbit { width: 116%; } .tg-spark:nth-of-type(n+4) { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .tg-w { transform: none; } .tg-hand { clip-path: none; } .tg-under path, .tg-ring { stroke-dashoffset: 0; } .tg-star { opacity: 1; }
+}
