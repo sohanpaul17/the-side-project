@@ -847,12 +847,56 @@
       </div>`;
   }
 
+  /* ---------- Hero side gutters (wide screens): floating sticker doodles, falling snow, a little note ---------- */
+  function heroSides(root, theme) {
+    const K = "#161513", sw = 'stroke="#161513" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"';
+    const D = {
+      gift: `<svg viewBox="0 0 64 64"><rect x="10" y="27" width="44" height="29" rx="3" fill="#e03049" ${sw}/><rect x="7" y="19" width="50" height="10" rx="3" fill="#f05a6e" ${sw}/><path d="M29 19h6v37h-6z" fill="#f2c46d" ${sw}/><path d="M32 19c-5-10-15-11-14-4 1 5 14 4 14 4zM32 19c5-10 15-11 14-4-1 5-14 4-14 4z" fill="#f2c46d" ${sw}/></svg>`,
+      tree: `<svg viewBox="0 0 64 64"><path d="M32 8 47 29h-7l12 17H12l12-17h-7z" fill="#2f8a5c" ${sw}/><rect x="28" y="46" width="8" height="10" rx="1" fill="#a0603a" ${sw}/><path d="M32 2l2 4.5 4.6.6-3.4 3.2.9 4.6L32 12.7l-4.1 2.2.9-4.6-3.4-3.2 4.6-.6z" fill="#f2c46d" ${sw} stroke-width="1.6"/><circle cx="27" cy="27" r="2.6" fill="#f2c46d"/><circle cx="37" cy="36" r="2.6" fill="#e03049"/><circle cx="24" cy="41" r="2.6" fill="#6cc6ff"/><circle cx="41" cy="43" r="2.6" fill="#f2c46d"/></svg>`,
+      candy: `<svg viewBox="0 0 64 64"><path d="M40 58V22a10 10 0 0 0-20 0" fill="none" stroke="${K}" stroke-width="11" stroke-linecap="round"/><path d="M40 58V22a10 10 0 0 0-20 0" fill="none" stroke="#fff" stroke-width="6.6" stroke-linecap="round"/><path d="M40 58V22a10 10 0 0 0-20 0" fill="none" stroke="#e03049" stroke-width="6.6" stroke-dasharray="5 6"/></svg>`,
+      bauble: `<svg viewBox="0 0 64 64"><path d="M32 4c-4 0-4 6 0 6s4-6 0-6z" fill="none" ${sw}/><rect x="26" y="10" width="12" height="8" rx="2" fill="#f2c46d" ${sw}/><circle cx="32" cy="38" r="20" fill="#3b7bd6" ${sw}/><path d="M14 34c12 6 24 6 36 0" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="1 5" stroke-linecap="round"/><path d="M15 42c11 5 23 5 34 0" fill="none" stroke="#f2c46d" stroke-width="3"/><ellipse cx="24" cy="30" rx="4" ry="6" fill="#fff" opacity=".6" transform="rotate(30 24 30)"/></svg>`,
+      snow: `<svg viewBox="0 0 24 24" fill="none" stroke="#6aa8d8" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7M12 2l-2.4 2.4M12 2l2.4 2.4M12 22l-2.4-2.4M12 22l2.4-2.4"/></svg>`,
+      star: `<svg viewBox="0 0 24 24"><path d="M12 1.5l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.6l-6.4 3.5L7 14l-5.3-5 7.2-.9z" fill="#f2c46d" stroke="${K}" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+      heart: `<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.4 2.3 4.5 6 4.5c2.2 0 3.6 1.3 4.5 2.6.3.4.9.4 1.2 0 .9-1.3 2.3-2.6 4.5-2.6 3.7 0 5.6 3.9 4 7.2C19.5 16.4 12 21 12 21z" fill="#e0456e" stroke="${K}" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+      letter: `<svg viewBox="0 0 64 64"><rect x="6" y="16" width="52" height="34" rx="3" fill="#fde8d8" ${sw}/><path d="M6 18l26 19 26-19" fill="none" ${sw}/><path d="M32 33c-2-3-7-2-6 2 1 3 6 5 6 5s5-2 6-5c1-4-4-5-6-2z" fill="#e0456e"/></svg>`,
+    };
+    const xmas = theme === "christmas";
+    // [left %, top %, width px, kind, tilt, parallax depth]
+    const L = xmas
+      ? [[56, 12, 66, "gift", -10, 1.4], [24, 30, 30, "star", 0, .6], [76, 34, 54, "candy", 16, 1], [30, 74, 74, "tree", -6, 1.6], [72, 90, 44, "bauble", 10, .8], [80, 64, 22, "star", 0, .5]]
+      : [[56, 12, 60, "letter", -10, 1.4], [24, 30, 30, "star", 0, .6], [76, 36, 40, "heart", 12, 1], [32, 74, 46, "heart", -8, 1.6], [72, 90, 30, "star", 10, .8], [80, 62, 24, "heart", 0, .5]];
+    const R = xmas
+      ? [[42, 10, 50, "bauble", 8, 1], [76, 28, 36, "snow", 0, .6], [30, 44, 26, "star", 0, .5], [64, 58, 70, "tree", 6, 1.5], [30, 82, 58, "gift", 12, 1.2], [80, 88, 34, "snow", 0, .7]]
+      : [[42, 10, 40, "heart", 8, 1], [76, 28, 28, "star", 0, .6], [30, 46, 58, "letter", 8, 1.5], [70, 62, 36, "heart", -6, 1], [34, 84, 30, "star", 12, 1.2], [80, 88, 26, "heart", 0, .7]];
+    const r = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
+    const doodles = (list) => list.map(([x, y, w, k, rot, z], i) =>
+      `<span class="dd" style="left:${x}%;top:${y}%;--w:${w}px;--r:${rot}deg;--z:${z};--k:${i}"><span class="dd-p"><span class="dd-f" style="--t:${r(4.5, 7)}s;--dl:-${r(0, 5)}s">${D[k]}</span></span></span>`).join("");
+    const fall = () => Array.from({ length: 9 }, () =>
+      `<i class="sf" style="left:${r(4, 96)}%;--s:${r(9, 16)}px;--t:${r(9, 15)}s;--dl:-${r(0, 15)}s;--sw:${r(-24, 24)}px">${xmas ? D.snow : D.heart}</i>`).join("");
+    const note = `<div class="dd-note"><span>${xmas ? "psst… the perfect<br>Christmas gift!" : "made with<br>love, for you"}</span>
+      <svg viewBox="0 0 120 60" aria-hidden="true"><path pathLength="1" d="M6 8c10 34 50 44 96 30"/><path pathLength="1" d="M90 26l13 12-17 6"/></svg></div>`;
+    root.insertAdjacentHTML("afterbegin",
+      `<div class="hs-side l" aria-hidden="true">${fall()}${doodles(L)}${note}</div><div class="hs-side r" aria-hidden="true">${fall()}${doodles(R)}</div>`);
+    // a little parallax as the mouse moves
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || !matchMedia("(hover: hover)").matches) return;
+    let raf = 0;
+    addEventListener("mousemove", (e) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        root.style.setProperty("--mx", ((e.clientX / innerWidth - 0.5) * 16).toFixed(1) + "px");
+        root.style.setProperty("--my", ((e.clientY / innerHeight - 0.5) * 12).toFixed(1) + "px");
+      });
+    }, { passive: true });
+  }
+
   function heroSlider() {
     const root = $("#hero-slider");
     if (!root) return;
     const track = $(".hs-track", root), dotsEl = $(".hs-dots", root);
     const hero = PRODUCTS.find((p) => p.id === "customised-lovebook") || PRODUCTS[0];
     const occ = nextOccasion();
+    heroSides(root, occ ? occ.theme : "");
     const order = ["customised-night-sky", "customised-scrapbook", "customised-journey-map", "customised-love-letter"];
     const rest = order.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean);
     PRODUCTS.forEach((p) => { if (p !== hero && !rest.includes(p)) rest.push(p); });
