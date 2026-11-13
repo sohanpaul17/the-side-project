@@ -1441,3 +1441,14 @@ body[data-page="shop"] main .wrap { width: min(1060px, 100% - 64px); }
   .nav-links > a, .nav-extra { transition: none; }
 }
 
+
+/* slider: bigger products (Night Sky, Journey Map, Love Letter, Scrapbook) */
+.ps-sky .ss-frame, .ps-frame { width: clamp(200px, 19vw, 250px); }
+.ps-ll { width: clamp(260px, 26vw, 330px); }
+.ps-sb .sb-book { width: clamp(170px, 16.5vw, 215px); margin-left: 44%; }
+.hs-prod .hs-ring { width: min(88%, 440px); }
+@media (max-width: 860px) {
+  .ps-sky .ss-frame, .ps-frame { width: 150px; }
+  .ps-ll { width: 215px; }
+  .ps-sb .sb-book { width: 128px; }
+}
