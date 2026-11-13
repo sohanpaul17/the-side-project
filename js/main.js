@@ -726,7 +726,7 @@
     }).join("");
     const days = o.days === 0 ? `<b>${esc(o.today)}</b>` : `<b data-days>${o.days}</b> ${o.days === 1 ? "day" : "days"} to ${esc(o.name)}`;
     return `
-      <div class="hs-slide hs-occ occ-${o.theme}" data-dur="5000" aria-roledescription="slide" aria-label="${esc(o.name)} gift">
+      <div class="hs-slide hs-occ occ-${o.theme}" data-dur="8000" aria-roledescription="slide" aria-label="${esc(o.name)} gift">
         <canvas class="occ-fx" aria-hidden="true"></canvas>
         ${xmas ? `<div class="occ-lights" aria-hidden="true"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><path d="${wire}"/></svg>${bulbs}</div>
         <div class="occ-baubles" aria-hidden="true"><span class="bauble r" style="--len:70px"></span><span class="bauble g" style="--len:120px"></span><span class="bauble y" style="--len:46px"></span></div>
@@ -832,7 +832,7 @@
     const dark = pal[0] && parseInt(pal[0].slice(1, 3), 16) < 90;
     const price = p.sizes ? `<small>From</small> ${money(Math.min(...p.sizes.map((s) => s.price)))}` : money(p.price);
     return `
-      <div class="hs-slide hs-prod ${dark ? "dark" : ""}" data-dur="5000" style="--bg:${pal[0] || "var(--cream-2)"};--ac:${pal[2] || "var(--accent)"}" aria-roledescription="slide" aria-label="${esc(p.title)}">
+      <div class="hs-slide hs-prod ${dark ? "dark" : ""}" data-dur="8000" style="--bg:${pal[0] || "var(--cream-2)"};--ac:${pal[2] || "var(--accent)"}" aria-roledescription="slide" aria-label="${esc(p.title)}">
         <span class="hs-blob a" aria-hidden="true"></span><span class="hs-blob b" aria-hidden="true"></span>
         ${bgFx(dark)}
         <div class="hs-grid">
