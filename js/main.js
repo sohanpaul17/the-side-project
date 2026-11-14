@@ -581,7 +581,7 @@
         let set = items.slice();
         while (set.length < 6) set = set.concat(items); // enough cards to fill wide screens
         const cards = set.map((x) => reviewCard(x)).join("");
-        return `<div class="rv-row-track ${r % 2 ? "rev" : ""}" style="--dur:${set.length * 7}s"><div class="rv-row-set">${cards}</div><div class="rv-row-set" aria-hidden="true">${cards}</div></div>`;
+        return `<div class="rv-row-track ${r % 2 ? "rev" : ""}" style="--dur:${set.length * 7}s"><div class="rv-row-set">${cards}</div><div class="rv-row-set" aria-hidden="true" inert>${cards}</div></div>`;
       }).join("");
     };
     let wasPhone = phone.matches;
@@ -1117,7 +1117,7 @@
     function go(n) {
       n = (n + els.length) % els.length;
       if (n === index) return;
-      els.forEach((s, i) => { s.classList.toggle("is-active", i === n); s.classList.toggle("is-prev", i === index); s.setAttribute("aria-hidden", i === n ? "false" : "true"); s.inert = i !== n; });
+      els.forEach((s, i) => { s.classList.toggle("is-active", i === n); s.classList.toggle("is-prev", i === index); s.inert = i !== n; /* slides not showing are inert: not focusable, hidden from screen readers */ });
       dots.forEach((d, i) => { d.classList.toggle("on", i === n); d.style.setProperty("--dur", (els[n].dataset.dur || 6000) + "ms"); });
       index = n;
       wake(els[n]); wake(els[(n + 1) % els.length]);
