@@ -24,6 +24,11 @@
     const v = Number(n) * RATES[CUR] * INTL_UPLIFT[CUR];
     return CURRENCIES[CUR].sym + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
+  // outside India (USD / AED) there's no free delivery: show "International shipping rates apply" instead
+  const INTL = CUR !== "INR";
+  const INTL_SHIP = "International shipping rates apply";
+  const shipNote = (p) => (INTL && !(p.formats || []).includes("digital") ? INTL_SHIP : p.priceNote);
+  const deliveryLine = (d) => (INTL && /free delivery|shipping/i.test(d) ? INTL_SHIP : d);
   function refreshRates() {
     if (RATES.live && Date.now() - (RATES.t || 0) < 12 * 3600e3) return;
     fetch("https://open.er-api.com/v6/latest/INR").then((r) => r.json()).then((d) => {
@@ -44,6 +49,7 @@
     right: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
     close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
     truck: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v10H2zM13 9h4.5L21 12.5V16h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>`,
+    plane: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 13.5L3 11l1.5-1.5 7.5 1L16 6c1-1 3-1.5 3.5-1S19 7 18 8l-4.5 4.5 1 7.5L13 21.5 10.5 14z"/></svg>`,
     bag: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1 13H5L6 7z"/><path d="M9 7a3 3 0 016 0"/></svg>`,
     print: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>`,
     pdf: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6M12 18v-6M9 15l3 3 3-3"/></svg>`,
@@ -199,7 +205,7 @@
     document.body.prepend(header);
     const bar = document.createElement("div");
     bar.className = "top-bar";
-    bar.innerHTML = `<span class="tb-truck">${I.truck}</span> <b>Free delivery</b> on every order across India`;
+    bar.innerHTML = INTL ? `<span class="tb-truck">${I.plane}</span> <b>${INTL_SHIP}</b>` : `<span class="tb-truck">${I.truck}</span> <b>Free delivery</b> on every order across India`;
     header.before(bar);
     // Christmas season (desktop): festive menu, fairy lights under the header and Santa's sleigh flying across
     const occNow = typeof nextOccasion === "function" ? nextOccasion() : null;
@@ -318,7 +324,7 @@
           ${p.badge ? `<span class="card-badge">${esc(p.badge)}</span>` : ""}
           <img src="${imgs[0]}" alt="${esc(p.title)}" loading="lazy" decoding="async">
           ${imgs[1] ? `<img class="alt" src="${imgs[1]}" alt="" loading="lazy" decoding="async">` : ""}
-          ${p.priceNote ? `<span class="card-ship">${p.formats && p.formats.includes("digital") ? I.bolt : I.truck} ${esc(p.priceNote)}</span>` : ""}
+          ${p.priceNote ? `<span class="card-ship">${p.formats && p.formats.includes("digital") ? I.bolt : INTL ? I.plane : I.truck} ${esc(shipNote(p))}</span>` : ""}
           <span class="card-quick" data-buy="${esc(p.id)}">${I.bag} Buy now</span>
         </div>
         <div class="card-body">
@@ -606,7 +612,7 @@
         ${leaves.map((l, i) => `<div class="bk-leaf" style="z-index:${N - i}">${face(l.front, "front")}${face(l.back, "back")}</div>`).join("")}
       </div>`;
     const sky = PRODUCTS.find((x) => x.spotlight);
-    const notes = [...(p.details || []), ...((sky && sky.details) || [])].filter(Boolean);
+    const notes = [...new Set([...(p.details || []), ...((sky && sky.details) || [])].filter(Boolean).map(deliveryLine))];
     const strip = notes.map((t) => `<span>${esc(t)}</span><i>${STAR()}</i>`).join("");
     sec.querySelector(".bs-notes").innerHTML = `<div class="bs-notes-track">${strip}${strip}</div>`;
     sec.hidden = false;
@@ -748,7 +754,7 @@
       <h3 class="h-display spot-title">${esc(p.title)}</h3>
       <p class="bs-rating"></p>
       <p class="bs-short">${esc(p.short)}</p>
-      <div class="bs-price"><span class="price">${money(p.price)}${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}</span>${p.priceNote ? `<span class="ship-pill">${p.formats && p.formats.includes("digital") ? I.bolt : I.truck} ${esc(p.priceNote)}</span>` : ""}</div>
+      <div class="bs-price"><span class="price">${money(p.price)}${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}</span>${p.priceNote ? `<span class="ship-pill">${p.formats && p.formats.includes("digital") ? I.bolt : INTL ? I.plane : I.truck} ${esc(shipNote(p))}</span>` : ""}</div>
       <div class="bs-actions">
         <a class="btn btn-lg bs-buy" href="${productUrl(p)}" data-buy="${esc(p.id)}">${I.bag} Buy now</a>
         <a class="btn btn-lg btn-ghost bs-view" href="${productUrl(p)}">${esc(viewLabel)} ${I.arrow}</a>
@@ -1407,9 +1413,9 @@
         <nav class="breadcrumb reveal"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <a href="shop.html?cat=${encodeURIComponent(p.category)}">${esc(p.category)}</a></nav>
         <span class="card-cat reveal" style="--d:.05s">${esc(p.category)}${p.badge ? " · " + esc(p.badge) : ""}</span>
         <h1 class="pdp-title reveal" style="--d:.1s">${esc(p.title)}</h1>
-        <div class="pdp-price reveal" style="--d:.15s"><span class="price"><span id="pdp-price-val">${money(p.sizes ? p.sizes[0].price : p.price)}</span>${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>${save ? `<span class="save-tag">Save ${save}%</span>` : ""}${p.priceNote ? `<span class="ship-tag">${p.formats && p.formats.includes("digital") ? I.bolt : I.truck} ${esc(p.priceNote)}</span>` : ""}</div>
+        <div class="pdp-price reveal" style="--d:.15s"><span class="price"><span id="pdp-price-val">${money(p.sizes ? p.sizes[0].price : p.price)}</span>${p.unit ? `<small class="price-unit"> / ${esc(p.unit)}</small>` : ""}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ""}</span>${save ? `<span class="save-tag">Save ${save}%</span>` : ""}${p.priceNote ? `<span class="ship-tag">${p.formats && p.formats.includes("digital") ? I.bolt : INTL ? I.plane : I.truck} ${esc(shipNote(p))}</span>` : ""}</div>
         ${p.sizes ? `<div class="size-pick reveal" style="--d:.16s"><div class="delivery-title">Choose your size</div><div class="size-opts">${p.sizes.map((s, i) => `<label class="sopt"><input type="radio" name="size" value="${i}" ${i ? "" : "checked"}><span><b>${esc(s.label)}</b>${s.dims ? `<small>${esc(s.dims)}</small>` : ""}</span><em>${money(s.price)}</em></label>`).join("")}</div></div>` : ""}
-        ${p.shippingNote ? `<p class="intl-note reveal" style="--d:.17s">✈ ${esc(p.shippingNote)}</p>` : ""}
+        ${p.shippingNote && !INTL ? `<p class="intl-note reveal" style="--d:.17s">✈ ${esc(p.shippingNote)}</p>` : ""}
         ${p.framingNote ? `<div class="frame-note reveal" style="--d:.19s" role="note"><span class="frame-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg></span><span><b>Framing costs extra</b><small>${esc(p.framingNote)}. Want it framed? Just ask when you order.</small></span></div>` : ""}
         <p class="pdp-short reveal" style="--d:.2s">${esc(p.short)}</p>
         ${fmts.length ? `
@@ -1428,7 +1434,7 @@
         <p class="buy-note reveal" style="--d:.35s">${I.chat} Tap Buy now to message me on WhatsApp or Instagram and place your order.</p>
         <div class="reveal" style="--d:.4s">
           <div class="acc open"><button class="acc-head">Description <i></i></button><div class="acc-body"><div><p>${esc(p.description)}</p></div></div></div>
-          <div class="acc"><button class="acc-head">What's included <i></i></button><div class="acc-body"><div><ul>${p.details.map((d) => `<li>${I.check}<span>${esc(d)}</span></li>`).join("")}</ul></div></div></div>
+          <div class="acc"><button class="acc-head">What's included <i></i></button><div class="acc-body"><div><ul>${[...new Set(p.details.map(deliveryLine))].map((d) => `<li>${I.check}<span>${esc(d)}</span></li>`).join("")}</ul></div></div></div>
           <div class="acc"><button class="acc-head">Delivery & ordering <i></i></button><div class="acc-body"><div><p>${fmts.includes("digital") ? "This is a digital product, so there's nothing to print or ship: your files (PDF and PNG) are emailed to you the same day your order is confirmed. " : ""}${fmts.includes("pdf") ? "PDF orders are sent to you on WhatsApp or email as soon as your order is confirmed. " : ""}${fmts.includes("print") ? "Printed copies are made to order and usually ship within 3–5 days. " : ""}Message me on WhatsApp or Instagram and I'll help with payment, sizes and anything else.</p></div></div></div>
         </div>
       </div>`;
@@ -1772,6 +1778,7 @@
   initTransitions();
   ({ home: homePage, shop: shopPage, product: (...a) => { productPage(...a); productReviews(PRODUCTS.find((x) => x.id === new URLSearchParams(location.search).get("id")) || PRODUCTS[0]); }, about: aboutPage, contact: contactPage, reviews: reviewsPage }[page] || (() => {}))();
   festivePage();
+  if (INTL) $$("[data-intl]").forEach((el) => (el.textContent = el.dataset.intl));
   observeReveals();
   // looping animations only run while their section is on screen (keeps scrolling smooth)
   const animIO = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle("anim-off", !e.isIntersecting)), { rootMargin: "120px 0px" });
