@@ -1837,3 +1837,18 @@ html.li-lock, html.li-lock body { overflow: hidden; }
 }
 @media (max-width: 400px) { .cur-btn b { display: none; } }
 @media (min-width: 821px) { .nav { justify-content: flex-start; } .nav-links { margin-left: auto; } }
+
+/* ===================== speed, round 3 ===================== */
+/* quicker page switches */
+.curtain { transition-duration: .45s; }
+body.is-leaving .curtain { transition-duration: .22s; }
+body:not(.is-leaving) .curtain { animation-delay: 1.2s; }
+/* the star map: no per-star twinkle repaints, the bright glints still sparkle */
+.ss-poster .tw, .ss-poster .tw2 { animation: none; opacity: .8; }
+/* phones: drop the purely decorative background layers */
+@media (max-width: 760px) {
+  .hs-bgfx .fl, .hs-bgfx .tw:not(.big), .hs-bgfx .shoot, .lb-field, .ss-field i, .ss-field .sp, .hs-blob.b, .xb-glint, .hd-sleigh::after { display: none !important; }
+  .bauble.y { display: none; }
+}
+/* below-the-fold blocks skip rendering work until they're near the screen */
+.site-footer, .home-reviews + section, #home-reviews ~ .section { content-visibility: auto; contain-intrinsic-size: auto 600px; }

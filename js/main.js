@@ -40,6 +40,7 @@
     }).catch(() => {});
   }
   const page = document.body.dataset.page;
+  const LITE = matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4; // phones & low-power devices get fewer decorations
 
   /* ---------- Icons ---------- */
   const STAR = (c = "currentColor") => `<svg viewBox="0 0 24 24" fill="${c}"><path d="M12 0c.6 7.5 4.5 11.4 12 12-7.5.6-11.4 4.5-12 12-.6-7.5-4.5-11.4-12-12C7.5 11.4 11.4 7.5 12 0z"/></svg>`;
@@ -227,7 +228,7 @@
           <path d="M138 30h46q10 0 12-12l7-2q-2 24-21 28h-41q-8 0-6-14z" fill="#d42c3c"/><path d="M142 33h38" stroke="#f2c46d" stroke-width="1.6" stroke-dasharray="2 3"/>
           <path d="M146 44v6M176 44v6" stroke="#c8a24a" stroke-width="2"/><path d="M134 51h62q11 0 13-9" stroke="#f2c46d" stroke-width="2.8" fill="none" stroke-linecap="round"/></g>
       </svg>`;
-      const N = 44;
+      const N = 26;
       const lights = Array.from({ length: N }, (_, i) => `<i class="b${i % 4}" style="left:${((i + 0.5) / N * 100).toFixed(2)}%;--i:${i}"></i>`).join("");
       header.insertAdjacentHTML("afterbegin", `<div class="hd-sky" aria-hidden="true"><div class="hd-sleigh">${sleigh}</div></div>
         <div class="hd-lights" aria-hidden="true"><svg viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 2${Array.from({ length: 11 }, (_, k) => ` Q${k * 10 - 5} 9 ${k * 10} 2`).join("").replace(" Q-5 9 0 2", "")}"/></svg>${lights}</div>`);
@@ -291,7 +292,7 @@
 
   /* ---------- Page transitions ---------- */
   function initTransitions() {
-    setTimeout(() => document.body.classList.add("is-loaded"), 80);
+    requestAnimationFrame(() => document.body.classList.add("is-loaded"));
     addEventListener("pageshow", (e) => { if (e.persisted) document.body.classList.remove("is-leaving"); });
     document.addEventListener("click", (e) => {
       const a = e.target.closest("a");
@@ -301,7 +302,7 @@
       e.preventDefault();
       document.body.classList.remove("menu-open");
       document.body.classList.add("is-leaving");
-      setTimeout(() => (location.href = href), 480);
+      setTimeout(() => (location.href = href), 220);
     });
   }
 
@@ -626,8 +627,8 @@
       const colors = ["#f06b8f", "#ff9eb5", "#e0456e", "#c9b4f2", "#ffc7d6", "#f6a3c4"];
       lb.innerHTML =
         '<b class="lb-glow g1"></b><b class="lb-glow g2"></b><b class="lb-glow g3"></b>' +
-        Array.from({ length: 16 }, (_, i) => `<span class="lb-heart" style="left:${(r() * 96).toFixed(1)}%;--s:${(12 + r() * 22).toFixed(0)}px;--d:${(9 + r() * 9).toFixed(1)}s;--sway:${(20 + r() * 40).toFixed(0)}px;--c:${colors[i % colors.length]};animation-delay:-${(r() * 18).toFixed(1)}s">${HEART}</span>`).join("") +
-        Array.from({ length: 18 }, () => `<i class="lb-spark" style="left:${(r() * 100).toFixed(1)}%;top:${(r() * 100).toFixed(1)}%;animation-delay:-${(r() * 3).toFixed(1)}s"></i>`).join("");
+        Array.from({ length: LITE ? 0 : 8 }, (_, i) => `<span class="lb-heart" style="left:${(r() * 96).toFixed(1)}%;--s:${(12 + r() * 22).toFixed(0)}px;--d:${(9 + r() * 9).toFixed(1)}s;--sway:${(20 + r() * 40).toFixed(0)}px;--c:${colors[i % colors.length]};animation-delay:-${(r() * 18).toFixed(1)}s">${HEART}</span>`).join("") +
+        Array.from({ length: LITE ? 0 : 8 }, () => `<i class="lb-spark" style="left:${(r() * 100).toFixed(1)}%;top:${(r() * 100).toFixed(1)}%;animation-delay:-${(r() * 3).toFixed(1)}s"></i>`).join("");
     }
 
     const stage = $(".bk-stage", sec), els = $$(".bk-leaf", sec);
@@ -681,7 +682,7 @@
       const x = cx + (rnd() * 2 - 1) * R, y = cy + (rnd() * 2 - 1) * R;
       if (!inCircle(x, y)) continue; n++;
       const r = [0.7, 0.9, 1.1, 1.4][Math.floor(rnd() * 4)];
-      dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="#fff" class="${n % 6 === 0 ? "tw" : "st"}" style="animation-delay:-${(rnd() * 5).toFixed(2)}s"/>`;
+      dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="#fff" class="${n % 22 === 0 ? "tw" : "st"}" style="animation-delay:-${(rnd() * 5).toFixed(2)}s"/>`;
     }
     // bright sparkling stars (four-point glints with a glow)
     const glint = (x, y, s, d) => `<g class="glint" style="animation-delay:-${d}s;transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${s * .55}" fill="#fff" filter="url(#${uid}-glow)"/><path d="M${x} ${y - s * 2.6}Q${x + s * .3} ${y - s * .3} ${x + s * 2.6} ${y}Q${x + s * .3} ${y + s * .3} ${x} ${y + s * 2.6}Q${x - s * .3} ${y + s * .3} ${x - s * 2.6} ${y}Q${x - s * .3} ${y - s * .3} ${x} ${y - s * 2.6}Z" fill="#fff"/></g>`;
@@ -722,7 +723,7 @@
           <g transform="translate(${cx + R * .62} ${cy - R * .62})" class="ss-moon"><circle r="15" fill="#f6dc8f" filter="url(#${uid}-glow)" opacity=".6"/><circle r="14" fill="#f6dc8f"/><circle cx="6" cy="-4" r="13" fill="#283163"/></g>
           <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#e2b75a" stroke-width="2.5"/>
           <circle cx="${cx}" cy="${cy}" r="${R - 7}" fill="none" stroke="#e2b75a" stroke-opacity=".5" stroke-width="1"/>
-          <image href="assets/products/night-sky-faces.png" x="${cx - fw / 2}" y="${cy + R - fh * .42}" width="${fw}" height="${fh}"/>
+          <image href="assets/products/night-sky-faces.webp" x="${cx - fw / 2}" y="${cy + R - fh * .42}" width="${fw}" height="${fh}"/>
           <text x="${cx}" y="458" text-anchor="middle" class="ss-t1">the night we met</text>
           <text x="${cx}" y="488" text-anchor="middle" class="ss-t2">RIYA &amp; AARAV</text>
           <text x="${cx}" y="515" text-anchor="middle" class="ss-t3">14 · 02 · 2019 · PUNE</text>
@@ -739,8 +740,8 @@
     // the card's own sky, behind the poster: twinkling dots, sparkling stars and shooting stars
     const pos = () => `left:${(rnd() * 100).toFixed(1)}%;top:${(rnd() * 100).toFixed(1)}%`;
     card.querySelector(".ss-field").innerHTML =
-      Array.from({ length: 55 }, () => `<i style="${pos()};animation-delay:-${(rnd() * 4).toFixed(1)}s;transform:scale(${(0.5 + rnd()).toFixed(2)})"></i>`).join("") +
-      Array.from({ length: 12 }, () => `<span class="sp" style="${pos()};animation-delay:-${(rnd() * 3.2).toFixed(1)}s;--s:${(10 + rnd() * 14).toFixed(0)}px">${STAR()}</span>`).join("") +
+      Array.from({ length: LITE ? 0 : 22 }, () => `<i style="${pos()};animation-delay:-${(rnd() * 4).toFixed(1)}s;transform:scale(${(0.5 + rnd()).toFixed(2)})"></i>`).join("") +
+      Array.from({ length: LITE ? 0 : 6 }, () => `<span class="sp" style="${pos()};animation-delay:-${(rnd() * 3.2).toFixed(1)}s;--s:${(10 + rnd() * 14).toFixed(0)}px">${STAR()}</span>`).join("") +
       [[8, 6, 22, 0], [40, 2, 28, 2.4], [-5, 30, 18, 4.6], [55, 12, 32, 6.4]].map(([x, y, a, d]) =>
         `<b class="shoot" style="left:${x}%;top:${y}%;--ang:${a}deg;animation-delay:${d}s"></b>`).join("");
     fillRating(card, p);
@@ -864,12 +865,12 @@
     const r = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
     let h = "";
     if (dark) {
-      for (let i = 0; i < 46; i++) h += `<i class="tw" style="left:${r(0, 100)}%;top:${r(0, 100)}%;--s:${r(1.5, 3.6)}px;--t:${r(1.8, 4.2)}s;--dl:-${r(0, 4)}s"></i>`;
-      for (let i = 0; i < 6; i++) h += `<span class="tw big" style="left:${r(4, 96)}%;top:${r(4, 92)}%;--s:${r(12, 20)}px;--t:${r(2.4, 4)}s;--dl:-${r(0, 3)}s">${STAR()}</span>`;
+      for (let i = 0; i < (LITE ? 0 : 20); i++) h += `<i class="tw" style="left:${r(0, 100)}%;top:${r(0, 100)}%;--s:${r(1.5, 3.6)}px;--t:${r(1.8, 4.2)}s;--dl:-${r(0, 4)}s"></i>`;
+      for (let i = 0; i < (LITE ? 2 : 4); i++) h += `<span class="tw big" style="left:${r(4, 96)}%;top:${r(4, 92)}%;--s:${r(12, 20)}px;--t:${r(2.4, 4)}s;--dl:-${r(0, 3)}s">${STAR()}</span>`;
       [[8, 6, 0], [40, 2, 1.7], [22, 30, 3.4]].forEach(([x, y, d]) => (h += `<i class="shoot" style="left:${x}%;top:${y}%;--dl:${d}s"></i>`));
     } else {
       const shapes = [HEART, STAR(), HEART, `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg>`];
-      for (let i = 0; i < 16; i++) h += `<span class="fl" style="left:${r(0, 96)}%;--s:${r(10, 26)}px;--t:${r(7, 13)}s;--dl:-${r(0, 13)}s;--o:${r(0.25, 0.6)};--sw:${r(-40, 40)}px">${shapes[i % shapes.length]}</span>`;
+      for (let i = 0; i < (LITE ? 0 : 8); i++) h += `<span class="fl" style="left:${r(0, 96)}%;--s:${r(10, 26)}px;--t:${r(7, 13)}s;--dl:-${r(0, 13)}s;--o:${r(0.25, 0.6)};--sw:${r(-40, 40)}px">${shapes[i % shapes.length]}</span>`;
     }
     return `<div class="hs-bgfx" aria-hidden="true">${h}</div>`;
   }
@@ -1076,7 +1077,12 @@
     // ?allslides in the address shows every product (handy for checking them all)
     const rest = (sky ? [sky] : []).concat(new URLSearchParams(location.search).has("allslides") ? pool : daily);
     const slides = (occ ? [occasionSlide(occ, hero)] : []).concat(rest.map(productSlide));
-    track.innerHTML = slides.join("");
+    // build the slides without downloading every picture up front: only the first two load now, the rest just before they show
+    const tpl = document.createElement("template");
+    tpl.innerHTML = slides.join("");
+    [...tpl.content.children].forEach((sl, i) => { if (i > 1) sl.querySelectorAll("img[src]").forEach((im) => { im.dataset.src = im.getAttribute("src"); im.removeAttribute("src"); }); });
+    track.replaceChildren(tpl.content);
+    const wake = (sl) => sl && sl.querySelectorAll("img[data-src]").forEach((im) => { im.src = im.dataset.src; im.removeAttribute("data-src"); });
     const els = $$(".hs-slide", track);
     dotsEl.innerHTML = els.map((s, i) => `<button type="button" aria-label="Slide ${i + 1}: ${esc(s.getAttribute("aria-label"))}"><i></i></button>`).join("");
     const dots = $$("button", dotsEl);
@@ -1114,6 +1120,7 @@
       els.forEach((s, i) => { s.classList.toggle("is-active", i === n); s.classList.toggle("is-prev", i === index); s.setAttribute("aria-hidden", i === n ? "false" : "true"); s.inert = i !== n; });
       dots.forEach((d, i) => { d.classList.toggle("on", i === n); d.style.setProperty("--dur", (els[n].dataset.dur || 6000) + "ms"); });
       index = n;
+      wake(els[n]); wake(els[(n + 1) % els.length]);
       // the Lovebook's pages turn over once the gift is unwrapped
       turnPages(els[n]);
       fx.toggle(els[n].classList.contains("hs-occ") && !reduce && heroOnScreen);
@@ -1208,7 +1215,7 @@
     const hero = $(".page-hero"); if (!hero) return;
     const occ = nextOccasion(), D = doodleSvgs();
     const r = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
-    const snow = Array.from({ length: 22 }, () => `<i class="sf" style="left:${r(0, 100)}%;--s:${r(8, 14)}px;--t:${r(8, 14)}s;--dl:-${r(0, 14)}s;--sw:${r(-24, 24)}px">${D.snow}</i>`).join("");
+    const snow = Array.from({ length: LITE ? 8 : 14 }, () => `<i class="sf" style="left:${r(0, 100)}%;--s:${r(8, 14)}px;--t:${r(8, 14)}s;--dl:-${r(0, 14)}s;--sw:${r(-24, 24)}px">${D.snow}</i>`).join("");
     const list = page === "shop"
       ? [[70, 30, 66, "gift", -10], [87, 62, 76, "tree", 6], [93, 20, 32, "star", 0], [60, 78, 52, "candy", 14], [78, 86, 42, "bauble", -8]]
       : [[72, 28, 54, "bauble", 8], [88, 60, 72, "tree", -6], [62, 76, 56, "letter", -8], [93, 20, 30, "star", 0], [80, 88, 40, "gift", 10]];
@@ -1278,7 +1285,7 @@
     const spreads = Array.from({ length: leaves + 1 }, (_, f) => (f === 0 ? [1] : f === leaves ? [n] : [2 * f, 2 * f + 1]));
     sec.hidden = false;
     const r = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
-    const hearts = Array.from({ length: 18 }, (_, i) => `<span class="fl" style="left:${r(2, 96)}%;--s:${r(12, 30)}px;--t:${r(8, 14)}s;--dl:-${r(0, 14)}s;--o:${r(0.35, 0.75)};--sw:${r(-40, 40)}px;color:${["#e0456e", "#f07a9a", "#d42c3c", "#f5a3b8"][i % 4]}">${HEART}</span>`).join("");
+    const hearts = Array.from({ length: LITE ? 6 : 12 }, (_, i) => `<span class="fl" style="left:${r(2, 96)}%;--s:${r(12, 30)}px;--t:${r(8, 14)}s;--dl:-${r(0, 14)}s;--o:${r(0.35, 0.75)};--sw:${r(-40, 40)}px;color:${["#e0456e", "#f07a9a", "#d42c3c", "#f5a3b8"][i % 4]}">${HEART}</span>`).join("");
     const bulbs = Array.from({ length: 26 }, (_, i) => `<i class="b${i % 4}" style="left:${((i + 0.5) / 26 * 100).toFixed(2)}%;--i:${i}"></i>`).join("");
     sec.innerHTML = `
       <div class="wrap">
