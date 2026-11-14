@@ -1184,11 +1184,15 @@
     // on phones, pause while the hero is scrolled out of view
 
     // wait for the page's loading curtain to lift so the first slide's animation is seen in full
-    setTimeout(() => { if (index < 0) go(0); }, 650);
+    go(0);
   }
 
   function homePage() {
     heroSlider();
+    const later = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
+    later(() => { homeBelowFold(); observeReveals(); }, { timeout: 1200 });
+  }
+  function homeBelowFold() {
     homeReviews();
     const words = ["Made with love", "Handcrafted", "Drawn just for you", "One of a kind", "Made to order", "Your story, illustrated", "Little things, big feelings", "Gifts that mean something"];
     const mq = words.map((w) => `<span>${w} ${STAR()}</span>`).join("");

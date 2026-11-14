@@ -1852,3 +1852,11 @@ body:not(.is-leaving) .curtain { animation-delay: 1.2s; }
 }
 /* below-the-fold blocks skip rendering work until they're near the screen */
 .site-footer, .home-reviews + section, #home-reviews ~ .section { content-visibility: auto; contain-intrinsic-size: auto 600px; }
+
+/* ===================== experience score ===================== */
+/* the Lovebook's pages are all painted from the start and simply stacked (the visible one on top),
+   so turning a page doesn't count as a brand-new "largest paint" seconds later */
+.xb-page img { opacity: 1; z-index: 0; }
+.xb-page img.on { z-index: 1; }
+/* a slightly bigger book, so it stays the largest thing painted at load */
+.xb-book { width: clamp(170px, 17.5vw, 240px); }
