@@ -3,7 +3,37 @@
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const money = (n) => STORE.currency + Number(n).toLocaleString("en-IN");
+  /* ---------- Currency: prices are in ₹; visitors can view them in US dollars or UAE dirhams ---------- */
+  const FLAGS = {
+    INR: `<svg viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.67" fill="#FF9933"/><rect y="13.33" width="30" height="6.67" fill="#138808"/><circle cx="15" cy="10" r="2.5" fill="none" stroke="#000080" stroke-width=".8"/><circle cx="15" cy="10" r=".5" fill="#000080"/></svg>`,
+    USD: `<svg viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#B22234"/>${[1, 3, 5, 7, 9, 11].map((i) => `<rect y="${(i * 20 / 13).toFixed(2)}" width="30" height="${(20 / 13).toFixed(2)}" fill="#fff"/>`).join("")}<rect width="12" height="10.77" fill="#3C3B6E"/>${[[2, 2], [5, 2], [8, 2], [3.5, 4.5], [6.5, 4.5], [2, 7], [5, 7], [8, 7]].map(([x, y]) => `<circle cx="${x + 1}" cy="${y + .4}" r=".55" fill="#fff"/>`).join("")}</svg>`,
+    AED: `<svg viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="6.67" fill="#00732F"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><rect y="13.33" width="30" height="6.67" fill="#000"/><rect width="8" height="20" fill="#FF0000"/></svg>`,
+  };
+  const CURRENCIES = { INR: { name: "Indian Rupee", sym: "₹" }, USD: { name: "US Dollar", sym: "$" }, AED: { name: "UAE Dirham", sym: "AED " } };
+  const store = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
+  let CUR = store("tsp-currency");
+  if (!CURRENCIES[CUR]) CUR = "INR";
+  // ₹ → USD / AED. Fallback values, replaced by live rates (cached for 12 hours)
+  let RATES = { USD: 0.0113, AED: 0.0415, t: 0, live: false };
+  try { const c = JSON.parse(store("tsp-rates") || "null"); if (c && c.USD && c.AED) RATES = { ...c, live: true }; } catch (e) {}
+  const inr = (n) => "₹" + Number(n).toLocaleString("en-IN");
+  // international price list: the ₹ price at today's rate, plus a regional uplift (USD +30%, AED +20%)
+  const INTL_UPLIFT = { USD: 1.3, AED: 1.2 };
+  const money = (n) => {
+    if (CUR === "INR") return inr(n);
+    const v = Number(n) * RATES[CUR] * INTL_UPLIFT[CUR];
+    return CURRENCIES[CUR].sym + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+  function refreshRates() {
+    if (RATES.live && Date.now() - (RATES.t || 0) < 12 * 3600e3) return;
+    fetch("https://open.er-api.com/v6/latest/INR").then((r) => r.json()).then((d) => {
+      if (!d || !d.rates || !d.rates.USD || !d.rates.AED) return;
+      const hadLive = RATES.live;
+      RATES = { USD: d.rates.USD, AED: d.rates.AED, t: Date.now(), live: true };
+      store("tsp-rates", JSON.stringify(RATES));
+      if (!hadLive && CUR !== "INR") location.reload(); // first visit in USD/AED: show the live numbers
+    }).catch(() => {});
+  }
   const page = document.body.dataset.page;
 
   /* ---------- Icons ---------- */
@@ -34,7 +64,7 @@
   const igProfile = () => `https://instagram.com/${STORE.instagramHandle}`;
   const productUrl = (p) => `product.html?id=${encodeURIComponent(p.id)}`;
   const buyMessage = (p, format, size) =>
-    `Hi! I'd like to buy "${p.title}"${size ? ` — ${size.label} size` : ""} (${money(size ? size.price : p.price)}${p.unit ? ` for a ${p.unit}` : ""}${p.priceNote ? ", " + p.priceNote.charAt(0).toLowerCase() + p.priceNote.slice(1) : ""})${format ? ` as a ${(format === "print" ? "printed copy" : format === "digital" ? "digital download (PDF + PNG by email)" : "PDF")}` : ""}. Is it available?`;
+    `Hi! I'd like to buy "${p.title}"${size ? ` — ${size.label} size` : ""} (${money(size ? size.price : p.price)}${p.unit ? ` for a ${p.unit}` : ""}${p.priceNote && CUR === "INR" ? ", " + p.priceNote.charAt(0).toLowerCase() + p.priceNote.slice(1) : ""})${format ? ` as a ${(format === "print" ? "printed copy" : format === "digital" ? "digital download (PDF + PNG by email)" : "PDF")}` : ""}. Is it available?`;
 
   /* ---------- Illustrated product previews (used when a product has no photos) ---------- */
   const starPath = (cx, cy, s) =>
@@ -156,6 +186,14 @@
             <span class="nav-social"><a href="${waLink("Hi! I'd love to know more about your products.")}" target="_blank" rel="noopener" aria-label="WhatsApp">${I.wa}</a><a href="${igProfile()}" target="_blank" rel="noopener" aria-label="Instagram">${I.ig}</a></span>
           </div>
         </nav>
+        <div class="cur">
+          <button type="button" class="cur-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Currency: ${CURRENCIES[CUR].name}">${FLAGS[CUR]}<b>${CUR}</b><svg class="cur-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="cur-menu" role="listbox" aria-label="Show prices in">
+            <p class="cur-title">Show prices in</p>
+            ${Object.entries(CURRENCIES).map(([k, c]) => `<button type="button" role="option" class="cur-opt${k === CUR ? " on" : ""}" data-cur="${k}" aria-selected="${k === CUR}">${FLAGS[k]}<span>${c.name}<small>${k}${k === "INR" ? " · ₹" : k === "USD" ? " · $" : ""}</small></span>${k === CUR ? '<i class="cur-tick">✓</i>' : ""}</button>`).join("")}
+            <p class="cur-note">USD and AED prices are for orders from outside India. International shipping costs extra.</p>
+          </div>
+        </div>
         <button class="menu-btn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
       </div>`;
     document.body.prepend(header);
@@ -228,6 +266,19 @@
     menuBtn.addEventListener("click", () => setMenu(!document.body.classList.contains("menu-open")));
     addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
     addEventListener("resize", () => { if (innerWidth > 820) setMenu(false); });
+    const cur = $(".cur", header), curBtn = $(".cur-btn", header);
+    const setCurOpen = (open) => { cur.classList.toggle("open", open); curBtn.setAttribute("aria-expanded", String(open)); };
+    curBtn.addEventListener("click", (e) => { e.stopPropagation(); setCurOpen(!cur.classList.contains("open")); });
+    document.addEventListener("click", (e) => { if (!cur.contains(e.target)) setCurOpen(false); });
+    addEventListener("keydown", (e) => { if (e.key === "Escape") setCurOpen(false); });
+    $$(".cur-opt", header).forEach((o) => o.addEventListener("click", () => {
+      const k = o.dataset.cur;
+      setCurOpen(false);
+      if (k === CUR) return;
+      store("tsp-currency", k);
+      location.reload();
+    }));
+    refreshRates();
     const onScroll = () => header.classList.toggle("scrolled", scrollY > 10);
     addEventListener("scroll", onScroll, { passive: true }); onScroll();
   }
